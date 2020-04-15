@@ -138,26 +138,31 @@
                 header, data,
                 parts = ref.split('#'),
                 xhr = new XMLHttpRequest,
-                xhrUpload = xhr.upload, fn;
+                xhrUpload = xhr.upload, fn,
+                defaultResponseType = state.type || 'document',
+                blobResponseType = 'blob',
+                jsonResponseType = 'json',
+                textResponseType = 'text';
+            xhr.responseType = ({
+                'apng': blobResponseType,
+                'asp': defaultResponseType,
+                'gif': blobResponseType,
+                'htm': defaultResponseType,
+                'html': defaultResponseType,
+                'jpeg': blobResponseType,
+                'jpg': blobResponseType,
+                'json': jsonResponseType,
+                'log': textResponseType,
+                'mp3': blobResponseType,
+                'mp4': blobResponseType,
+                'php': defaultResponseType,
+                'png': blobResponseType,
+                'svg': defaultResponseType,
+                'txt': textResponseType,
+                'xml': defaultResponseType
+            })[ref.split('/').pop().split('.').pop()] || defaultResponseType;
             function setData() {
-                var lot = toResponseHeadersAsObject(xhr),
-                    defaultType = 'document';
-                // Automatic response type based on MIME type
-                xhr.responseType = toCaseLower(({
-                    'application/atom+xml': defaultType,
-                    'application/json': 'json',
-                    'application/mathml+xml': defaultType,
-                    'application/octet-stream': 'blob',
-                    'application/rss+xml': defaultType,
-                    'application/xhtml+xml': defaultType,
-                    'application/xml': defaultType,
-                    'application/xslt+xml': defaultType,
-                    'image/svg+xml': defaultType,
-                    'svg': defaultType,
-                    'text/html': defaultType,
-                    'text/xml': defaultType
-                })[lot['Content-Type']] || 'text');
-                $.lot = lot;
+                $.lot = toResponseHeadersAsObject(xhr);
                 $.status = xhr.status;
             }
             xhr.open(type, ref, true);
@@ -167,18 +172,18 @@
                 }
             }
             eventSet(xhr, 'abort', function() {
-                hookFire('abort', [xhr.response, node]);
+                setData(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
                 data = [xhr.response, node];
-                hookFire('error', data);
+                setData(), hookFire('error', data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet();
             });
             eventSet(xhrUpload, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
                 data = [xhr.response, node];
-                hookFire($.status, data), hookFire('success', data);
+                setData(), hookFire($.status, data), hookFire('success', data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet();
                 // Jump to the hash position
@@ -192,13 +197,10 @@
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
-                hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+                setData(), hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             eventSet(xhrUpload, 'progress', function(e) {
-                hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
-            });
-            eventSet(xhr, 'readystatechange', function() {
-                /* xhr.HEADERS_RECEIVED */ 2 === xhr.readyState && setData();
+                setData(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             // eventSet(xhr, 'timeout', fn = function() {});
             // eventSet(xhrUpload, 'timeout', fn);
