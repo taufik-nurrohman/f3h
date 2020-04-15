@@ -2,83 +2,258 @@
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
+    <meta content="Load pages asynchronously while maintaining the principles of progressive enhancement." name="description">
+    <title>F3H</title>
     <link href="favicon.ico" rel="icon">
-    <title>Home &middot; F3H</title>
     <style>
     * {
-      margin: 0;
-      padding: 0;
-      list-style: none;
       box-sizing: border-box;
     }
     :root {
-      background: #000;
-      color: #eee;
-      font-family: sans-serif;
+      background: #fff;
+      color: #000;
+      border-top: 4px solid;
+      font: normal normal 16px/1.25 serif;
     }
     a {
-      color: #f69;
+      color: #009;
       text-decoration: none;
     }
-    body {
+    a, code {
+      word-wrap: break-word;
+    }
+    code {
+      font-family: monospace;
+      font-size: 80%;
+    }
+    footer, header, main, nav {
       max-width: 700px;
       margin: 0 auto;
-      padding: 5%;
     }
-    form, h1, h2, h3, h4, h5, h6, nav, p {
-      margin: 0 0 1rem;
+    hr {
+      border: 0;
+      color: inherit;
+      border-top: 1px dashed;
+      height: 0;
     }
-    nav ul {
-      display: flex;
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
-    nav li {
-      margin: 0 1.5em 0 0;
+    pre code {
+      display: block;
+      background: #eee;
+      padding: 1em;
     }
-    nav li:last-child {
-      margin-right: 0;
+    table {
+      width: 100%;
+    }
+    td, th {
+      text-align: left;
+      vertical-align: top;
+    }
+    body > p:first-child {
+      background: #ffa;
+      border: 1px dashed;
+      margin-top: 0;
+      padding: .75em 1em;
     }
     </style>
   </head>
   <body>
-    <nav>
-      <ul>
-        <li><span>Home</span></li>
-        <li><a href="/f3h/about.html">About</a></li>
-        <li><a href="/f3h/archive.html">Archive</a></li>
-        <li><a href="/f3h/contact.html">Contact</a></li>
-        <li><a href="/f3h/error.html">Error</a></li>
-      </ul>
-    </nav>
+    <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
+    <header>
+      <h1>F3H v1.0.0-dev</h1>
+      <p>You can read <abbr title="Fetch">F3H</abbr> as how you would read <abbr title="Accessibility">A11Y</abbr> and <abbr title="Internationalization">I18N</abbr>.</p>
+      <p>Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will save those data into the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable basic AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.</p>
+      <hr>
+    </header>
     <main>
-      <h1>Home</h1>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
-      <p>Nam liber tempor cum soluta <a href="/f3h/contact.html">internal link</a> nobis eleifend <a href="/f3h/archive.html#archive:2016">internal link with hash</a> option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius <a href="/f3h/contact.html" target="_blank">internal link with <code>target</code> attribute</a> quod ii <a href="https://example.com">external link</a> legunt saepius. Claritas est etiam processus <a href="https://example.com" target="_blank">external link with <code>target</code> attribute</a> dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
-    </main>
-    <script src="f3h.js"></script>
-    <script>
-
-    var f3h = new F3H,
-        main = document.querySelector('main'),
-        nav = document.querySelector('nav');
-
-    f3h.on('exit', function() {
-        document.title = 'Loading…';
+      <p>Progressive enhancement is a design principle that is focused in ensuring the availability of web page content in the most limited conditions, and if possible, to provide the most maximum features when the conditions are supportive. By enhancing features while maintaining the basic functions of HTML pages, this concept will ensure that if your advanced JavaScript features cannot work optimally under certain conditions, then at least the web page content that you want to provide is still accessible to most users.</p>
+      <p><a href="example-1/index.html" target="_blank">View Demo</a></p>
+      <h2>Features</h2>
+      <ul>
+        <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
+        <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
+        <li>There will be no complicated settings. This application simply provides an AJAX response as HTML elements from the page that has been successfully loaded into the callback function parameters. With the basic knowledge of accessing the DOM and manipulating it, you can use this application to the fullest.</li>
+      </ul>
+      <h2>Usage</h2>
+      <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html dir="ltr"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;main id="content"&gt;
+      &lt;p&gt;Lorem &lt;a href="/path-to-internal-page"&gt;ipsum&lt;/a&gt; dolor sit amet.&lt;/p&gt;
+    &lt;/main&gt;
+    &lt;script src="<a href="f3h.min.js" target="_blank">f3h.min.js</a>"&gt;&lt;/script&gt;
+    &lt;script&gt;
+    let f3h = new F3H,
+        content = document.querySelector('#content');
+    f3h.on('success', function(response) {
+        document.title = response.title;
+        content.innerHTML = response.querySelector('#content').innerHTML;
     });
-
-    f3h.on('success', function(response, source) {
-        if (404 !== this.status) {
-            document.title = response.title;
-            main.innerHTML = response.querySelector('main').innerHTML;
-            nav.innerHTML = response.querySelector('nav').innerHTML;
-        } else {
-            document.title = 'Error 404';
-            main.innerHTML = '<h1>Error 404</h1><p>Page not found.</p>';
-            source.style.textDecoration = 'line-through';
-            source.removeAttribute('href');
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <h2>Examples</h2>
+      <ul>
+        <li><a href="example-0/index.html" target="_blank">No Idea?</a></li>
+        <li>Apply Events to Specific Elements</li>
+        <li>Progress Animation Example</li>
+        <li>Page Example with Inline JavaScript</li>
+        <li>Form Example</li>
+        <li>Infinite Scroll Example</li>
+      </ul>
+      <h2>Settings</h2>
+      <pre><code>let f3h = new F3H(<var>state</var> = {
+        sources: 'a[href], form[action]',
+        is: source =&gt; { &hellip; },
+        lot: {
+            'X-Requested-With': 'F3H'
         }
-    });
+    });</code></pre>
+      <ul>
+        <li><var>state</var> &rarr; The configuration data.</li>
+        <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
+        <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
+        <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
+      </ul>
+      <h2>Methods and Properties</h2>
+      <h3>F3H.version</h3>
+      <p>Return the application version.</p>
+      <pre><code>let version = F3H.version,
+    major = version.split('.')[0];
 
-    </script>
+if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>F3H.instances</h3>
+      <p>Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.</p>
+      <pre><code>for (let key in F3H.instances) {
+    console.log(key);
+    console.log(F3H.instances[key]);
+}</code></pre>
+      <h3>F3H._</h3>
+      <p>Alias of <code>F3H.prototype</code> used to formalize the prototype creation.</p>
+      <pre><code>// Create `cancelAllRequests()` method
+F3H._.cancelAllRequests = function() {
+    return this.abort();
+};</code></pre>
+      <h3>f3h.state</h3>
+      <p>Return the modified application states.</p>
+      <h3>f3h.lot</h3>
+      <p>Return the HTTP response headers as object.</p>
+      <pre><code>f3h.on('success', function(response) {
+    console.log(this.lot);
+});</code></pre>
+      <h3>f3h.status</h3>
+      <p>Return the HTTP response status.</p>
+      <pre><code>f3h.on('success', function(response) {
+    if (404 === this.status) {
+        // Handle 404 page
+    } else {
+        // Handle normal page
+    }
+});</code></pre>
+      <h3>f3h.sources</h3>
+      <p>Return the current selected HTML elements.</p>
+      <pre><code>console.log(f3h.sources);</code></pre>
+      <h3>f3h.abort(id)</h3>
+      <p>Abort requests.</p>
+      <pre><code>f3h.abort(); // Abort all requests
+f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/asdf`</code></pre>
+      <h3>f3h.pop()</h3>
+      <p>Remove all AJAX events from the page.</p>
+      <h2>Hooks</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>abort</code></td>
+            <td>Will be triggered on AJAX aborting event.</td>
+          </tr>
+          <tr>
+            <td><code>enter</code></td>
+            <td>Will be triggered on AJAX sending event.</td>
+          </tr>
+          <tr>
+            <td><code>exit</code></td>
+            <td>Will be triggered on the next AJAX loading event. e.g. just after user clicks on a link.</td>
+          </tr>
+          <tr>
+            <td><code>error</code></td>
+            <td>Will be triggered on AJAX loading error event.</td>
+          </tr>
+          <tr>
+            <td><code>pop</code></td>
+            <td>Will be triggered after <code>f3h.pop()</code>.</td>
+          </tr>
+          <tr>
+            <td><code>pull</code></td>
+            <td>Will be triggered on AJAX downloading progress event (for the <code>GET</code> requests).</td>
+          </tr>
+          <tr>
+            <td><code>push</code></td>
+            <td>Will be triggered on AJAX uploading progress event (for the <code>POST</code> requests).</td>
+          </tr>
+          <tr>
+            <td><code>success</code></td>
+            <td>Will be triggered on AJAX loading success event, with any page status.</td>
+          </tr>
+          <tr>
+            <td><code>200</code></td>
+            <td>Will be triggered on AJAX loading event, with the page status of <code>200</code>.</td>
+          </tr>
+          <tr>
+            <td><code>404</code></td>
+            <td>Will be triggered on AJAX loading event, with the page status of <code>404</code>.</td>
+          </tr>
+          <tr>
+            <td><code>*</code></td>
+            <td>Will be triggered on AJAX loading event, with the page status of <code>*</code> where <code>*</code> is a HTTP status code as described in the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" rel="nofollow" target="_blank">HTTP status code reference</a>.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>f3h.hooks</h3>
+      <p>Return the added hooks.</p>
+      <pre><code>console.log(f3h.hooks);</code></pre>
+      <h3>f3h.on(name, fn)</h3>
+      <p>Add a new hook.</p>
+      <pre><code>f3h.on('success', function(response) {
+    console.log(response);
+});</code></pre>
+      <pre><code>function onSuccess(response) {
+    console.log(response);
+}
+
+f3h.on('success', onSuccess); // With context</code></pre>
+      <h3>f3h.off(name, fn)</h3>
+      <p>Remove a hook.</p>
+      <pre><code>f3h.off('success');</code></pre>
+      <pre><code>f3h.off('success', onSuccess); // With context</code></pre>
+      <h3>f3h.fire(name, lot)</h3>
+      <p>Trigger hooks.</p>
+      <pre><code>f3h.fire('success', [document, window]);</code></pre>
+      <h2>License</h2>
+      <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
+      <p>Thank you! ❤️</p>
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+        <input name="cmd" value="_s-xclick" type="hidden">
+        <input name="hosted_button_id" value="TNVGH7NQ7E4EU" type="hidden">
+        <p><button type="submit" class="button">Donate</button></p>
+      </form>
+    </main>
+    <footer>
+      <hr>
+      <p>&copy; 2020 <a href="/">Taufik Nurrohman</a></p>
+    </footer>
   </body>
 </html>

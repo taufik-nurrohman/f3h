@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H (FETCH) 0.0.0
+ *  F3H 1.0.0-dev
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -9,10 +9,18 @@
 
 (function(win, doc, name) {
 
-    var instances = 'instances';
+    var GET = 'GET',
+        POST = 'POST',
+
+        html = doc.documentElement,
+        instances = 'instances';
 
     function attributeGet(node, attr) {
         return node.getAttribute(attr);
+    }
+
+    function eventNameGet(node) {
+        return isNodeForm(node) ? 'submit' : 'click';
     }
 
     function doPreventDefault(e) {
@@ -29,6 +37,10 @@
 
     function isFunction(x) {
         return 'function' === typeof x;
+    }
+
+    function isNodeForm(x) {
+        return 'form' === toCaseLower(x.nodeName);
     }
 
     function isSet(x) {
@@ -51,13 +63,31 @@
         return x.toUpperCase();
     }
 
+    function toResponseHeadersAsObject(xhr) {
+        var out = {},
+            headers = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/),
+            header, h;
+        for (header in headers) {
+            h = headers[header].split(': ');
+            out[h.shift().replace(/(^|-)(\w)/g, function(m0, m1, m2) {
+                return m1 + toCaseUpper(m2);
+            })] = h.join(': ');
+        }
+        return out;
+    }
+
     (function($$) {
 
-        $$.version = '0.0.0';
+        $$.version = '1.0.0-dev';
 
         $$[instances] = {};
 
+        $$._ = $$.prototype;
+
     })(win[name] = function(o) {
+
+        // Prevent window from jumping to the top whenever user tries to hit the back or forward button
+        win.history.scrollRestoration = 'manual';
 
         var $ = this,
             $$ = win[name],
@@ -68,13 +98,13 @@
             sources = {},
             state = {
                 'sources': 'a[href],form[action]',
-                'is': function(element) {
-                    var target = element.target,
-                        to = attributeGet(element, 'href') || attributeGet(element, 'action');
+                'is': function(source) {
+                    var target = source.target,
+                        to = attributeGet(source, 'href') || attributeGet(source, 'action');
                     if (target && target !== '_self') {
                         return false;
                     }
-                    return "" === to || -1 !== ['.', '/', '?'].indexOf(to[0]) || 0 === to.search(home) || 0 === to.search(win.location.protocol + home);
+                    return "" === to || -1 !== ['.', '/', '?'].indexOf(to[0]) || 0 === to.search(home) || 0 === to.search(win.location.protocol + home) || -1 === to.search('://');
                 },
                 'lot': {
                     'X-Requested-With': name
@@ -98,47 +128,85 @@
         state = Object.assign(state, o);
         sources = sourcesGet(state.sources);
 
+        // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
             hookFire('exit', [doc, node]);
-            var headers = state.lot,
+            var body = doc.body,
+                headers = state.lot,
                 header, data,
                 parts = ref.split('#'),
-                xhr = new XMLHttpRequest;
-            xhr.responseType = state.type || 'document';
-            xhr.open(type, ref);
+                xhr = new XMLHttpRequest,
+                xhrUpload = xhr.upload, fn;
+            function setData() {
+                var lot = toResponseHeadersAsObject(xhr),
+                    defaultType = 'document';
+                // Automatic response type based on MIME type
+                xhr.responseType = toCaseLower(({
+                    'application/atom+xml': defaultType,
+                    'application/json': 'json',
+                    'application/mathml+xml': defaultType,
+                    'application/octet-stream': 'blob',
+                    'application/rss+xml': defaultType,
+                    'application/xhtml+xml': defaultType,
+                    'application/xml': defaultType,
+                    'application/xslt+xml': defaultType,
+                    'image/svg+xml': defaultType,
+                    'text/html': defaultType,
+                    'text/xml': defaultType
+                })[lot['Content-Type']] || 'text');
+                $.lot = lot;
+                $.status = xhr.status;
+            }
+            xhr.open(type, ref, true);
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
                 }
             }
-            xhr.onload = function() {
-                data = [xhr.response, node];
-                hookFire($.status = xhr.status, data);
-                hookFire('success', data);
-                sources = sourcesGet(state.sources);
-                onSourcesEventsSet();
-                if (parts[1]) {
-                    var target = doc.getElementById(parts[1]);
-                    if (target) {
-                        doc.documentElement.scrollLeft = doc.body.scrollLeft = target.offsetLeft;
-                        doc.documentElement.scrollTop = doc.body.scrollTop = target.offsetTop;
-                    }
-                }
-            };
-            xhr.onerror = function() {
+            eventSet(xhr, 'abort', function() {
+                hookFire('abort', [xhr.response, node]);
+            });
+            eventSet(xhr, 'error', fn = function() {
                 data = [xhr.response, node];
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet();
-            }
-            xhr.send('POST' === type ? new FormData(node) : null);
+            });
+            eventSet(xhrUpload, 'error', fn);
+            eventSet(xhr, 'load', fn = function() {
+                data = [xhr.response, node];
+                hookFire($.status, data), hookFire('success', data);
+                sources = sourcesGet(state.sources);
+                onSourcesEventsSet();
+                // Jump to the hash position
+                if (parts[1]) {
+                    var target = doc.getElementById(parts[1]) || doc.getElementsByName(parts[1])[0];
+                    if (target) {
+                        html.scrollLeft = body.scrollLeft = target.offsetLeft;
+                        html.scrollTop = body.scrollTop = target.offsetTop;
+                    }
+                }
+            });
+            eventSet(xhrUpload, 'load', fn);
+            eventSet(xhr, 'progress', function(e) {
+                hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+            });
+            eventSet(xhrUpload, 'progress', function(e) {
+                hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+            });
+            eventSet(xhr, 'readystatechange', function() {
+                /* xhr.HEADERS_RECEIVED */ 2 === xhr.readyState && setData();
+            });
+            // eventSet(xhr, 'timeout', fn = function() {});
+            // eventSet(xhrUpload, 'timeout', fn);
+            xhr.send(POST === type ? new FormData(node) : null);
+            hookFire('enter', [doc, node]);
             return xhr;
         }
 
         function doFetchAbort(id) {
             if (requests[id]) {
                 requests[id][0].abort();
-                hookFire('abort', [doc, requests[id][1]]);
                 delete requests[id];
             }
         }
@@ -202,8 +270,8 @@
                 href = t.href,
                 action = t.action,
                 ref = href || action,
-                type = toCaseUpper(t.method || 'GET');
-            if ('GET' === type && 'popstate' !== e.type) {
+                type = toCaseUpper(t.method || GET);
+            if (GET === type && 'popstate' !== e.type) {
                 doRefChange(t, href);
             }
             requests[ref] = [doFetch(t, type, ref), t];
@@ -214,13 +282,19 @@
             doFetchAbortAll();
             var href = e.state ? e.state.ref : ref;
             if (href) {
-                requests[href] = [doFetch(win, 'GET', href), win];
+                requests[href] = [doFetch(win, GET, href), win];
+            }
+        }
+
+        function onSourcesEventsLet() {
+            for (var i = 0, j = sources.length; i < j; ++i) {
+                eventLet(sources[i], eventNameGet(sources[i]), onFetch);
             }
         }
 
         function onSourcesEventsSet() {
             for (var i = 0, j = sources.length; i < j; ++i) {
-                eventSet(sources[i], 'FORM' === toCaseUpper(sources[i].nodeName) ? 'submit' : 'click', onFetch);
+                eventSet(sources[i], eventNameGet(sources[i]), onFetch);
             }
         }
 
@@ -234,14 +308,17 @@
         };
 
         $.pop = function() {
-            return eventLet(win, 'popstate', onPopState), hookFire('pop', [doc, win]), $;
+            onSourcesEventsLet();
+            return eventLet(win, 'popstate', onPopState), hookFire('pop', [doc, win]), $.abort();
         };
 
         $.fire = hookFire;
         $.hooks = hooks;
+        $.lot = {};
         $.off = hookLet;
         $.on = hookSet;
         $.sources = sources;
+        $.state = state;
         $.status = null;
 
         eventSet(win, 'DOMContentLoaded', onSourcesEventsSet);

@@ -1,0 +1,7 @@
+{
+  "foo": {
+    "bar": "Lorem ipsum dolor sit amet.",
+    "baz": 200,
+    "qux": true
+  }
+}
