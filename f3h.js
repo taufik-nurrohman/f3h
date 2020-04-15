@@ -66,12 +66,14 @@
     function toResponseHeadersAsObject(xhr) {
         var out = {},
             headers = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/),
-            header, h;
+            header, h, k, v;
         for (header in headers) {
             h = headers[header].split(': ');
-            out[h.shift().replace(/(^|-)(\w)/g, function(m0, m1, m2) {
+            k = h.shift().replace(/(^|-)(\w)/g, function(m0, m1, m2) {
                 return m1 + toCaseUpper(m2);
-            })] = h.join(': ');
+            });
+            v = h.join(': ');
+            out[k] = /^-?(\d+?\.)?\d+$/.test(v) ? +v : v;
         }
         return out;
     }
@@ -101,7 +103,7 @@
                 'is': function(source) {
                     var target = source.target,
                         to = attributeGet(source, 'href') || attributeGet(source, 'action');
-                    if (target && target !== '_self') {
+                    if (target && '_self' !== target) {
                         return false;
                     }
                     return "" === to || -1 !== ['.', '/', '?'].indexOf(to[0]) || 0 === to.search(home) || 0 === to.search(win.location.protocol + home) || -1 === to.search('://');
@@ -131,7 +133,8 @@
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
             hookFire('exit', [doc, node]);
-            var body = doc.body,
+            var x = ref.split('/').pop().split('.').pop(), // Get file extension
+                body = doc.body,
                 headers = state.lot,
                 header, data,
                 parts = ref.split('#'),
@@ -150,10 +153,15 @@
                     'application/xhtml+xml': defaultType,
                     'application/xml': defaultType,
                     'application/xslt+xml': defaultType,
+                    'htm': defaultType,
+                    'html': defaultType,
                     'image/svg+xml': defaultType,
+                    'json': 'json',
+                    'svg': defaultType,
                     'text/html': defaultType,
-                    'text/xml': defaultType
-                })[lot['Content-Type']] || 'text');
+                    'text/xml': defaultType,
+                    'xml': defaultType
+                })[x || lot['Content-Type']] || 'text');
                 $.lot = lot;
                 $.status = xhr.status;
             }
@@ -223,7 +231,7 @@
         function doRefChange(el, ref) {
             win.history.pushState({
                 ref: ref
-            }, doc.title, ref);
+            }, "", ref);
         }
 
         function hookLet(name, fn) {
