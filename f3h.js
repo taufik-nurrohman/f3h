@@ -143,7 +143,9 @@
                 blobResponseType = 'blob',
                 jsonResponseType = 'json',
                 textResponseType = 'text';
+            // Automatic response type based on file extension
             xhr.responseType = ({
+                "": defaultResponseType, // No extension, treat as HTML
                 'apng': blobResponseType,
                 'asp': defaultResponseType,
                 'gif': blobResponseType,
@@ -152,24 +154,22 @@
                 'jpeg': blobResponseType,
                 'jpg': blobResponseType,
                 'json': jsonResponseType,
-                'log': textResponseType,
                 'mp3': blobResponseType,
                 'mp4': blobResponseType,
                 'php': defaultResponseType,
                 'png': blobResponseType,
                 'svg': defaultResponseType,
-                'txt': textResponseType,
                 'xml': defaultResponseType
-            })[ref.split('/').pop().split('.').pop()] || defaultResponseType;
-            function setData() {
-                $.lot = toResponseHeadersAsObject(xhr);
-                $.status = xhr.status;
-            }
+            })[ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""] || textResponseType;
             xhr.open(type, ref, true);
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
                 }
+            }
+            function setData() {
+                $.lot = toResponseHeadersAsObject(xhr);
+                $.status = xhr.status;
             }
             eventSet(xhr, 'abort', function() {
                 setData(), hookFire('abort', [xhr.response, node]);
