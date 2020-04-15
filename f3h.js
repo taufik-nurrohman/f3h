@@ -133,8 +133,7 @@
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
             hookFire('exit', [doc, node]);
-            var x = ref.split('/').pop().split('.').pop(), // Get file extension
-                body = doc.body,
+            var body = doc.body,
                 headers = state.lot,
                 header, data,
                 parts = ref.split('#'),
@@ -153,15 +152,11 @@
                     'application/xhtml+xml': defaultType,
                     'application/xml': defaultType,
                     'application/xslt+xml': defaultType,
-                    'htm': defaultType,
-                    'html': defaultType,
                     'image/svg+xml': defaultType,
-                    'json': 'json',
                     'svg': defaultType,
                     'text/html': defaultType,
-                    'text/xml': defaultType,
-                    'xml': defaultType
-                })[x || lot['Content-Type']] || 'text');
+                    'text/xml': defaultType
+                })[lot['Content-Type']] || 'text');
                 $.lot = lot;
                 $.status = xhr.status;
             }
