@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <title>Home</title>
+    <style>
+
+    .progress {
+      position: fixed;
+      top: .25em;
+      right: .25em;
+      left: .25em;
+      pointer-events: none;
+    }
+
+    .progress span {
+      display: block;
+      float: left;
+      width: 0;
+      height: .25em;
+      background: #00f;
+      transition: width .25s ease-out;
+    }
+
+    .progress span.success {
+      background: #0f0;
+    }
+
+    .progress span.error {
+      background: #f00;
+    }
+
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="test.html">Test!</a></p>
+    </main>
+    <script src="../f3h.min.js"></script>
+    <script>
+
+    var f3h = new F3H,
+        main = document.querySelector('main'),
+        progress = document.createElement('div'),
+        bar = document.createElement('span');
+
+    progress.className = 'progress';
+
+    progress.appendChild(bar);
+    document.body.appendChild(progress);
+
+    f3h.on('error', function() {
+        bar.style.width = '100%';
+        bar.classList.add('error');
+    });
+
+    f3h.on('exit', function() {
+        bar.classList.remove('error');
+        bar.classList.remove('success');
+    });
+
+    f3h.on('pull', function(from, to) {
+        bar.style.width = ((to / from) * 100) + '%';
+    });
+
+    f3h.on('success', function(response) {
+        document.title = response.title;
+        main.innerHTML = response.querySelector('main').innerHTML;
+        bar.classList.add('success');
+        setTimeout(function() {
+            bar.style.display = 'none';
+            bar.style.width = 0;
+        }, 1000);
+        setTimeout(function() {
+            bar.style.display = "";
+        }, 1200);
+    });
+
+    </script>
+  </body>
+</html>
