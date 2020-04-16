@@ -12,7 +12,12 @@
     var GET = 'GET',
         POST = 'POST',
 
+        responseTypeHTML = 'document',
+        responseTypeJSON = 'json',
+        responseTypeTXT = 'text',
+
         html = doc.documentElement,
+        home = '//' + win.location.hostname,
         instances = 'instances';
 
     function attributeGet(node, attr) {
@@ -82,11 +87,48 @@
 
         $$.version = '1.0.0-dev';
 
+        $$.state = {
+            'sources': 'a[href],form[action]',
+            'is': function(source) {
+                var target = source.target,
+                    src = 'search',
+                    to = attributeGet(source, 'href') || attributeGet(source, 'action');
+                if (target && '_self' !== target) {
+                    return false;
+                }
+                if (0 === to[src](/(data|javascript|mailto):/)) {
+                    return false;
+                }
+                return "" === to ||
+                    0 === to[src](/[.\/?]/) ||
+                    0 === to[src](home) ||
+                    0 === to[src](win.location.protocol + home) ||
+                    0 !== to[src]('://');
+            },
+            'lot': {
+                'X-Requested-With': name
+            },
+            'types': {
+                "": responseTypeHTML, // Default response type for extension-less URL
+                'ASP': responseTypeHTML,
+                'HTM': responseTypeHTML,
+                'HTML': responseTypeHTML,
+                'JSON': responseTypeJSON,
+                'PHP': responseTypeHTML,
+                'XML': responseTypeHTML
+            }
+        };
+
         $$[instances] = {};
 
         $$._ = $$.prototype;
 
     })(win[name] = function(o) {
+
+        // Drop feature(s) in legacy JavaScript environment
+        if (!(win.history && win.history.pushState)) {
+            return;
+        }
 
         // Prevent window from jumping to the top whenever user tries to hit the back or forward button
         win.history.scrollRestoration = 'manual';
@@ -94,24 +136,10 @@
         var $ = this,
             $$ = win[name],
             hooks = {},
-            home = '//' + win.location.hostname,
             ref = refGet(),
             requests = {},
-            sources = {},
-            state = {
-                'sources': 'a[href],form[action]',
-                'is': function(source) {
-                    var target = source.target,
-                        to = attributeGet(source, 'href') || attributeGet(source, 'action');
-                    if (target && '_self' !== target) {
-                        return false;
-                    }
-                    return "" === to || -1 !== ['.', '/', '?'].indexOf(to[0]) || 0 === to.search(home) || 0 === to.search(win.location.protocol + home) || -1 === to.search('://');
-                },
-                'lot': {
-                    'X-Requested-With': name
-                }
-            };
+            state = Object.assign({}, $$.state, (o || {})),
+            sources = sourcesGet(state.sources);
 
         // Return new instance if `F3H` was called without the `new` operator
         if (!($ instanceof $$)) {
@@ -123,44 +151,26 @@
 
         function sourcesGet(query, root) {
             return Array.from((root || doc).querySelectorAll(query)).filter(state.is || function() {
-                return false;
+                return true;
             });
         }
 
-        state = Object.assign(state, o);
-        sources = sourcesGet(state.sources);
-
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
+            $.ref = ref;
             hookFire('exit', [doc, node]);
             var body = doc.body,
                 headers = state.lot,
                 header, data,
                 parts = ref.split('#'),
                 xhr = new XMLHttpRequest,
-                xhrUpload = xhr.upload, fn,
-                defaultResponseType = state.type || 'document',
-                blobResponseType = 'blob',
-                jsonResponseType = 'json',
-                textResponseType = 'text';
-            // Automatic response type based on file extension
-            xhr.responseType = ({
-                "": defaultResponseType, // No extension, treat as HTML
-                'apng': blobResponseType,
-                'asp': defaultResponseType,
-                'gif': blobResponseType,
-                'htm': defaultResponseType,
-                'html': defaultResponseType,
-                'jpeg': blobResponseType,
-                'jpg': blobResponseType,
-                'json': jsonResponseType,
-                'mp3': blobResponseType,
-                'mp4': blobResponseType,
-                'php': defaultResponseType,
-                'png': blobResponseType,
-                'svg': defaultResponseType,
-                'xml': defaultResponseType
-            })[ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""] || textResponseType;
+                xhrUpload = xhr.upload, fn;
+            // Automatic response type by file extension
+            var responseType = state.types[toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || "")] || responseTypeTXT;
+            if (isFunction(responseType)) {
+                responseType = responseType.call($, ref);
+            }
+            xhr.responseType = responseType;
             xhr.open(type, ref, true);
             if (headers && headers.length) {
                 for (header in headers) {
@@ -322,6 +332,7 @@
         $.lot = {};
         $.off = hookLet;
         $.on = hookSet;
+        $.ref = null;
         $.sources = sources;
         $.state = state;
         $.status = null;

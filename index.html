@@ -77,7 +77,7 @@
       <ul>
         <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
         <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
-        <li>There will be no complicated settings. This application simply provides an AJAX response as HTML elements from the page that has been successfully loaded into the callback function parameters. With the basic knowledge of accessing the DOM and manipulating it, you can use this application to the fullest.</li>
+        <li>Accessible AJAX response as generic HTML elements (by default). With the basic JavaScript knowledge on accessing the DOM and manipulating it, you can use this application like a pro.</li>
       </ul>
       <h2>Usage</h2>
       <pre><code>&lt;!DOCTYPE html&gt;
@@ -104,7 +104,7 @@
       <ul>
         <li><a href="example-0/index.html" target="_blank">No Idea?</a></li>
         <li>Apply Events to Specific Elements</li>
-        <li>Progress Animation Example</li>
+        <li><a href="example-3/index.html" target="_blank">Progress Animation Example</a></li>
         <li>Page Example with Inline JavaScript</li>
         <li>Form Example</li>
         <li>Infinite Scroll Example</li>
@@ -115,13 +115,15 @@
         is: source =&gt; { &hellip; },
         lot: {
             'X-Requested-With': 'F3H'
-        }
+        },
+        types: { &hellip; }
     });</code></pre>
       <ul>
         <li><var>state</var> &rarr; The configuration data.</li>
         <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
+        <li><var>state.types</var> &rarr; List of file extensions with the expected response type.</li>
       </ul>
       <h2>Methods and Properties</h2>
       <h3>F3H.version</h3>
@@ -130,6 +132,13 @@
     major = version.split('.')[0];
 
 if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>F3H.state</h3>
+      <p>This property stores the initial values of <code>f3h.state</code>.</p>
+      <pre><code>let f3h = new F3H({
+        foo: ['bar', 'baz', 'qux']
+    });
+
+console.log([F3H.state, f3h.state]);</code></pre>
       <h3>F3H.instances</h3>
       <p>Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.</p>
       <pre><code>for (let key in F3H.instances) {
@@ -198,11 +207,11 @@ f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/
           </tr>
           <tr>
             <td><code>pull</code></td>
-            <td>Will be triggered on AJAX downloading progress event (for the <code>GET</code> requests).</td>
+            <td>Will be triggered on AJAX downloading progress event (GET requests only).</td>
           </tr>
           <tr>
             <td><code>push</code></td>
-            <td>Will be triggered on AJAX uploading progress event (for the <code>POST</code> requests).</td>
+            <td>Will be triggered on AJAX uploading progress event (POST requests only).</td>
           </tr>
           <tr>
             <td><code>success</code></td>
@@ -242,6 +251,51 @@ f3h.on('success', onSuccess); // With context</code></pre>
       <h3>f3h.fire(name, lot)</h3>
       <p>Trigger hooks.</p>
       <pre><code>f3h.fire('success', [document, window]);</code></pre>
+      <h2>Frequently Asked Questions</h2>
+      <p><b>Can I mimic POST request via standard links?</b></p>
+      <p>My purpose in making this application is to improve the standard navigation system on a HTML document that already able to work without AJAX features. To mimic POST request on standard links isn&rsquo;t natural and can cause unwanted responses when the AJAX feature does not work due to certain conditions.</p>
+      <p>However, you can still send POST requests via standard links as long as you have a server-side language that capable of doing that. For example, with PHP server-side language, you can use the <code>curl</code> extension to send POST request even without submitting a form:</p>
+      <pre><code>&lt;?php // Example page in `/post.php`
+
+$curl = curl_init();
+
+// `get_current_url()` is a custom function
+curl_setopt($curl, CURLOPT_URL, '/post.php');
+curl_setopt($curl, CURLOPT_POST, 1);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $_SERVER['QUERY_STRING']);
+
+// Receive server response&hellip;
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+$out = curl_exec($curl);
+
+curl_close($curl);
+
+// Further processing&hellip;
+if ($out) { /* &hellip; */ } else { /* &hellip; */ }</code></pre>
+      <p>Use a standard link with form data as query string on the link element:</p>
+      <pre><code>&lt;a href="/post.php?data[foo]=1&amp;amp;data[bar]=2"&gt;Send data!&lt;/a&gt;</code></pre>
+      <p><b>I have a REST API functionality that returns data as JSON, but my URL doesn&rsquo;t end with extension <code>.json</code>. How do I set the response type as JSON under these circumstances?</b></p>
+      <p>The <code>F3H.state.types</code> object contains some data in the form of file extension as object key and the desired response type as object value. By default, the value of the object is set as string, but you can also specify it as a function that returns the type of response based on a specific pattern on the given URL.</p>
+      <p>There is a <code>""</code> key to express the default response type for URL or file name that does not have extension. A typical clean URL that is commonly used for search engine optimization. You can use this property to specify the response type as JSON under certain conditions in the given link according to the standard URL naming pattern in your application:</p>
+      <pre><code>F3H.state.types[""] = link =&gt; {
+    // Assume your REST API link format is `/foo/bar?output=json`
+    if (link.match(/[?&]output=json([&#]|$)/)) {
+        return 'json';
+    }
+    // Return the default response for extension-less URL
+    return 'document';
+};</code></pre>
+      <p>And here&rsquo;s the way to process JSON or HTML data simultaneously on success:</p>
+      <pre><code>let f3h = new F3H;
+
+f3h.on('success', function(response) {
+    if ('application/json' === this.lot['Content-Type']) {
+        // Handle JSON response
+    } else {
+        // Handle HTML response
+    }
+});</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
