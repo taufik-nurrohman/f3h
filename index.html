@@ -259,8 +259,7 @@ f3h.on('success', onSuccess); // With context</code></pre>
 
 $curl = curl_init();
 
-// `get_current_url()` is a custom function
-curl_setopt($curl, CURLOPT_URL, '/post.php');
+curl_setopt($curl, CURLOPT_URL, '.');
 curl_setopt($curl, CURLOPT_POST, 1);
 curl_setopt($curl, CURLOPT_POSTFIELDS, $_SERVER['QUERY_STRING']);
 
@@ -297,7 +296,7 @@ f3h.on('success', function(response) {
     }
 });</code></pre>
       <p><b>Can I integrate it with jQuery?</b></p>
-      <p>Every application built using native JavaScript will be able to integrate with any third party JavaScript library. If you know how to select DOM elements with jQuery, then you are ready to go:</p>
+      <p>Every application built using native JavaScript will be able to integrate with any third party JavaScript library. If you know how to select DOM elements using jQuery, then you are ready to go:</p>
       <pre><code>let f3h = new F3H,
     $main = $('main'),
     $nav = $('nav');
