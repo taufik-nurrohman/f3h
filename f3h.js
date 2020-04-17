@@ -195,7 +195,6 @@
                 onSourcesEventsSet();
                 doFocusToElement();
                 doScrollToElement();
-                doEvaluateScript(response); // Must come last
             });
             eventSet(xhrUpload, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
@@ -205,7 +204,6 @@
                 onSourcesEventsSet();
                 doFocusToElement();
                 doScrollToElement();
-                doEvaluateScript(response); // Must come last
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
@@ -234,16 +232,6 @@
             }
             for (var request in requests) {
                 doFetchAbort(request);
-            }
-        }
-
-        // Evaluate inline JavaScript
-        function doEvaluateScript(response) {
-            if (response && response[querySelectorAll]) {
-                var scripts = response[querySelectorAll]('script'), value;
-                scripts && scripts.forEach(function(script) {
-                    (value = script.textContent) && win.eval(value);
-                });
             }
         }
 

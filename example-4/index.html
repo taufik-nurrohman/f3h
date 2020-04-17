@@ -7,10 +7,10 @@
   </head>
   <body>
     <main>
-      <p><a href="test.html">Test!</a></p>
+      <p><a href="test.html">Test!</a> (pressing the back button after clicking the link shouldn&rsquo;t trigger the first alert)</p>
     </main>
     <script src="../f3h.min.js"></script>
-    <script>
+    <script data-f3h>
 
     var f3h = new F3H,
         main = document.querySelector('main');
@@ -18,7 +18,14 @@
     f3h.on('success', function(response) {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
+        // Evalute inline JavaScript thas has no `data-f3h` attribute
+        response.querySelectorAll('script:not([data-f3h])').forEach(function(script) {
+            var value = script.textContent;
+            value && eval(value);
+        });
     });
+
+    alert('Alert once!');
 
     </script>
   </body>
