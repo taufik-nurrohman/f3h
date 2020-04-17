@@ -56,6 +56,7 @@
     });
 
     f3h.on('exit', function() {
+        bar.style.width = '0%';
         bar.classList.remove('error');
         bar.classList.remove('success');
     });
@@ -68,13 +69,6 @@
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
         bar.classList.add('success');
-        setTimeout(function() {
-            bar.style.display = 'none';
-            bar.style.width = 0;
-        }, 1000);
-        setTimeout(function() {
-            bar.style.display = "";
-        }, 1200);
     });
 
     </script>

@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Load pages asynchronously while maintaining the principles of progressive enhancement." name="description">
-    <title>F3H</title>
+    <title>F3H &middot; Load pages asynchronously while maintaining the principles of progressive enhancement.</title>
     <link href="favicon.ico" rel="icon">
     <style>
     * {
@@ -67,17 +67,17 @@
     <header>
       <h1>F3H v1.0.0-dev</h1>
       <p>You can read <abbr title="Fetch">F3H</abbr> as how you would read <abbr title="Accessibility">A11Y</abbr> and <abbr title="Internationalization">I18N</abbr>.</p>
-      <p>Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will save those data into the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.</p>
+      <p>Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will store it to the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.</p>
       <hr>
     </header>
     <main>
-      <p>Progressive enhancement is a design principle that is focused in ensuring the availability of web page content in the most limited conditions, and if possible, to provide the most maximum features when the conditions are supportive. By enhancing features while maintaining the basic functions of HTML pages, this concept will ensure that if your advanced JavaScript features cannot work optimally under certain conditions, then at least the web page content that you want to provide is still accessible to most users.</p>
+      <p>Progressive enhancement is a design principle that is focused in ensuring the availability of web page content in the most limited conditions, and if possible, to provide the most advanced features when the conditions are supportive. By enhancing features while maintaining the basic functions of HTML pages, this concept will ensure that if your advanced JavaScript features cannot work optimally under certain conditions, then at least the web page content that you want to provide is still accessible to most users.</p>
       <p><a href="example-1/index.html" target="_blank"><b>Demo</b></a></p>
       <h2>Features</h2>
       <ul>
         <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
         <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
-        <li>Accessible AJAX response as generic HTML elements (by default). With the basic JavaScript knowledge on accessing the DOM and manipulating it, you can use this application like a pro.</li>
+        <li>Accessible AJAX response as HTML elements (by default). With the basic knowledge on accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.</li>
       </ul>
       <h2>Usage</h2>
       <pre><code>&lt;!DOCTYPE html&gt;
@@ -103,10 +103,10 @@
       <h2>Examples</h2>
       <ul>
         <li><a href="example-0/index.html" target="_blank">No Idea?</a></li>
-        <li>Apply Events to Specific Elements</li>
+        <li><a href="example-2/index.html" target="_blank">Apply Events to Specific Elements</a></li>
         <li><a href="example-3/index.html" target="_blank">Progress Animation Example</a></li>
-        <li>Page Example with Inline JavaScript</li>
-        <li>Form Example</li>
+        <li><a href="example-4/index.html" target="_blank">Page Example with Inline JavaScript</a></li>
+        <li><a href="example-5/index.php" target="_blank">Basic Form Example</a> (Requires PHP)</li>
         <li>Infinite Scroll Example</li>
       </ul>
       <h2>Settings</h2>
@@ -215,7 +215,7 @@ f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/
           </tr>
           <tr>
             <td><code>success</code></td>
-            <td>Will be triggered on AJAX loading success event, with any page status.</td>
+            <td>Will be triggered on AJAX loading success event, regardless of the page status. Might result in a null response on URL redirection after form submission. Consider to use the <code>200</code> hook instead.</td>
           </tr>
           <tr>
             <td><code>200</code></td>
@@ -296,13 +296,38 @@ f3h.on('success', function(response) {
         // Handle HTML response
     }
 });</code></pre>
+      <p><b>Can I integrate it with jQuery?</b></p>
+      <p>Every application built using native JavaScript will be able to integrate with any third party JavaScript library. If you know how to select DOM elements with jQuery, then you are ready to go:</p>
+      <pre><code>let f3h = new F3H,
+    $main = $('main'),
+    $nav = $('nav');
+
+f3h.on('success', function(response) {
+    document.title = response.title;
+    $main.html($(response).find('main').html());
+    $nav.html($(response).find('nav').html());
+});</code></pre>
+      <p><b>I get an error <code>TypeError: response is null</code> from the web console every time I submit a form. Why?</b></p>
+      <p>Your form data processor may have redirected you to a certain page via 302 status (and the like) when the data you provided was sent successfully. Consider to use <code>200</code> hook instead of <code>success</code>, or be sure to check that the response status is <code>200</code> before doing anything to the response given:</p>
+      <pre><code>f3h.on(200, function(response) {
+    console.log(response);
+});</code></pre>
+      <pre><code>f3h.on('success', function(response) {
+    if (200 === this.status) {
+        // Handle normal page
+    } else if (404 === this.status) {
+        // Handle error page
+    } else {
+        // Send successful page loading event to your web statistic
+    }
+});</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-        <input name="cmd" value="_s-xclick" type="hidden">
-        <input name="hosted_button_id" value="TNVGH7NQ7E4EU" type="hidden">
-        <p><button type="submit" class="button">Donate</button></p>
+        <input name="cmd" type="hidden" value="_s-xclick">
+        <input name="hosted_button_id" type="hidden" value="TNVGH7NQ7E4EU">
+        <p><button type="submit">Donate</button></p>
       </form>
     </main>
     <footer>

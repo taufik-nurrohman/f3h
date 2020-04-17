@@ -12,6 +12,9 @@
     var GET = 'GET',
         POST = 'POST',
 
+        querySelector = 'querySelector',
+        querySelectorAll = querySelector + 'All',
+
         responseTypeHTML = 'document',
         responseTypeJSON = 'json',
         responseTypeTXT = 'text',
@@ -150,7 +153,7 @@
         $$[instances][Object.keys($$[instances]).length] = $;
 
         function sourcesGet(query, root) {
-            return Array.from((root || doc).querySelectorAll(query)).filter(state.is || function() {
+            return Array.from((root || doc)[querySelectorAll](query)).filter(state.is || function() {
                 return true;
             });
         }
@@ -159,10 +162,8 @@
         function doFetch(node, type, ref) {
             $.ref = ref;
             hookFire('exit', [doc, node]);
-            var body = doc.body,
-                headers = state.lot,
-                header, data,
-                parts = ref.split('#'),
+            var headers = state.lot,
+                header, data, response,
                 xhr = new XMLHttpRequest,
                 xhrUpload = xhr.upload, fn;
             // Automatic response type by file extension
@@ -172,6 +173,9 @@
             }
             xhr.responseType = responseType;
             xhr.open(type, ref, true);
+            if (POST === type) {
+                headers['Content-Type'] = 'multipart/form-data';
+            }
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
@@ -185,25 +189,23 @@
                 setData(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
-                data = [xhr.response, node];
+                data = [response = xhr.response, node];
                 setData(), hookFire('error', data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet();
+                doFocusToElement();
+                doScrollToElement();
+                doEvaluateScript(response); // Must come last
             });
             eventSet(xhrUpload, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
-                data = [xhr.response, node];
+                data = [response = xhr.response, node];
                 setData(), hookFire($.status, data), hookFire('success', data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet();
-                // Jump to the hash position
-                if (parts[1]) {
-                    var target = doc.getElementById(parts[1]) || doc.getElementsByName(parts[1])[0];
-                    if (target) {
-                        html.scrollLeft = body.scrollLeft = target.offsetLeft;
-                        html.scrollTop = body.scrollTop = target.offsetTop;
-                    }
-                }
+                doFocusToElement();
+                doScrollToElement();
+                doEvaluateScript(response); // Must come last
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
@@ -235,10 +237,39 @@
             }
         }
 
+        // Evaluate inline JavaScript
+        function doEvaluateScript(response) {
+            if (response && response[querySelectorAll]) {
+                var scripts = response[querySelectorAll]('script'), value;
+                scripts && scripts.forEach(function(script) {
+                    (value = script.textContent) && win.eval(value);
+                });
+            }
+        }
+
+        // Focus to the first form element that has `autofocus` attribute
+        function doFocusToElement() {
+            var target = doc[querySelector]('[autofocus]');
+            target && target.focus();
+        }
+
         function doRefChange(el, ref) {
             win.history.pushState({
                 ref: ref
             }, "", ref);
+        }
+
+        // Scroll to the first element with `id` or `name` attribute that has value as the location hash value
+        function doScrollToElement() {
+            var hash = win.location.hash.replace('#', "");
+            if (hash) {
+                var body = doc.body,
+                    target = doc.getElementById(hash) || doc.getElementsByName(hash)[0];
+                if (target) {
+                    html.scrollLeft = body.scrollLeft = target.offsetLeft;
+                    html.scrollTop = body.scrollTop = target.offsetTop;
+                }
+            }
         }
 
         function hookLet(name, fn) {
