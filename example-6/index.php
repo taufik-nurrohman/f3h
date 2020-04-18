@@ -24,21 +24,21 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   <body>
     <main>
       <h1>Files</h1>
-      <form action="" enctype="multipart/form-data" method="post">
-        <?php if ($files = glob(__DIR__ . '/*.*')): ?>
-        <ol>
-          <?php foreach ($files as $file): ?>
-          <?php if ('index.php' === ($n = basename($file))) continue; ?>
-          <li><a href="<?= $n; ?>" target="_blank"><?= $n; ?></a></li>
-          <?php endforeach; ?>
-          </ol>
-        <?php endif; ?>
-        <p>
-          <input name="blob" type="file">
-          <button type="submit">Upload</button>
-        </p>
-      </form>
+      <?php if ($files = glob(__DIR__ . '/*.*')): ?>
+      <ol>
+        <?php foreach ($files as $file): ?>
+        <?php if ('index.php' === ($n = basename($file))) continue; ?>
+        <li><a href="<?= $n; ?>" target="_blank"><?= $n; ?></a></li>
+        <?php endforeach; ?>
+      </ol>
+      <?php endif; ?>
     </main>
+    <form enctype="multipart/form-data" method="post">
+      <p>
+        <input name="blob" type="file">
+        <button name="save" hidden type="submit">Upload</button>
+      </p>
+    </form>
     <script src="../f3h.min.js"></script>
     <script>
 
@@ -52,7 +52,13 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     f3h.on(200, function(response) {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
+        document.forms[0].blob.value = "";
     });
+
+    // Upload immediately on file selection
+    document.forms[0].blob.addEventListener('change', function() {
+        this.form.save.click(); // Click the hidden button element
+    }, false);
 
     </script>
   </body>

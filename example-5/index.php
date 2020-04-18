@@ -24,11 +24,13 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   <body>
     <main>
       <h1>Notes</h1>
-      <p><?= strtr(trim('<b>' . file_get_contents(__DIR__ . '/log')), [
+      <?php if ($content = file_get_contents(__DIR__ . '/log')): ?>
+      <p><?= strtr(trim('<b>' . $content), [
           "\n[" => '<br><b>[',
           '] ' => ']</b> '
       ]); ?></p>
-      <form action="" method="post">
+      <?php endif; ?>
+      <form method="post">
         <p>
           <input autocomplete="off" autofocus name="message" type="text">
           <button type="submit">Send</button>

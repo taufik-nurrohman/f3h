@@ -47,6 +47,14 @@
         node.addEventListener(name, fn, false);
     }
 
+    function hashGet(ref) {
+        return ref.split('#')[1] || "";
+    }
+
+    function hashLet(ref) {
+        return ref.split('#')[0];
+    }
+
     function isFunction(x) {
         return 'function' === typeof x;
     }
@@ -95,13 +103,13 @@
         $$.version = '1.0.0';
 
         $$.state = {
-            'focus': true, // Focus to the first element that has `autofocus` attribute?
+            'history': true,
             'is': function(source, refCurrent) {
                 var target = source.target,
                     // Get URL data as-is from the DOM attribute string
-                    raw = attributeGet(source, 'href') || attributeGet(source, 'action'),
+                    raw = attributeGet(source, 'href') || attributeGet(source, 'action') || "",
                     // Get resolved URL data from the DOM property
-                    value = source.href || source.action;
+                    value = source.href || source.action || "";
                 if (target && '_self' !== target) {
                     return false;
                 }
@@ -111,7 +119,7 @@
                 }
                 // If `value` is the same as current URL excluding the hash, treat `raw` as hash only,
                 // so that we don’t break the native hash change event that you may want to add in the future
-                if (-1 !== value[search]('#') && refCurrent.split('#')[0] === value.split('#')[0]) {
+                if (hashGet(value) && hashLet(refCurrent) === hashLet(value)) {
                     return false;
                 }
                 // Detect internal link starts from here
@@ -127,8 +135,7 @@
             'ref': function(source, refCurrent) {
                 return refCurrent; // Default URL hook
             },
-            'scroll': true, // Scroll to the first element with `id` or `name` attribute that has the same value as location hash?
-            'sources': 'a[href],form[action]',
+            'sources': 'a[href],form',
             'types': {
                 "": responseTypeHTML, // Default response type for extension-less URL
                 'ASP': responseTypeHTML,
@@ -158,6 +165,7 @@
             $$ = win[name],
             hooks = {},
             ref = refGet(), // Get current URL to be used as the default state after the last pop state
+            refCurrent = ref, // Store current URL to a variable to be compared to the next URL
             requests = {},
             state = Object.assign({}, $$.state, (o || {})),
             sources = sourcesGet(state.sources);
@@ -190,7 +198,7 @@
             var headers = state.lot || {},
                 xhr = new XMLHttpRequest,
                 xhrUpload = xhr.upload,
-                data, fn, header, response;
+                data, fn, header, redirect;
             // Automatic response type by file extension
             var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
                 responseType = state.types[x] || responseTypeTXT;
@@ -215,21 +223,33 @@
                 setData(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
-                data = [response = xhr.response, node];
-                setData(), hookFire('error', data);
+                setData();
+                data = [xhr.response, node];
+                hookFire('error', data);
                 sources = sourcesGet(state.sources);
-                onSourcesEventsSet();
+                onSourcesEventsSet(data);
+                hookFire('enter', data);
             });
             eventSet(xhrUpload, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
+                // Handle redirection
+                redirect = xhr.responseURL;
+                if (redirect && redirect !== ref) {
+                    doFetch(node, GET, redirect);
+                    refCurrent = redirect;
+                    return;
+                }
                 setData();
                 if (GET === type) {
                     doRefChange(node, ref, $.status);
                 }
-                data = [response = xhr.response, node];
-                hookFire($.status, data), hookFire('success', data);
+                data = [xhr.response, node];
+                hookFire($.status, data);
+                hookFire('success', data);
                 sources = sourcesGet(state.sources);
-                onSourcesEventsSet();
+                onSourcesEventsSet(data);
+                hookFire('enter', data);
+                refCurrent = ref;
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
@@ -241,7 +261,6 @@
             // eventSet(xhr, 'timeout', fn = function() {});
             // eventSet(xhrUpload, 'timeout', fn);
             xhr.send(POST === type ? new FormData(node) : null);
-            hookFire('enter', [doc, node]);
             return xhr;
         }
 
@@ -262,8 +281,9 @@
         }
 
         // Focus to the first element that has `autofocus` attribute
-        function doFocusToElement() {
-            if (!state.focus) {
+        function doFocusToElement(data) {
+            if (hooks.focus) {
+                hookFire('focus', data);
                 return;
             }
             var target = doc[querySelector]('[autofocus]');
@@ -274,14 +294,13 @@
             if (ref === refGet()) {
                 return; // Clicking on the same URL should trigger the AJAX call. Just don’t duplicate it to the history!
             }
-            200 === status && history.pushState({
-                ref: ref
-            }, "", ref);
+            state.history && 200 === status && history.pushState({}, "", ref);
         }
 
         // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
-        function doScrollToElement() {
-            if (!state.scroll) {
+        function doScrollToElement(data) {
+            if (hooks.scroll) {
+                hookFire('scroll', data);
                 return;
             }
             var hash = win.location.hash.replace('#', "");
@@ -346,13 +365,13 @@
 
         function onPopState(e) {
             doFetchAbortAll();
-            var href = e.state && e.state.ref;
-            if (href) {
-                requests[href] = [doFetch(win, GET, href), win];
-            } else {
-                // TODO
-                // requests[ref] = [doFetch(win, GET, ref), win];
+            var ref = refGet();
+            // Updating the hash value shouldn’t trigger the AJAX call!
+            if (hashGet(ref) && hashLet(refCurrent) === hashLet(ref)) {
+                return;
             }
+            requests[ref] = [doFetch(win, GET, ref), win];
+            refCurrent = ref;
         }
 
         function onSourcesEventsLet() {
@@ -361,12 +380,12 @@
             }
         }
 
-        function onSourcesEventsSet() {
+        function onSourcesEventsSet(data) {
             for (var i = 0, j = sources.length; i < j; ++i) {
                 eventSet(sources[i], eventNameGet(sources[i]), onFetch);
             }
-            doFocusToElement();
-            doScrollToElement();
+            doFocusToElement(data);
+            doScrollToElement(data);
         }
 
         $.abort = function(id) {
@@ -393,7 +412,10 @@
         $.state = state;
         $.status = null;
 
-        eventSet(win, 'DOMContentLoaded', onSourcesEventsSet);
+        eventSet(win, 'DOMContentLoaded', function() {
+            onSourcesEventsSet([doc, win]);
+        });
+
         eventSet(win, 'popstate', onPopState);
 
         return $;

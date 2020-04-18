@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
-    <meta content="Load pages asynchronously while maintaining the principles of progressive enhancement." name="description">
-    <title>F3H &middot; Load pages asynchronously while maintaining the principles of progressive enhancement.</title>
+    <meta content="Your job is to make a website that works traditionally. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically." name="description">
+    <title>F3H &middot; Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.</title>
     <link href="favicon.ico" rel="icon">
     <style>
     * {
@@ -105,31 +105,31 @@
         <li><a href="example-0/index.html" target="_blank">No Idea?</a></li>
         <li><a href="example-2/index.html" target="_blank">Apply Events to Specific Elements</a></li>
         <li><a href="example-3/index.html" target="_blank">Progress Animation Example</a> (Requires <code>Content-Length</code> response header)</li>
-        <li><a href="example-4/index.html" target="_blank">Page Example with Inline JavaScript</a></li>
+        <li><a href="example-4/index.html" target="_blank">Inline JavaScript Evaluation Example</a></li>
         <li><a href="example-5/index.php" target="_blank">Basic Form Example</a> (Requires PHP)</li>
         <li><a href="example-6/index.php" target="_blank">Upload Form Example</a> (Requires PHP)</li>
         <li><a href="example-7/index.html" target="_blank">Native Hash Change Events</a></li>
-        <li>Infinite Scroll Example</li>
+        <li><a href="example-8/index.html" target="_blank">Load More Example</a></li>
+        <li><a href="example-9/index.html" target="_blank">Infinite Scroll Example</a></li>
+        <li>Smooth Scrolling Example</li>
       </ul>
       <h2>Settings</h2>
       <pre><code>let f3h = new F3H(<var>state</var> = {
-        focus: true,
+        history: true,
         is: (source, refCurrent) =&gt; { &hellip; },
         lot: {
             'X-Requested-With': 'F3H'
         },
         ref: (source, refCurrent) =&gt; { &hellip; },
-        scroll: true,
-        sources: 'a[href], form[action]',
+        sources: 'a[href], form',
         types: { &hellip; }
     });</code></pre>
       <ul>
         <li><var>state</var> &rarr; The configuration data.</li>
-        <li><var>state.focus</var> &rarr; Focus to the first element that has <code>autofocus</code> attribute on AJAX success event?</li>
+        <li><var>state.history</var> &rarr; Set to <code>false</code> to disable the history feature.</li>
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
         <li><var>state.ref</var> &rarr; Default URL filter to replace the reference URL to fetch from the source element without replacing the original URL value in the source element.</li>
-        <li><var>state.scroll</var> &rarr; Scroll to the first element that has <code>id</code> or <code>name</code> attribute with the same value as the current location hash.</li>
         <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
         <li><var>state.types</var> &rarr; List of file extensions with the expected response type.</li>
       </ul>
@@ -210,6 +210,10 @@ f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/
             <td>Will be triggered on the next AJAX loading event. e.g. just after user clicks on a link.</td>
           </tr>
           <tr>
+            <td><code>focus</code></td>
+            <td>Adding a <code>focus</code> hook will disable the default focus behavior, that is, to focus to the first element that has <code>autofocus</code> attribute.</td>
+          </tr>
+          <tr>
             <td><code>pop</code></td>
             <td>Will be triggered after <code>f3h.pop()</code>.</td>
           </tr>
@@ -220,6 +224,10 @@ f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/
           <tr>
             <td><code>push</code></td>
             <td>Will be triggered on AJAX uploading progress event (POST requests only).</td>
+          </tr>
+          <tr>
+            <td><code>scroll</code></td>
+            <td>Adding a <code>scroll</code> hook will disable the default scroll behavior, that is, to scroll to the first element that has <code>id</code> or <code>name</code> attribute with the same value as the current location hash value.</td>
           </tr>
           <tr>
             <td><code>success</code></td>
@@ -325,7 +333,7 @@ f3h.on('success', function(response) {
     } else if (404 === this.status) {
         // Handle error page
     } else {
-        // Send successful page loading event to your web statistic
+        // Send successful AJAX loading event to your web statistic
     }
 });</code></pre>
       <h2>License</h2>
