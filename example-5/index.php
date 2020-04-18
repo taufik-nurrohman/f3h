@@ -4,7 +4,10 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     $log = file_get_contents(__DIR__ . '/log');
     $v = trim(strip_tags($_POST['message']));
     if ("" !== $v) {
-        $log .= '<b>[' . date('H:i:s') . ']</b> ' . $v . "\n";
+        $log .= '[' . date('H:i:s') . '] ' . strtr($v, [
+            '[' => '&#x5B;',
+            ']' => '&#x5D;'
+        ]) . "\n";
     }
     file_put_contents(__DIR__ . '/log', $log);
     header('Location: .');
@@ -20,11 +23,15 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   </head>
   <body>
     <main>
-      <p><?= strtr(trim(file_get_contents(__DIR__ . '/log')), ["\n" => '<br>']); ?></p>
+      <h1>Notes</h1>
+      <p><?= strtr(trim('<b>' . file_get_contents(__DIR__ . '/log')), [
+          "\n[" => '<br><b>[',
+          '] ' => ']</b> '
+      ]); ?></p>
       <form action="" method="post">
         <p>
           <input autocomplete="off" autofocus name="message" type="text">
-          <button type="submit">Save</button>
+          <button type="submit">Send</button>
         </p>
       </form>
     </main>
