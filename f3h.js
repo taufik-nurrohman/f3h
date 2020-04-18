@@ -23,7 +23,8 @@
         test = 'test',
 
         history = win.history,
-        home = '//' + win.location.hostname,
+        location = win.location,
+        home = '//' + location.hostname,
         html = doc.documentElement,
         instances = 'instances';
 
@@ -72,7 +73,7 @@
     }
 
     function refGet() {
-        return win.location.href;
+        return location.href;
     }
 
     function toCaseLower(x) {
@@ -126,7 +127,7 @@
                 return "" === raw ||
                     0 === raw[search](/[.\/?]/) ||
                     0 === raw[search](home) ||
-                    0 === raw[search](win.location.protocol + home) ||
+                    0 === raw[search](location.protocol + home) ||
                     0 !== raw[search]('://');
             },
             'lot': {
@@ -232,11 +233,12 @@
             });
             eventSet(xhrUpload, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
-                // Handle redirection
+                // Handle internal server-side redirection
                 redirect = xhr.responseURL;
-                if (redirect && redirect !== ref) {
+                // `redirect !== hashLet(ref)` because URL hash is not included in `xhr.responseURL` object
+                // <https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseURL>
+                if (redirect && redirect !== hashLet(ref)) {
                     doFetch(node, GET, redirect);
-                    refCurrent = redirect;
                     return;
                 }
                 setData();
@@ -303,7 +305,7 @@
                 hookFire('scroll', data);
                 return;
             }
-            var hash = win.location.hash.replace('#', "");
+            var hash = location.hash.replace('#', "");
             if (hash) {
                 var body = doc.body,
                     target = doc.getElementById(hash) || doc.getElementsByName(hash)[0];

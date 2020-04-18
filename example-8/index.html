@@ -38,15 +38,17 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var sections = {},
-        f3h = new F3H({
+    var f3h = new F3H({
             history: false // Disable the history feature
         }),
         main = document.querySelector('main'),
         nav = document.querySelector('nav'),
         prev = nav.querySelector('[rel=prev]'),
-        next = nav.querySelector('[rel=next]');
+        next = nav.querySelector('[rel=next]'),
 
+        sections = {};
+
+    // Convert “Next/Previous” navigation in your traditional HTML pages into “Load More” navigation
     function nextToMore(title) {
         // Hide previous navigation
         prev && (prev.style.display = 'none');
@@ -55,7 +57,7 @@
         sections[main.offsetHeight] = title;
     }
 
-    f3h.on('success', function(response) {
+    f3h.on('success', function(response,a) {console.log(a)
         main.insertAdjacentHTML('beforeend', '<hr>' + response.querySelector('main').innerHTML);
         nav.innerHTML = response.querySelector('nav').innerHTML;
         prev = nav.querySelector('[rel=prev]');
@@ -68,7 +70,7 @@
 
     // Change document title on section match
     window.addEventListener('scroll', function() {
-        var top, visible = this.pageYOffset + (this.innerHeight / 2);
+        var visible = this.pageYOffset + (this.innerHeight / 2), top;
         for (top in sections) {
             if (+top < visible) {
                 continue;
