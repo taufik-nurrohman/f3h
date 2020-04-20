@@ -58,7 +58,9 @@
     <script src="../f3h.js"></script>
     <script>
 
-    var f3h = new F3H,
+    var f3h = new F3H({
+            cache: true // Enable local cache feature
+        }),
         main = document.querySelector('main'),
         nav = document.querySelector('nav');
 
@@ -77,7 +79,7 @@
             a.style.textDecoration = 'line-through';
             a.removeAttribute('href');
         }
-        console.log([this.lot, JSON.parse(JSON.stringify(this.lot))]);
+        console.log(JSON.parse(JSON.stringify(this.lot)));
     });
 
     </script>

@@ -115,7 +115,9 @@
         <li><a href="example-11/index.php" target="_blank">Server-Side Redirection Example</a> (Requires PHP, experimental)</li>
       </ul>
       <h2>Settings</h2>
+      <pre><code>let f3h = new F3H(<var>cache</var>);</code></pre>
       <pre><code>let f3h = new F3H(<var>state</var> = {
+        cache: false,
         history: true,
         is: (source, refCurrent) =&gt; { &hellip; },
         lot: {
@@ -126,7 +128,9 @@
         types: { &hellip; }
     });</code></pre>
       <ul>
+        <li><var>cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only GET responses that will be cached.</li>
         <li><var>state</var> &rarr; The configuration data.</li>
+        <li><var>state.cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only GET responses that will be cached.</li>
         <li><var>state.history</var> &rarr; Set to <code>false</code> to disable the history feature.</li>
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
@@ -160,6 +164,11 @@ console.log([F3H.state, f3h.state]);</code></pre>
 F3H._.cancelAllRequests = function() {
     return this.abort();
 };</code></pre>
+      <h3>f3h.caches</h3>
+      <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will removes all caches.</p>
+      <pre><code>console.log(f3h.caches);</code></pre>
+      <h3>f3h.ref</h3>
+      <p>This variable stores current URL that is being fetched, including the hash part.</p>
       <h3>f3h.state</h3>
       <p>Return the modified application states.</p>
       <h3>f3h.lot</h3>
@@ -306,7 +315,7 @@ if ($out) { /* &hellip; */ } else { /* &hellip; */ }</code></pre>
       <pre><code>let f3h = new F3H;
 
 f3h.on('success', function(response) {
-    if ('application/json' === this.lot['Content-Type']) {
+    if ('application/json' === this.lot['content-type']) {
         // Handle JSON response
     } else {
         // Handle HTML response

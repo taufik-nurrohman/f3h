@@ -112,8 +112,9 @@
         $$.version = '1.0.1';
 
         $$.state = {
+            'cache': false, // Store all response body to variable to be used later?
             'history': true,
-            'is': function(source, refCurrent) {
+            'is': function(source, refNow) {
                 var target = source.target,
                     // Get URL data as-is from the DOM attribute string
                     raw = attributeGet(source, 'href') || attributeGet(source, 'action') || "",
@@ -128,7 +129,7 @@
                 }
                 // If `value` is the same as current URL excluding the hash, treat `raw` as hash only,
                 // so that we don’t break the native hash change event that you may want to add in the future
-                if (hashGet(value) && hashLet(refCurrent) === hashLet(value)) {
+                if (hashGet(value) && hashLet(refNow) === hashLet(value)) {
                     return false;
                 }
                 // Detect internal link starts from here
@@ -141,8 +142,8 @@
             'lot': {
                 'x-requested-with': name
             },
-            'ref': function(source, refCurrent) {
-                return refCurrent; // Default URL hook
+            'ref': function(source, refNow) {
+                return refNow; // Default URL hook
             },
             'sources': 'a[href],form',
             'types': {
@@ -172,11 +173,14 @@
 
         var $ = this,
             $$ = win[name],
+            caches = {},
             hooks = {},
             ref = refGet(), // Get current URL to be used as the default state after the last pop state
             refCurrent = ref, // Store current URL to a variable to be compared to the next URL
             requests = {},
-            state = Object.assign({}, $$.state, (o || {})),
+            state = Object.assign({}, $$.state, true === o ? {
+                cache: o
+            } : (o || {})),
             sources = sourcesGet(state.sources), nodeCurrent;
 
         // Return new instance if `F3H` was called without the `new` operator
@@ -189,11 +193,11 @@
 
         function sourcesGet(query, root) {
             var from = (root || doc)[querySelectorAll](query),
-                refCurrent = refGet();
+                refNow = refGet();
             if (isFunction(state.is)) {
                 var to = [];
                 for (var i = 0, j = from.length; i < j; ++i) {
-                    state.is.call($, from[i], refCurrent) && to.push(from[i]);
+                    state.is.call($, from[i], refNow) && to.push(from[i]);
                 }
                 return to;
             }
@@ -202,12 +206,29 @@
 
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
-            if (node === nodeCurrent) {
+            // Compare currently selected source element with the previously stored source element, unless it is a window.
+            // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
+            if (node === nodeCurrent && node !== win) {
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
-            nodeCurrent = node;
+            nodeCurrent = node; // Store currently selected source element to a variable to be compared later
             refCurrent = $.ref = ref;
             hookFire('exit', [doc, node]);
+            // Get response from cache if any
+            if (state.cache) {
+                var cache = caches[hashLet(ref)]; // `[status, response, lot]`
+                if (cache) {
+                    $.lot = cache[2];
+                    doRefChange(node, ref, $.status = cache[0]);
+                    data = [cache[1], node];
+                    hookFire(cache[0], data);
+                    hookFire('success', data);
+                    sources = sourcesGet(state.sources);
+                    onSourcesEventsSet(data);
+                    hookFire('enter', data);
+                    return;
+                }
+            }
             var headers = state.lot || {},
                 xhr = new XMLHttpRequest,
                 xhrUpload = xhr.upload,
@@ -229,16 +250,22 @@
                 }
             }
             function dataSet() {
-                var raw = toResponseHeadersAsObject(xhr);
-                $.lot = new Proxy(raw, {
-                    get: function(o, k) {
-                        return o[toCaseLower(k)] || null;
-                    },
-                    set: function(o, k, v) {
-                        o[toCaseLower(k)] = v;
-                    }
-                });
-                $.status = xhr.status;
+                // Use proxy to make response header’s key to be case-insensitive
+                var lot = new Proxy(toResponseHeadersAsObject(xhr), {
+                        get: function(o, k) {
+                            return o[toCaseLower(k)] || null;
+                        },
+                        set: function(o, k, v) {
+                            o[toCaseLower(k)] = v;
+                        }
+                    }),
+                    status = xhr.status;
+                $.lot = lot;
+                $.status = status;
+                // Store response from GET request(s) to cache
+                if (GET === type && state.cache) {
+                    caches[hashLet(ref)] = [status, xhr.response, lot];
+                }
             }
             eventSet(xhr, 'abort', function() {
                 dataSet(), hookFire('abort', [xhr.response, node]);
@@ -258,6 +285,11 @@
                 // `redirect !== hashLet(ref)` because URL hash is not included in `xhr.responseURL` object
                 // <https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseURL>
                 if (redirect && redirect !== hashLet(ref)) {
+                    // Redirection should delete cache related to response URL
+                    // This is useful for case(s) like, when you have submitted
+                    // a comment form and then you will be redirected to the same URL
+                    caches[redirect] && (delete caches[redirect]);
+                    // Do the normal fetch
                     doFetch(node, GET, redirect);
                     return;
                 }
@@ -378,21 +410,20 @@
             var t = this,
                 href = t.href,
                 action = t.action,
-                ref = href || action,
+                refNow = href || action,
                 type = toCaseUpper(t.method || GET);
-            requests[ref] = [doFetch(t, type, ref), t];
+            requests[refNow] = [doFetch(t, type, refNow), t];
             doPreventDefault(e);
         }
 
         function onPopState(e) {
             doFetchAbortAll();
-            var ref = refGet();
+            var refNow = refGet();
             // Updating the hash value shouldn’t trigger the AJAX call!
-            if (hashGet(ref) && hashLet(refCurrent) === hashLet(ref)) {
+            if (hashGet(refNow) && hashLet(refCurrent) === hashLet(refNow)) {
                 return;
             }
-            requests[ref] = [doFetch(win, GET, ref), win];
-            refCurrent = ref;
+            requests[refNow] = [doFetch(win, GET, refNow), win];
         }
 
         function onSourcesEventsLet() {
@@ -423,6 +454,7 @@
             return eventLet(win, 'popstate', onPopState), hookFire('pop', [doc, win]), $.abort();
         };
 
+        $.caches = caches;
         $.fire = hookFire;
         $.hooks = hooks;
         $.lot = {};

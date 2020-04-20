@@ -16,6 +16,7 @@ Release Notes
 
  - Response headers is now case-insensitive.
  - Clicking on the same source element multiple times should trigger the AJAX request once.
+ - Added local cache feature which can be enabled by setting the `state.cache` value to `true`.
 
 ### 1.0.0
 
