@@ -208,7 +208,7 @@
         function doFetch(node, type, ref) {
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
-            if (node === nodeCurrent && node !== win) {
+            if (GET === type && node === nodeCurrent && node !== win) {
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
             nodeCurrent = node; // Store currently selected source element to a variable to be compared later
@@ -219,7 +219,8 @@
                 var cache = caches[hashLet(ref)]; // `[status, response, lot]`
                 if (cache) {
                     $.lot = cache[2];
-                    doRefChange(node, ref, $.status = cache[0]);
+                    $.status = cache[0];
+                    doRefChange(node, ref);
                     data = [cache[1], node];
                     hookFire(cache[0], data);
                     hookFire('success', data);
@@ -285,6 +286,7 @@
                 // `redirect !== hashLet(ref)` because URL hash is not included in `xhr.responseURL` object
                 // <https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseURL>
                 if (redirect && redirect !== hashLet(ref)) {
+                    nodeCurrent = win;
                     // Redirection should delete cache related to response URL
                     // This is useful for case(s) like, when you have submitted
                     // a comment form and then you will be redirected to the same URL
@@ -294,8 +296,9 @@
                     return;
                 }
                 dataSet();
+                // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
-                    doRefChange(node, ref, $.status);
+                    doRefChange(node, ref);
                 }
                 data = [xhr.response, node];
                 hookFire($.status, data);
@@ -343,11 +346,11 @@
             target && target.focus();
         }
 
-        function doRefChange(el, ref, status) {
+        function doRefChange(el, ref) {
             if (ref === refGet()) {
                 return; // Clicking on the same URL should trigger the AJAX call. Just don’t duplicate it to the history!
             }
-            state.history && 200 === status && history.pushState({}, "", ref);
+            state.history && history.pushState({}, "", ref);
         }
 
         // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
@@ -412,6 +415,9 @@
                 action = t.action,
                 refNow = href || action,
                 type = toCaseUpper(t.method || GET);
+            if (GET === type) {
+                doRefChange(t, refNow);
+            }
             requests[refNow] = [doFetch(t, type, refNow), t];
             doPreventDefault(e);
         }

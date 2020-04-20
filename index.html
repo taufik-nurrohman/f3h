@@ -119,19 +119,19 @@
       <pre><code>let f3h = new F3H(<var>state</var> = {
         cache: false,
         history: true,
-        is: (source, refCurrent) =&gt; { &hellip; },
+        is: (source, ref) =&gt; { &hellip; },
         lot: {
             'x-requested-with': 'F3H'
         },
-        ref: (source, refCurrent) =&gt; { &hellip; },
+        ref: (source, ref) =&gt; { &hellip; },
         sources: 'a[href], form',
         types: { &hellip; }
     });</code></pre>
       <ul>
-        <li><var>cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only GET responses that will be cached.</li>
+        <li><var>cache</var> &rarr; See <code>state.cache</code>.</li>
         <li><var>state</var> &rarr; The configuration data.</li>
-        <li><var>state.cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only GET responses that will be cached.</li>
-        <li><var>state.history</var> &rarr; Set to <code>false</code> to disable the history feature.</li>
+        <li><var>state.cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only responses from the GET requests that will be cached by the application. By setting the value to <code>false</code> on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.</li>
+        <li><var>state.history</var> &rarr; Set to <code>false</code> to disable the history feature (loading different pages won&rsquo;t change the URL in the address bar).</li>
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
         <li><var>state.ref</var> &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.</li>
@@ -165,14 +165,14 @@ F3H._.cancelAllRequests = function() {
     return this.abort();
 };</code></pre>
       <h3>f3h.caches</h3>
-      <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will removes all caches.</p>
+      <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will remove all caches.</p>
       <pre><code>console.log(f3h.caches);</code></pre>
       <h3>f3h.ref</h3>
-      <p>This variable stores current URL that is being fetched, including the hash part.</p>
+      <p>This variable stores current URL that is being fetched by the application, including the hash part.</p>
       <h3>f3h.state</h3>
       <p>Return the modified application states.</p>
       <h3>f3h.lot</h3>
-      <p>Return the HTTP response headers as object.</p>
+      <p>Return the HTTP response headers as object. Every property in it are case-insensitive.</p>
       <pre><code>f3h.on('success', function(response) {
     console.log(this.lot);
 });</code></pre>
@@ -305,7 +305,7 @@ if ($out) { /* &hellip; */ } else { /* &hellip; */ }</code></pre>
       <p>There is a <code>""</code> key to express the default response type for URL or file name that does not have extension. A typical clean URL that is commonly used for search engine optimization. You can use this property to specify the response type as JSON under certain conditions in the given link according to the standard URL naming pattern in your application:</p>
       <pre><code>F3H.state.types[""] = link =&gt; {
     // Assume your REST API link format is `/foo/bar?output=json`
-    if (link.match(/[?&]output=json([&#]|$)/)) {
+    if (link.match(/[?&amp;]output=json([&amp;#]|$)/)) {
         return 'json';
     }
     // Return the default response for extension-less URL
