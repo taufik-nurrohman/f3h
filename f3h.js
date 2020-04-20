@@ -177,7 +177,7 @@
             refCurrent = ref, // Store current URL to a variable to be compared to the next URL
             requests = {},
             state = Object.assign({}, $$.state, (o || {})),
-            sources = sourcesGet(state.sources);
+            sources = sourcesGet(state.sources), nodeCurrent;
 
         // Return new instance if `F3H` was called without the `new` operator
         if (!($ instanceof $$)) {
@@ -202,13 +202,17 @@
 
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
-            $.ref = ref;
+            if (node === nodeCurrent) {
+                return; // Accidental click(s) on the same source element should cancel the request!
+            }
+            nodeCurrent = node;
+            refCurrent = $.ref = ref;
             hookFire('exit', [doc, node]);
             var headers = state.lot || {},
                 xhr = new XMLHttpRequest,
                 xhrUpload = xhr.upload,
                 data, fn, header, redirect;
-            // Automatic response type by file extension
+            // Automatic response type based on current file extension
             var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
                 responseType = state.types[x] || responseTypeTXT;
             if (isFunction(responseType)) {
@@ -267,7 +271,6 @@
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
-                refCurrent = ref;
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {

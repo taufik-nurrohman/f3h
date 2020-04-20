@@ -15,6 +15,7 @@ Release Notes
 ### 1.0.1
 
  - Response headers is now case-insensitive.
+ - Clicking on the same source element multiple times should trigger the AJAX request once.
 
 ### 1.0.0
 

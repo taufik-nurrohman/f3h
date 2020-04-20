@@ -57,7 +57,7 @@
         sections[main.offsetHeight] = title;
     }
 
-    f3h.on('success', function(response,a) {console.log(a)
+    f3h.on('success', function(response) {
         main.insertAdjacentHTML('beforeend', '<hr>' + response.querySelector('main').innerHTML);
         nav.innerHTML = response.querySelector('nav').innerHTML;
         prev = nav.querySelector('[rel=prev]');
@@ -68,7 +68,7 @@
     // Initial page
     nextToMore(document.title = 'Page 1');
 
-    // Change document title on section match
+    // Change document title on every section match
     window.addEventListener('scroll', function() {
         var visible = this.pageYOffset + (this.innerHeight / 2), top;
         for (top in sections) {
