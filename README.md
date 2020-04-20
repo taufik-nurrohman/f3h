@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.1
+
+ - Response headers is now case-insensitive.
+
 ### 1.0.0
 
  - Initial release.

@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.0
+ *  F3H 1.0.1
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -87,21 +87,29 @@
     function toResponseHeadersAsObject(xhr) {
         var out = {},
             headers = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/),
-            header, h, k, v;
+            header, h, k, v, w;
         for (header in headers) {
             h = headers[header].split(': ');
-            k = h.shift().replace(/(^|-)(\w)/g, function(m0, m1, m2) {
-                return m1 + toCaseUpper(m2);
-            });
-            v = h.join(': ');
-            out[k] = /^-?((\d+)?\.)?\d+$/[test](v) ? +v : v;
+            k = toCaseLower(h.shift());
+            w = toCaseLower(v = h.join(': '));
+            // Evaluate string value into their appropriate data type
+            if ("" === w || 'null' === w) {
+                v = null;
+            } else if ('true' === w) {
+                v = true;
+            } else if ('false' === w) {
+                v = false;
+            } else if (/^-?(\d*\.)?\d+$/[test](v)) {
+                v = +v;
+            }
+            out[k] = v;
         }
         return out;
     }
 
     (function($$) {
 
-        $$.version = '1.0.0';
+        $$.version = '1.0.1';
 
         $$.state = {
             'history': true,
@@ -131,7 +139,7 @@
                     0 !== raw[search]('://');
             },
             'lot': {
-                'X-Requested-With': name
+                'x-requested-with': name
             },
             'ref': function(source, refCurrent) {
                 return refCurrent; // Default URL hook
@@ -209,22 +217,30 @@
             xhr.responseType = responseType;
             xhr.open(type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref, true);
             if (POST === type) {
-                headers['Content-Type'] = node.enctype || 'multipart/form-data';
+                headers['content-type'] = node.enctype || 'multipart/form-data';
             }
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
                 }
             }
-            function setData() {
-                $.lot = toResponseHeadersAsObject(xhr);
+            function dataSet() {
+                var raw = toResponseHeadersAsObject(xhr);
+                $.lot = new Proxy(raw, {
+                    get: function(o, k) {
+                        return o[toCaseLower(k)] || null;
+                    },
+                    set: function(o, k, v) {
+                        o[toCaseLower(k)] = v;
+                    }
+                });
                 $.status = xhr.status;
             }
             eventSet(xhr, 'abort', function() {
-                setData(), hookFire('abort', [xhr.response, node]);
+                dataSet(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
-                setData();
+                dataSet();
                 data = [xhr.response, node];
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
@@ -241,7 +257,7 @@
                     doFetch(node, GET, redirect);
                     return;
                 }
-                setData();
+                dataSet();
                 if (GET === type) {
                     doRefChange(node, ref, $.status);
                 }
@@ -255,10 +271,10 @@
             });
             eventSet(xhrUpload, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
-                setData(), hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+                dataSet(), hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             eventSet(xhrUpload, 'progress', function(e) {
-                setData(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+                dataSet(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             // eventSet(xhr, 'timeout', fn = function() {});
             // eventSet(xhrUpload, 'timeout', fn);

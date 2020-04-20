@@ -1,7 +1,7 @@
 {
   "name": "@taufik-nurrohman/f3h",
   "description": "Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "f3h.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
