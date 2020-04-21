@@ -15,6 +15,7 @@ Release Notes
 ### 1.0.2
 
  - Fixed scroll restoration bug on history back.
+ - Removed `f3h.sources` property since it was never generated in live unless you put the response body to the current document. But when it is generated, it is too late.
 
 ### 1.0.1
 

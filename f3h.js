@@ -238,8 +238,8 @@
                     $.status = cache[0];
                     doRefChange(node, ref);
                     data = [cache[1], node];
-                    hookFire(cache[0], data);
                     hookFire('success', data);
+                    hookFire(cache[0], data);
                     sources = sourcesGet(state.sources);
                     onSourcesEventsSet(data);
                     hookFire('enter', data);
@@ -298,8 +298,8 @@
                     doRefChange(node, ref);
                 }
                 data = [xhr.response, node];
-                hookFire($.status, data);
                 hookFire('success', data);
+                hookFire($.status, data);
                 sources = sourcesGet(state.sources);
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
@@ -496,13 +496,15 @@
         };
 
         $.caches = caches;
+        $.fetch = function(ref, type, node) {
+            return doFetchBase(node, type, ref);
+        };
         $.fire = hookFire;
         $.hooks = hooks;
         $.lot = {};
         $.off = hookLet;
         $.on = hookSet;
         $.ref = null;
-        $.sources = sources;
         $.state = state;
         $.status = null;
 
