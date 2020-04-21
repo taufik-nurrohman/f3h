@@ -11,8 +11,8 @@
     "url": "git+https://github.com/taufik-nurrohman/f3h.git"
   },
   "keywords": [
-    "tag",
-    "picker"
+    "ajax",
+    "fetch"
   ],
   "author": "Taufik Nurrohman",
   "license": "MIT",
