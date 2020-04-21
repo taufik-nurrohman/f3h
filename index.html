@@ -125,26 +125,28 @@
         },
         ref: (source, ref) =&gt; { &hellip; },
         sources: 'a[href], form',
+        turbo: false,
         types: { &hellip; }
     });</code></pre>
       <ul>
         <li><var>cache</var> &rarr; See <code>state.cache</code>.</li>
         <li><var>state</var> &rarr; The configuration data.</li>
-        <li><var>state.cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only responses from the GET requests that will be cached by the application. By setting the value to <code>false</code> on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.</li>
+        <li><var>state.cache</var> &rarr; Set to <code>true</code> to enable local cache feature. Only responses from the GET requests that will be cached by the application. Setting the value to <code>false</code> on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.</li>
         <li><var>state.history</var> &rarr; Set to <code>false</code> to disable the history feature (loading different pages won&rsquo;t change the URL in the address bar).</li>
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
         <li><var>state.ref</var> &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.</li>
+        <li><var>state.turbo</var> &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.</li>
         <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
         <li><var>state.types</var> &rarr; List of file extensions with the expected response type.</li>
       </ul>
       <h2>Methods and Properties</h2>
-      <h3>F3H.version</h3>
-      <p>Return the application version.</p>
-      <pre><code>let version = F3H.version,
-    major = version.split('.')[0];
-
-if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>F3H.instances</h3>
+      <p>Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.</p>
+      <pre><code>for (let key in F3H.instances) {
+    console.log(key);
+    console.log(F3H.instances[key]);
+}</code></pre>
       <h3>F3H.state</h3>
       <p>This property stores the initial values of <code>f3h.state</code>.</p>
       <pre><code>let f3h = new F3H({
@@ -152,12 +154,12 @@ if (+major &lt; 3) { &hellip; }</code></pre>
     });
 
 console.log([F3H.state, f3h.state]);</code></pre>
-      <h3>F3H.instances</h3>
-      <p>Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.</p>
-      <pre><code>for (let key in F3H.instances) {
-    console.log(key);
-    console.log(F3H.instances[key]);
-}</code></pre>
+      <h3>F3H.version</h3>
+      <p>Return the application version.</p>
+      <pre><code>let version = F3H.version,
+    major = version.split('.')[0];
+
+if (+major &lt; 3) { &hellip; }</code></pre>
       <h3>F3H._</h3>
       <p>Alias of <code>F3H.prototype</code> used to formalize the prototype creation.</p>
       <pre><code>// Create `cancelAllRequests()` method
@@ -167,15 +169,15 @@ F3H._.cancelAllRequests = function() {
       <h3>f3h.caches</h3>
       <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will remove all caches.</p>
       <pre><code>console.log(f3h.caches);</code></pre>
-      <h3>f3h.ref</h3>
-      <p>This variable stores current URL that is being fetched by the application, including the hash part.</p>
-      <h3>f3h.state</h3>
-      <p>Return the modified application states.</p>
       <h3>f3h.lot</h3>
       <p>Return the HTTP response headers as object. Every property in it are case-insensitive.</p>
       <pre><code>f3h.on('success', function(response) {
     console.log(this.lot);
 });</code></pre>
+      <h3>f3h.ref</h3>
+      <p>This variable stores current URL that is being fetched by the application, including the hash part.</p>
+      <h3>f3h.state</h3>
+      <p>Return the modified application states.</p>
       <h3>f3h.status</h3>
       <p>Return the HTTP response status.</p>
       <pre><code>f3h.on('success', function(response) {
@@ -189,6 +191,12 @@ F3H._.cancelAllRequests = function() {
       <p>Abort requests.</p>
       <pre><code>f3h.abort(); // Abort all requests
 f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/asdf`</code></pre>
+      <h3>f3h.fetch(ref, type, from)</h3>
+      <p>Internal method used to help doing the generic fetch request using <code>XMLHttpRequest</code>.</p>
+      <pre><code>let xhr = f3h.fetch('https://127.0.0.1/test.html', 'GET', window);
+xhr.addEventListener('load', function() {
+    console.log(this.status);
+});</code></pre>
       <h3>f3h.pop()</h3>
       <p>Remove all AJAX events from the page.</p>
       <h2>Hooks</h2>

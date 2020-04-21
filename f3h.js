@@ -163,6 +163,7 @@
                 return refNow; // Default URL hook
             },
             'sources': 'a[href],form',
+            'turbo': false, // Pre-fetch URL on hover?
             'types': {
                 "": responseTypeHTML, // Default response type for extension-less URL
                 'ASP': responseTypeHTML,
@@ -200,6 +201,10 @@
             } : (o || {})),
             sources = sourcesGet(state.sources), nodeCurrent;
 
+        if (state.turbo) {
+            state.cache = true; // Enable turbo feature will force enable cache feature
+        }
+
         // Return new instance if `F3H` was called without the `new` operator
         if (!($ instanceof $$)) {
             return new $$(o);
@@ -236,7 +241,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    doRefChange(node, ref);
+                    doRefChange(ref);
                     data = [cache[1], node];
                     hookFire('success', data);
                     hookFire(cache[0], data);
@@ -295,7 +300,7 @@
                 dataSet();
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
-                    doRefChange(node, ref);
+                    doRefChange(ref);
                 }
                 data = [xhr.response, node];
                 hookFire('success', data);
@@ -368,7 +373,11 @@
             });
         }
 
-        function doRefChange(el, ref) {
+        function doPreFetchElement(node) {
+            eventSet(node, 'mousemove', onHoverOnce);
+        }
+
+        function doRefChange(ref) {
             if (ref === refGet()) {
                 return; // Clicking on the same URL should trigger the AJAX call. Just don’t duplicate it to the history!
             }
@@ -442,7 +451,7 @@
                 refNow = href || action,
                 type = toCaseUpper(t.method || GET);
             if (GET === type) {
-                doRefChange(t, refNow);
+                doRefChange(refNow);
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
             doPreventDefault(e);
@@ -451,6 +460,16 @@
         function onHashChange(e) {
             doScrollTo(targetGet(hashGet(refGet())) || html);
             doPreventDefault(e);
+        }
+
+        // Pre-fetch URL on link hover
+        function onHoverOnce() {
+            var t = this,
+                href = t.href;
+            if (!caches[hashLet(href)]) {
+                doPreFetch(t, href);
+            }
+            eventLet(t, 'mousemove', onHoverOnce);
         }
 
         function onPopState(e) {
@@ -470,8 +489,10 @@
         }
 
         function onSourcesEventsSet(data) {
+            var turbo = state.turbo;
             for (var i = 0, j = sources.length; i < j; ++i) {
                 eventSet(sources[i], eventNameGet(sources[i]), onFetch);
+                turbo && !isNodeForm(sources[i]) && doPreFetchElement(sources[i]);
             }
             doFocusToElement(data);
             doScrollToElement(data);
@@ -496,8 +517,8 @@
         };
 
         $.caches = caches;
-        $.fetch = function(ref, type, node) {
-            return doFetchBase(node, type, ref);
+        $.fetch = function(ref, type, from) {
+            return doFetchBase(from, type, ref);
         };
         $.fire = hookFire;
         $.hooks = hooks;

@@ -16,6 +16,7 @@ Release Notes
 
  - Fixed scroll restoration bug on history back.
  - Removed `f3h.sources` property since it was never generated in live unless you put the response body to the current document. But when it is generated, it is too late.
+ - Added turbo feature that allows users to pre-fetch link URL on hover by setting the `state.turbo` to `true`.
 
 ### 1.0.1
 
