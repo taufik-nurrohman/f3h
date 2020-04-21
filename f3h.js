@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.1
+ *  F3H 1.0.2
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -12,9 +12,6 @@
     var GET = 'GET',
         POST = 'POST',
 
-        querySelector = 'querySelector',
-        querySelectorAll = querySelector + 'All',
-
         responseTypeHTML = 'document',
         responseTypeJSON = 'json',
         responseTypeTXT = 'text',
@@ -25,19 +22,19 @@
         history = win.history,
         location = win.location,
         home = '//' + location.hostname,
-        html = doc.documentElement,
+        html = doc.documentElement, body,
         instances = 'instances';
 
     function attributeGet(node, attr) {
         return node.getAttribute(attr);
     }
 
-    function eventNameGet(node) {
-        return isNodeForm(node) ? 'submit' : 'click';
-    }
-
     function doPreventDefault(e) {
         e.preventDefault();
+    }
+
+    function eventNameGet(node) {
+        return isNodeForm(node) ? 'submit' : 'click';
     }
 
     function eventLet(node, name, fn) {
@@ -72,8 +69,20 @@
         return 'string' === typeof x;
     }
 
+    function query(selector, base) {
+        return (base || doc).querySelector(selector);
+    }
+
+    function queryAll(selector, base) {
+        return (base || doc).querySelectorAll(selector);
+    }
+
     function refGet() {
         return location.href;
+    }
+
+    function targetGet(id) {
+        return id ? (doc.getElementById(id) || doc.getElementsByName(id)[0]) : "";
     }
 
     function toCaseLower(x) {
@@ -191,8 +200,8 @@
         // Store current instance to `F3H.instances`
         $$[instances][Object.keys($$[instances]).length] = $;
 
-        function sourcesGet(query, root) {
-            var from = (root || doc)[querySelectorAll](query),
+        function sourcesGet(sources, root) {
+            var from = queryAll(sources, root),
                 refNow = refGet();
             if (isFunction(state.is)) {
                 var to = [];
@@ -342,7 +351,7 @@
                 hookFire('focus', data);
                 return;
             }
-            var target = doc[querySelector]('[autofocus]');
+            var target = query('[autofocus]');
             target && target.focus();
         }
 
@@ -353,21 +362,18 @@
             state.history && history.pushState({}, "", ref);
         }
 
+        function doScrollTo(node) {
+            html.scrollLeft = body.scrollLeft = node.offsetLeft;
+            html.scrollTop = body.scrollTop = node.offsetTop;
+        }
+
         // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
         function doScrollToElement(data) {
             if (hooks.scroll) {
                 hookFire('scroll', data);
                 return;
             }
-            var hash = location.hash.replace('#', "");
-            if (hash) {
-                var body = doc.body,
-                    target = doc.getElementById(hash) || doc.getElementsByName(hash)[0];
-                if (target) {
-                    html.scrollLeft = body.scrollLeft = target.offsetLeft;
-                    html.scrollTop = body.scrollTop = target.offsetTop;
-                }
-            }
+            doScrollTo(targetGet(hashGet(refGet())) || html);
         }
 
         function hookLet(name, fn) {
@@ -408,6 +414,11 @@
             return $;
         }
 
+        function onDocumentReady() {
+            body = doc.body; // Set body variable value once, on document ready
+            onSourcesEventsSet([doc, win]);
+        }
+
         function onFetch(e) {
             doFetchAbortAll();
             var t = this,
@@ -419,6 +430,11 @@
                 doRefChange(t, refNow);
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
+            doPreventDefault(e);
+        }
+
+        function onHashChange(e) {
+            doScrollTo(targetGet(hashGet(refGet())) || html);
             doPreventDefault(e);
         }
 
@@ -457,7 +473,11 @@
 
         $.pop = function() {
             onSourcesEventsLet();
-            return eventLet(win, 'popstate', onPopState), hookFire('pop', [doc, win]), $.abort();
+            eventLet(win, 'DOMContentLoaded', onDocumentReady);
+            eventLet(win, 'hashchange', onHashChange);
+            eventLet(win, 'popstate', onPopState);
+            hookFire('pop', [doc, win]);
+            return $.abort();
         };
 
         $.caches = caches;
@@ -471,10 +491,9 @@
         $.state = state;
         $.status = null;
 
-        eventSet(win, 'DOMContentLoaded', function() {
-            onSourcesEventsSet([doc, win]);
-        });
+        eventSet(win, 'DOMContentLoaded', onDocumentReady);
 
+        eventSet(win, 'hashchange', onHashChange);
         eventSet(win, 'popstate', onPopState);
 
         return $;
