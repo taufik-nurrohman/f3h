@@ -93,7 +93,7 @@
         return x.toUpperCase();
     }
 
-    function toResponseHeadersAsObject(xhr) {
+    function toHeadersAsProxy(xhr) {
         var out = {},
             headers = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/),
             header, h, k, v, w;
@@ -113,12 +113,20 @@
             }
             out[k] = v;
         }
-        return out;
+        // Use proxy to make response header’s key to be case-insensitive
+        return new Proxy(out, {
+            get: function(o, k) {
+                return o[toCaseLower(k)] || null;
+            },
+            set: function(o, k, v) {
+                o[toCaseLower(k)] = v;
+            }
+        });
     }
 
     (function($$) {
 
-        $$.version = '1.0.1';
+        $$.version = '1.0.2';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -213,7 +221,6 @@
             return from;
         }
 
-        // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetch(node, type, ref) {
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
@@ -240,42 +247,23 @@
                 }
             }
             var headers = state.lot || {},
-                xhr = new XMLHttpRequest,
-                xhrUpload = xhr.upload,
-                data, fn, header, redirect;
-            // Automatic response type based on current file extension
-            var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
-                responseType = state.types[x] || responseTypeTXT;
-            if (isFunction(responseType)) {
-                responseType = responseType.call($, ref);
-            }
-            xhr.responseType = responseType;
-            xhr.open(type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref, true);
-            if (POST === type) {
-                headers['content-type'] = node.enctype || 'multipart/form-data';
-            }
+                data, fn, header, redirect,
+                xhr = doFetchBase(node, type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref),
+                xhrUpload = xhr.upload;
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
                 }
             }
             function dataSet() {
-                // Use proxy to make response header’s key to be case-insensitive
-                var lot = new Proxy(toResponseHeadersAsObject(xhr), {
-                        get: function(o, k) {
-                            return o[toCaseLower(k)] || null;
-                        },
-                        set: function(o, k, v) {
-                            o[toCaseLower(k)] = v;
-                        }
-                    }),
-                    status = xhr.status;
-                $.lot = lot;
-                $.status = status;
                 // Store response from GET request(s) to cache
+                var lot = toHeadersAsProxy(xhr),
+                    status = xhr.status;
                 if (GET === type && state.cache) {
                     caches[hashLet(ref)] = [status, xhr.response, lot];
                 }
+                $.lot = lot;
+                $.status = status;
             }
             eventSet(xhr, 'abort', function() {
                 dataSet(), hookFire('abort', [xhr.response, node]);
@@ -323,9 +311,6 @@
             eventSet(xhrUpload, 'progress', function(e) {
                 dataSet(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
-            // eventSet(xhr, 'timeout', fn = function() {});
-            // eventSet(xhrUpload, 'timeout', fn);
-            xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
         }
 
@@ -345,6 +330,24 @@
             }
         }
 
+        // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
+        function doFetchBase(node, type, ref) {
+            var xhr = new XMLHttpRequest;
+            // Automatic response type based on current file extension
+            var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
+                responseType = state.types[x] || responseTypeTXT;
+            if (isFunction(responseType)) {
+                responseType = responseType.call($, ref);
+            }
+            xhr.responseType = responseType;
+            xhr.open(type, ref, true);
+            if (POST === type) {
+                xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
+            }
+            xhr.send(POST === type ? new FormData(node) : null);
+            return xhr;
+        }
+
         // Focus to the first element that has `autofocus` attribute
         function doFocusToElement(data) {
             if (hooks.focus) {
@@ -353,6 +356,16 @@
             }
             var target = query('[autofocus]');
             target && target.focus();
+        }
+
+        // Prefetch page and store it into cache
+        function doPreFetch(node, ref) {
+            var xhr = doFetchBase(node, GET, ref), status;
+            eventSet(xhr, 'load', function() {
+                if (status = xhr.status) {
+                    caches[hashLet(ref)] = [status, xhr.response, toHeadersAsProxy(xhr)];
+                }
+            });
         }
 
         function doRefChange(el, ref) {
@@ -417,6 +430,8 @@
         function onDocumentReady() {
             body = doc.body; // Set body variable value once, on document ready
             onSourcesEventsSet([doc, win]);
+            // Store the initial page into cache
+            state.cache && doPreFetch(win, refGet());
         }
 
         function onFetch(e) {
