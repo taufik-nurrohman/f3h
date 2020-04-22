@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.2
+ *  F3H 1.0.3
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -82,7 +82,7 @@
     }
 
     function targetGet(id) {
-        return id ? (doc.getElementById(id) || doc.getElementsByName(id)[0]) : "";
+        return id ? (doc.getElementById(id) || doc.getElementsByName(id)[0]) : null;
     }
 
     function toCaseLower(x) {
@@ -126,7 +126,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.2';
+        $$.version = '1.0.3';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -186,9 +186,6 @@
             return;
         }
 
-        // Prevent window from jumping to the top whenever user tries to hit the back or forward button
-        history.scrollRestoration = 'manual';
-
         var $ = this,
             $$ = win[name],
             caches = {},
@@ -241,6 +238,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
+                    doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     hookFire('success', data);
@@ -274,7 +272,7 @@
                 dataSet(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
-                dataSet();
+                dataSet(), doScrollTo(html);
                 data = [xhr.response, node];
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
@@ -297,7 +295,7 @@
                     doFetch(node, GET, redirect);
                     return;
                 }
-                dataSet();
+                dataSet(), doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
@@ -385,6 +383,9 @@
         }
 
         function doScrollTo(node) {
+            if (!node) {
+                return;
+            }
             html.scrollLeft = body.scrollLeft = node.offsetLeft;
             html.scrollTop = body.scrollTop = node.offsetTop;
         }
@@ -395,7 +396,7 @@
                 hookFire('scroll', data);
                 return;
             }
-            doScrollTo(targetGet(hashGet(refGet())) || html);
+            doScrollTo(targetGet(hashGet(refGet())));
         }
 
         function hookLet(name, fn) {
@@ -458,7 +459,7 @@
         }
 
         function onHashChange(e) {
-            doScrollTo(targetGet(hashGet(refGet())) || html);
+            doScrollTo(targetGet(hashGet(refGet())));
             doPreventDefault(e);
         }
 
