@@ -116,7 +116,7 @@
             styles = nodeGetAll('link[href][rel=stylesheet]', base);
         for (var i = 0, j = styles.length; i < j; ++i) {
             style = styles[i];
-            out[attributeGet(style, 'href')] = style.media;
+            out[attributeGet(style, 'href')] = style.media || 1;
         }
         return out;
     }
@@ -124,7 +124,7 @@
     function styleSet(href, media) {
         var link = doc.createElement('link');
         attributeSet(link, 'href', href);
-        media && (link.media = media);
+        media && 1 !== media && (link.media = media);
         link.rel = 'stylesheet';
         head.appendChild(link);
     }
