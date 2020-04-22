@@ -22,11 +22,16 @@
         history = win.history,
         location = win.location,
         home = '//' + location.hostname,
-        html = doc.documentElement, body,
+        html = doc.documentElement,
+        head, body,
         instances = 'instances';
 
     function attributeGet(node, attr) {
         return node.getAttribute(attr);
+    }
+
+    function attributeSet(node, attr, value) {
+        return node.setAttribute(attr, value);
     }
 
     function doPreventDefault(e) {
@@ -69,16 +74,59 @@
         return 'string' === typeof x;
     }
 
-    function query(selector, base) {
+    function nodeGet(selector, base) {
         return (base || doc).querySelector(selector);
     }
 
-    function queryAll(selector, base) {
+    function nodeGetAll(selector, base) {
         return (base || doc).querySelectorAll(selector);
+    }
+
+    function nodeLet(node) {
+        if (!node) {
+            return;
+        }
+        var parent = node.parentNode;
+        parent && parent.removeChild(node);
     }
 
     function refGet() {
         return location.href;
+    }
+
+    function scriptGetAll(base) {
+        var out = {}, script,
+            scripts = nodeGetAll('script[src]', base);
+        for (var i = 0, j = scripts.length; i < j; ++i) {
+            script = scripts[i];
+            out[attributeGet(script, 'src')] = script.async;
+        }
+        return out;
+    }
+
+    function scriptSet(src, sync) {
+        var script = doc.createElement('script');
+        attributeSet(script, 'src', src);
+        sync && (script.async = sync);
+        head.appendChild(script);
+    }
+
+    function styleGetAll(base) {
+        var out = {}, style,
+            styles = nodeGetAll('link[href][rel=stylesheet]', base);
+        for (var i = 0, j = styles.length; i < j; ++i) {
+            style = styles[i];
+            out[attributeGet(style, 'href')] = style.media;
+        }
+        return out;
+    }
+
+    function styleSet(href, media) {
+        var link = doc.createElement('link');
+        attributeSet(link, 'href', href);
+        media && (link.media = media);
+        link.rel = 'stylesheet';
+        head.appendChild(link);
     }
 
     function targetGet(id) {
@@ -193,6 +241,8 @@
             ref = refGet(), // Get current URL to be used as the default state after the last pop state
             refCurrent = ref, // Store current URL to a variable to be compared to the next URL
             requests = {},
+            scripts = scriptGetAll(),
+            styles = styleGetAll(),
             state = Object.assign({}, $$.state, true === o ? {
                 cache: o
             } : (o || {})),
@@ -211,7 +261,7 @@
         $$[instances][Object.keys($$[instances]).length] = $;
 
         function sourcesGet(sources, root) {
-            var from = queryAll(sources, root),
+            var from = nodeGetAll(sources, root),
                 refNow = refGet();
             if (isFunction(state.is)) {
                 var to = [];
@@ -234,16 +284,20 @@
             hookFire('exit', [doc, node]);
             // Get response from cache if any
             if (state.cache) {
-                var cache = caches[hashLet(ref)]; // `[status, response, lot]`
+                var cache = caches[hashLet(ref)]; // `[status, response, lot, xhrIsDocument]`
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    doScrollTo(html);
+                    cache[3] && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     hookFire('success', data);
                     hookFire(cache[0], data);
                     sources = sourcesGet(state.sources);
+                    if (cache[3]) {
+                        scripts = doUpdateScripts(data[0]);
+                        styles = doUpdateStyles(data[0]);
+                    }
                     onSourcesEventsSet(data);
                     hookFire('enter', data);
                     return;
@@ -252,7 +306,8 @@
             var headers = state.lot || {},
                 data, fn, header, redirect,
                 xhr = doFetchBase(node, type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref),
-                xhrUpload = xhr.upload;
+                xhrIsDocument = responseTypeHTML === xhr.responseType,
+                xhrPush = xhr.upload;
             if (headers && headers.length) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
@@ -263,7 +318,7 @@
                 var lot = toHeadersAsProxy(xhr),
                     status = xhr.status;
                 if (GET === type && state.cache) {
-                    caches[hashLet(ref)] = [status, xhr.response, lot];
+                    caches[hashLet(ref)] = [status, xhr.response, lot, xhrIsDocument];
                 }
                 $.lot = lot;
                 $.status = status;
@@ -272,14 +327,19 @@
                 dataSet(), hookFire('abort', [xhr.response, node]);
             });
             eventSet(xhr, 'error', fn = function() {
-                dataSet(), doScrollTo(html);
+                dataSet();
+                xhrIsDocument && doScrollTo(html);
                 data = [xhr.response, node];
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
+                if (xhrIsDocument) {
+                    scripts = doUpdateScripts(data[0]);
+                    styles = doUpdateStyles(data[0]);
+                }
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
             });
-            eventSet(xhrUpload, 'error', fn);
+            eventSet(xhrPush, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
                 // Handle internal server-side redirection
                 redirect = xhr.responseURL;
@@ -295,7 +355,8 @@
                     doFetch(node, GET, redirect);
                     return;
                 }
-                dataSet(), doScrollTo(html);
+                dataSet();
+                xhrIsDocument && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
@@ -304,14 +365,18 @@
                 hookFire('success', data);
                 hookFire($.status, data);
                 sources = sourcesGet(state.sources);
+                if (xhrIsDocument) {
+                    scripts = doUpdateScripts(data[0]);
+                    styles = doUpdateStyles(data[0]);
+                }
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
             });
-            eventSet(xhrUpload, 'load', fn);
+            eventSet(xhrPush, 'load', fn);
             eventSet(xhr, 'progress', function(e) {
                 dataSet(), hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
-            eventSet(xhrUpload, 'progress', function(e) {
+            eventSet(xhrPush, 'progress', function(e) {
                 dataSet(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             return xhr;
@@ -347,6 +412,7 @@
             if (POST === type) {
                 xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
             }
+            // TODO: Include submit button value to the form data
             xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
         }
@@ -357,16 +423,16 @@
                 hookFire('focus', data);
                 return;
             }
-            var target = query('[autofocus]');
+            var target = nodeGet('[autofocus]');
             target && target.focus();
         }
 
-        // Prefetch page and store it into cache
+        // Pre-fetch page and store it into cache
         function doPreFetch(node, ref) {
             var xhr = doFetchBase(node, GET, ref), status;
             eventSet(xhr, 'load', function() {
                 if (status = xhr.status) {
-                    caches[hashLet(ref)] = [status, xhr.response, toHeadersAsProxy(xhr)];
+                    caches[hashLet(ref)] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
                 }
             });
         }
@@ -397,6 +463,38 @@
                 return;
             }
             doScrollTo(targetGet(hashGet(refGet())));
+        }
+
+        function doUpdateScripts(compare) {
+            var scriptsToCompare = scriptGetAll(compare), src;
+            for (src in scripts) {
+                if (!scriptsToCompare[src]) {
+                    delete scripts[src];
+                    nodeLet(nodeGet('script[src="' + src + '"]'));
+                }
+            }
+            for (src in scriptsToCompare) {
+                if (!scripts[src]) {
+                    scriptSet(src, scripts[src] = scriptsToCompare[src]);
+                }
+            }
+            return scripts;
+        }
+
+        function doUpdateStyles(compare) {
+            var stylesToCompare = styleGetAll(compare), href;
+            for (href in styles) {
+                if (!stylesToCompare[href]) {
+                    delete styles[href];
+                    nodeLet(nodeGet('link[href="' + href + '"][rel=stylesheet]'));
+                }
+            }
+            for (href in stylesToCompare) {
+                if (!styles[href]) {
+                    styleSet(href, styles[href] = stylesToCompare[href]);
+                }
+            }
+            return styles;
         }
 
         function hookLet(name, fn) {
@@ -438,7 +536,9 @@
         }
 
         function onDocumentReady() {
-            body = doc.body; // Set body variable value once, on document ready
+            // Set body and head variable value once, on document ready
+            body = doc.body;
+            head = doc.head;
             onSourcesEventsSet([doc, win]);
             // Store the initial page into cache
             state.cache && doPreFetch(win, refGet());
