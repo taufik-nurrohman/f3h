@@ -15,6 +15,8 @@ Release Notes
 ### 1.0.3
 
  - Fix scroll restoration bug, again.
+ - Added ability to add/remove external CSS and JavaScript files automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles.
+ - **TODO:** Add/remove inline CSS and JavaScript declarations.
 
 ### 1.0.2
 
