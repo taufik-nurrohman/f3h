@@ -276,7 +276,7 @@
         function doFetch(node, type, ref) {
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
-            if (GET === type && node === nodeCurrent && node !== win) {
+            if (GET === type && node === nodeCurrent && win !== node) {
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
             nodeCurrent = node; // Store currently selected source element to a variable to be compared later
@@ -288,7 +288,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    cache[3] && doScrollTo(html);
+                    cache[3] && win === node && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     hookFire('success', data);
@@ -328,7 +328,7 @@
             });
             eventSet(xhr, 'error', fn = function() {
                 dataSet();
-                xhrIsDocument && doScrollTo(html);
+                xhrIsDocument && win === node && doScrollTo(html);
                 data = [xhr.response, node];
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
@@ -356,7 +356,7 @@
                     return;
                 }
                 dataSet();
-                xhrIsDocument && doScrollTo(html);
+                xhrIsDocument && win === node && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
