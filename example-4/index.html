@@ -17,12 +17,7 @@
 
     f3h.on('success', function(response) {
         document.title = response.title;
-        var mainFromResponse = response.querySelector('main');
-        main.innerHTML = mainFromResponse.innerHTML;
-        // Evalute inline JavaScript in the `<main>` element
-        mainFromResponse.querySelectorAll('script').forEach(function(script) {
-            !script.src && eval(script.textContent);
-        });
+        main.innerHTML = response.querySelector('main').innerHTML;
     });
 
     alert('Alert once!');

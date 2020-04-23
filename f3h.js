@@ -24,7 +24,9 @@
         home = '//' + location.hostname,
         html = doc.documentElement,
         head, body,
-        instances = 'instances';
+        instances = 'instances',
+
+        scriptCurrent = doc.currentScript;
 
     function attributeGet(node, attr) {
         return node.getAttribute(attr);
@@ -32,10 +34,6 @@
 
     function attributeSet(node, attr, value) {
         return node.setAttribute(attr, value);
-    }
-
-    function doPreventDefault(e) {
-        e.preventDefault();
     }
 
     function eventNameGet(node) {
@@ -58,6 +56,13 @@
         return ref.split('#')[0];
     }
 
+    var idCurrent = Date.now();
+    function idSet(node) {
+        var id = node.id;
+        !id && (++idCurrent, (node.id = id = name + ':' + idCurrent));
+        return id;
+    }
+
     function isFunction(x) {
         return 'function' === typeof x;
     }
@@ -70,8 +75,34 @@
         return 'undefined' !== typeof x;
     }
 
+    function isScriptForF3H(node) {
+        // Exclude this very JavaScript
+        if (node.src && scriptCurrent.src === node.src) {
+            return 1;
+        }
+        var n = toCaseLower(name);
+        // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
+        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+            return 1;
+        }
+        // Exclude JavaScript that contains `F3H` instantiation
+        if ((new RegExp('\\b' + name + '\\b')).test(node.innerHTML || "")) {
+            return 1;
+        }
+        return 0;
+    }
+
     function isString(x) {
         return 'string' === typeof x;
+    }
+
+    function isStyleForF3H(node) {
+        var n = toCaseLower(name);
+        // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
+        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+            return 1;
+        }
+        return 0;
     }
 
     function nodeGet(selector, base) {
@@ -90,43 +121,54 @@
         parent && parent.removeChild(node);
     }
 
+    function nodeRestore(from) {
+        var node = doc.createElement(from[0]);
+        node.innerHTML = from[1];
+        for (var k in from[2]) {
+            attributeSet(node, k, from[2][k]);
+        }
+        return node;
+    }
+
+    function nodeSave(node) {
+        var attr = node.attributes,
+            to = [toCaseLower(node.nodeName), node.innerHTML, {}];
+        for (var i = 0, j = attr.length; i < j; ++i) {
+            to[2][attr[i].name] = attr[i].value;
+        }
+        return to;
+    }
+
+    function preventDefault(e) {
+        e.preventDefault();
+    }
+
     function refGet() {
         return location.href;
     }
 
     function scriptGetAll(base) {
         var out = {}, script,
-            scripts = nodeGetAll('script[src]', base);
+            scripts = nodeGetAll('script', base);
         for (var i = 0, j = scripts.length; i < j; ++i) {
-            script = scripts[i];
-            out[attributeGet(script, 'src')] = script.async;
+            if (isScriptForF3H(script = scripts[i])) {
+                continue;
+            }
+            out[idSet(script)] = nodeSave(script);
         }
         return out;
-    }
-
-    function scriptSet(src, sync) {
-        var script = doc.createElement('script');
-        attributeSet(script, 'src', src);
-        sync && (script.async = sync);
-        head.appendChild(script);
     }
 
     function styleGetAll(base) {
         var out = {}, style,
-            styles = nodeGetAll('link[href][rel=stylesheet]', base);
+            styles = nodeGetAll('link[href][rel=stylesheet],style', base);
         for (var i = 0, j = styles.length; i < j; ++i) {
-            style = styles[i];
-            out[attributeGet(style, 'href')] = style.media || 1;
+            if (isStyleForF3H(style = styles[i])) {
+                continue;
+            }
+            out[idSet(style)] = nodeSave(style);
         }
         return out;
-    }
-
-    function styleSet(href, media) {
-        var link = doc.createElement('link');
-        attributeSet(link, 'href', href);
-        media && 1 !== media && (link.media = media);
-        link.rel = 'stylesheet';
-        head.appendChild(link);
     }
 
     function targetGet(id) {
@@ -276,7 +318,7 @@
         function doFetch(node, type, ref) {
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
-            if (GET === type && node === nodeCurrent && win !== node) {
+            if (GET === type && node === nodeCurrent && node !== win) {
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
             nodeCurrent = node; // Store currently selected source element to a variable to be compared later
@@ -291,13 +333,13 @@
                     cache[3] && win === node && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
+                    // Update CSS before markup change
+                    cache[3] && (styles = doUpdateStyles(data[0]));
                     hookFire('success', data);
                     hookFire(cache[0], data);
                     sources = sourcesGet(state.sources);
-                    if (cache[3]) {
-                        scripts = doUpdateScripts(data[0]);
-                        styles = doUpdateStyles(data[0]);
-                    }
+                    // Update JavaScript after markup change
+                    cache[3] && (scripts = doUpdateScripts(data[0]));
                     onSourcesEventsSet(data);
                     hookFire('enter', data);
                     return;
@@ -330,12 +372,12 @@
                 dataSet();
                 xhrIsDocument && win === node && doScrollTo(html);
                 data = [xhr.response, node];
+                // Update CSS before markup change
+                xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('error', data);
                 sources = sourcesGet(state.sources);
-                if (xhrIsDocument) {
-                    scripts = doUpdateScripts(data[0]);
-                    styles = doUpdateStyles(data[0]);
-                }
+                // Update JavaScript after markup change
+                xhrIsDocument && (scripts = doUpdateScripts(data[0]));
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
             });
@@ -356,19 +398,19 @@
                     return;
                 }
                 dataSet();
-                xhrIsDocument && win === node && doScrollTo(html);
+                xhrIsDocument && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
                 }
                 data = [xhr.response, node];
+                // Update CSS before markup change
+                xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
                 hookFire($.status, data);
                 sources = sourcesGet(state.sources);
-                if (xhrIsDocument) {
-                    scripts = doUpdateScripts(data[0]);
-                    styles = doUpdateStyles(data[0]);
-                }
+                // Update JavaScript after markup change
+                xhrIsDocument && (scripts = doUpdateScripts(data[0]));
                 onSourcesEventsSet(data);
                 hookFire('enter', data);
             });
@@ -409,10 +451,9 @@
             }
             xhr.responseType = responseType;
             xhr.open(type, ref, true);
-            if (POST === type) {
-                xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
-            }
-            // TODO: Include submit button value to the form data
+            // if (POST === type) {
+            //    xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
+            // }
             xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
         }
@@ -466,32 +507,34 @@
         }
 
         function doUpdateScripts(compare) {
-            var scriptsToCompare = scriptGetAll(compare), src;
-            for (src in scripts) {
-                if (!scriptsToCompare[src]) {
-                    delete scripts[src];
-                    nodeLet(nodeGet('script[src="' + src + '"]'));
+            var id, scriptsToCompare = scriptGetAll(compare), v;
+            for (id in scripts) {
+                if (!scriptsToCompare[id]) {
+                    delete scripts[id];
+                    nodeLet(targetGet(id));
                 }
             }
-            for (src in scriptsToCompare) {
-                if (!scripts[src]) {
-                    scriptSet(src, scripts[src] = scriptsToCompare[src]);
+            for (id in scriptsToCompare) {
+                if (!scripts[id]) {
+                    scripts[id] = (v = scriptsToCompare[id]);
+                    body.appendChild(nodeRestore(v));
                 }
             }
             return scripts;
         }
 
         function doUpdateStyles(compare) {
-            var stylesToCompare = styleGetAll(compare), href;
-            for (href in styles) {
-                if (!stylesToCompare[href]) {
-                    delete styles[href];
-                    nodeLet(nodeGet('link[href="' + href + '"][rel=stylesheet]'));
+            var id, stylesToCompare = styleGetAll(compare), v;
+            for (id in styles) {
+                if (!stylesToCompare[id]) {
+                    delete styles[id];
+                    nodeLet(targetGet(id));
                 }
             }
-            for (href in stylesToCompare) {
-                if (!styles[href]) {
-                    styleSet(href, styles[href] = stylesToCompare[href]);
+            for (id in stylesToCompare) {
+                if (!styles[id]) {
+                    styles[id] = (v = stylesToCompare[id]);
+                    head.appendChild(nodeRestore(v));
                 }
             }
             return styles;
@@ -555,12 +598,12 @@
                 doRefChange(refNow);
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
-            doPreventDefault(e);
+            preventDefault(e);
         }
 
         function onHashChange(e) {
             doScrollTo(targetGet(hashGet(refGet())));
-            doPreventDefault(e);
+            preventDefault(e);
         }
 
         // Pre-fetch URL on link hover
@@ -627,8 +670,10 @@
         $.off = hookLet;
         $.on = hookSet;
         $.ref = null;
+        $.scripts = scripts;
         $.state = state;
         $.status = null;
+        $.styles = styles;
 
         eventSet(win, 'DOMContentLoaded', onDocumentReady);
 
