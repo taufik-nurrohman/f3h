@@ -171,8 +171,8 @@
         return out;
     }
 
-    function targetGet(id) {
-        return id ? (doc.getElementById(id) || doc.getElementsByName(id)[0]) : null;
+    function targetGet(id, orName) {
+        return id ? (doc.getElementById(id) || (orName ? doc.getElementsByName(id)[0] : null)) : null;
     }
 
     function toCaseLower(x) {
@@ -315,6 +315,20 @@
             return from;
         }
 
+        // Include submit button value to the form data
+        function doAppendValueStorageForButton(node) {
+            var buttonValueStorage = doc.createElement('input'),
+                buttons = nodeGetAll('[name][type=submit][value]', node);
+            buttonValueStorage.type = 'hidden';
+            node.appendChild(buttonValueStorage);
+            for (var i = 0, j = buttons.length; i < j; ++i) {
+                eventSet(buttons[i], 'click', function() {
+                    buttonValueStorage.name = this.name;
+                    buttonValueStorage.value = this.value;
+                });
+            }
+        }
+
         function doFetch(node, type, ref) {
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
@@ -330,7 +344,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    cache[3] && win === node && doScrollTo(html);
+                    cache[3] && win === node && state.history && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     // Update CSS before markup change
@@ -370,7 +384,7 @@
             });
             eventSet(xhr, 'error', fn = function() {
                 dataSet();
-                xhrIsDocument && win === node && doScrollTo(html);
+                xhrIsDocument && win === node && state.history && doScrollTo(html);
                 data = [xhr.response, node];
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
@@ -398,7 +412,7 @@
                     return;
                 }
                 dataSet();
-                xhrIsDocument && doScrollTo(html);
+                xhrIsDocument && state.history && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
@@ -503,7 +517,7 @@
                 hookFire('scroll', data);
                 return;
             }
-            doScrollTo(targetGet(hashGet(refGet())));
+            doScrollTo(targetGet(hashGet(refGet()), 1));
         }
 
         function doUpdateScripts(compare) {
@@ -602,7 +616,7 @@
         }
 
         function onHashChange(e) {
-            doScrollTo(targetGet(hashGet(refGet())));
+            doScrollTo(targetGet(hashGet(refGet()), 1));
             preventDefault(e);
         }
 
@@ -636,7 +650,11 @@
             var turbo = state.turbo;
             for (var i = 0, j = sources.length; i < j; ++i) {
                 eventSet(sources[i], eventNameGet(sources[i]), onFetch);
-                turbo && !isNodeForm(sources[i]) && doPreFetchElement(sources[i]);
+                if (isNodeForm(sources[i])) {
+                    doAppendValueStorageForButton(sources[i]);
+                } else {
+                    turbo && doPreFetchElement(sources[i]);
+                }
             }
             doFocusToElement(data);
             doScrollToElement(data);

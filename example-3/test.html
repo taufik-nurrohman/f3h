@@ -4,6 +4,33 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <title>A Test Page</title>
+    <style>
+
+    .progress {
+      position: fixed;
+      top: .25em;
+      right: .25em;
+      left: .25em;
+      pointer-events: none;
+    }
+
+    .progress span {
+      display: block;
+      float: left;
+      width: 0;
+      height: .25em;
+      background: #00f;
+    }
+
+    .progress span.success {
+      background: #0f0;
+    }
+
+    .progress span.error {
+      background: #f00;
+    }
+
+    </style>
   </head>
   <body>
     <main>

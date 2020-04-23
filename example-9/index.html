@@ -85,7 +85,10 @@
         threshold = 200; // 200 pixel(s) before end of the document
     window.addEventListener('scroll', function() {
         if ((window.innerHeight + window.pageYOffset) >= body.offsetHeight - threshold) {
-            next && next.click(); // Click the “Load More” link!
+            if (next) {
+                next.click(); // Click the “Load More” link!
+                next.style.visibility = 'hidden'; // Hide the “Load More” link!
+            }
         }
     }, false);
 
