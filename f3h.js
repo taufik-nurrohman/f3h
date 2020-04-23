@@ -36,6 +36,10 @@
         return node.setAttribute(attr, value);
     }
 
+    function contentGet(node) {
+        return node.innerHTML;
+    }
+
     function eventNameGet(node) {
         return isNodeForm(node) ? 'submit' : 'click';
     }
@@ -56,11 +60,19 @@
         return ref.split('#')[0];
     }
 
-    var idCurrent = Date.now();
-    function idSet(node) {
-        var id = node.id;
-        !id && (++idCurrent, (node.id = id = name + ':' + idCurrent));
-        return id;
+    // <https://stackoverflow.com/a/8831937/1163000>
+    function idFrom(text) {
+        var out = 0, c, i, j = text.length;
+        if (0 === j) {
+            return out;
+        }
+        for (i = 0; i < j; ++i) {
+            c = text.charCodeAt(i);
+            out = ((out << 5) - out) + c;
+            out = out & out; // Convert to 32bit integer
+        }
+        // Force absolute value
+        return out < 1 ? out * -1 : out;
     }
 
     function isFunction(x) {
@@ -86,7 +98,7 @@
             return 1;
         }
         // Exclude JavaScript that contains `F3H` instantiation
-        if ((new RegExp('\\b' + name + '\\b')).test(node.innerHTML || "")) {
+        if ((new RegExp('\\b' + name + '\\b')).test(contentGet(node) || "")) {
             return 1;
         }
         return 0;
@@ -103,6 +115,10 @@
             return 1;
         }
         return 0;
+    }
+
+    function nodeAppend(node, to) {
+        to.appendChild(node);
     }
 
     function nodeGet(selector, base) {
@@ -132,7 +148,7 @@
 
     function nodeSave(node) {
         var attr = node.attributes,
-            to = [toCaseLower(node.nodeName), node.innerHTML, {}];
+            to = [toCaseLower(node.nodeName), contentGet(node), {}];
         for (var i = 0, j = attr.length; i < j; ++i) {
             to[2][attr[i].name] = attr[i].value;
         }
@@ -148,25 +164,27 @@
     }
 
     function scriptGetAll(base) {
-        var out = {}, script,
+        var id, out = {}, script,
             scripts = nodeGetAll('script', base);
         for (var i = 0, j = scripts.length; i < j; ++i) {
             if (isScriptForF3H(script = scripts[i])) {
                 continue;
             }
-            out[idSet(script)] = nodeSave(script);
+            script.id = (id = script.id || name + ':' + idFrom(attributeGet(script, 'src') || contentGet(script)));
+            out[id] = nodeSave(script);
         }
         return out;
     }
 
     function styleGetAll(base) {
-        var out = {}, style,
+        var id, out = {}, style,
             styles = nodeGetAll('link[href][rel=stylesheet],style', base);
         for (var i = 0, j = styles.length; i < j; ++i) {
             if (isStyleForF3H(style = styles[i])) {
                 continue;
             }
-            out[idSet(style)] = nodeSave(style);
+            style.id = (id = style.id || name + ':' + idFrom(attributeGet(style, 'href') || contentGet(style)));
+            out[id] = nodeSave(style);
         }
         return out;
     }
@@ -320,7 +338,7 @@
             var buttonValueStorage = doc.createElement('input'),
                 buttons = nodeGetAll('[name][type=submit][value]', node);
             buttonValueStorage.type = 'hidden';
-            node.appendChild(buttonValueStorage);
+            nodeAppend(buttonValueStorage, node);
             for (var i = 0, j = buttons.length; i < j; ++i) {
                 eventSet(buttons[i], 'click', function() {
                     buttonValueStorage.name = this.name;
@@ -330,9 +348,11 @@
         }
 
         function doFetch(node, type, ref) {
+            var isWindow = node === win,
+                useHistory = state.history;
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
-            if (GET === type && node === nodeCurrent && node !== win) {
+            if (GET === type && node === nodeCurrent && !isWindow) {
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
             nodeCurrent = node; // Store currently selected source element to a variable to be compared later
@@ -344,7 +364,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    cache[3] && win === node && state.history && doScrollTo(html);
+                    cache[3] && isWindow && useHistory && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     // Update CSS before markup change
@@ -384,7 +404,7 @@
             });
             eventSet(xhr, 'error', fn = function() {
                 dataSet();
-                xhrIsDocument && win === node && state.history && doScrollTo(html);
+                xhrIsDocument && isWindow && useHistory && doScrollTo(html);
                 data = [xhr.response, node];
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
@@ -412,7 +432,7 @@
                     return;
                 }
                 dataSet();
-                xhrIsDocument && state.history && doScrollTo(html);
+                xhrIsDocument && useHistory && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
@@ -531,7 +551,7 @@
             for (id in scriptsToCompare) {
                 if (!scripts[id]) {
                     scripts[id] = (v = scriptsToCompare[id]);
-                    body.appendChild(nodeRestore(v));
+                    nodeAppend(nodeRestore(v), body);
                 }
             }
             return scripts;
@@ -548,7 +568,7 @@
             for (id in stylesToCompare) {
                 if (!styles[id]) {
                     styles[id] = (v = stylesToCompare[id]);
-                    head.appendChild(nodeRestore(v));
+                    nodeAppend(nodeRestore(v), head);
                 }
             }
             return styles;
