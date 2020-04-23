@@ -14,14 +14,14 @@ Release Notes
 
 ### 1.0.3
 
- - Fix scroll restoration bug, again.
+ - Fixed scroll restoration bug, again.
  - Added ability to add/remove external CSS and JavaScript files automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles.
- - Added ability to add/remove inline CSS and JavaScript code automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles.
+ - Added ability to add/remove inline CSS and JavaScript code automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles. No need to modify your Google AdSense code. Yay!
 
 ### 1.0.2
 
  - Fixed scroll restoration bug on history back.
- - Removed `f3h.sources` property since it was never generated in live unless you put the response body to the current document. But when it is generated, it is too late.
+ - Removed `f3h.sources` property since it was never generated in live unless you have put the response body to the current document. But when it is generated, it was too late.
  - Added turbo feature that allows users to pre-fetch link URL on hover by setting the `state.turbo` to `true`.
 
 ### 1.0.1

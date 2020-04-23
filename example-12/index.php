@@ -13,10 +13,24 @@
       <?php else: ?>
       <form method="post">
         <p>
-          <input name="title" type="text" value="Title Here">
+          <input name="text" type="text" value="Title Here">
         </p>
         <p>
-          <textarea name="content">Content here.</textarea>
+          <textarea name="textarea">Content here.</textarea>
+        </p>
+        <p>
+          <label><input name="radio" type="radio" value="1"> Option 1</label>
+          <label><input name="radio" type="radio" value="2"> Option 2</label>
+          <label><input name="radio" type="radio" value="3"> Option 3</label>
+        </p>
+        <p>
+          <label><input name="checkbox" type="checkbox" value="1"> Toggle 1</label>
+        </p>
+        <p>
+          <select name="select">
+            <option>Value 1</option>
+            <option value="2">Value 2</option>
+          </select>
         </p>
         <p>
           <button name="act" type="submit" value="1">Action 1</button>
@@ -24,7 +38,8 @@
           <button name="act" type="submit" value="3">Action 3</button>
           <button name="undo" type="reset" value="1">Reset</button>
         </p>
-        <input name="test-hidden" type="hidden" value="Yo!">
+        <input name="hidden" type="hidden" value="Yo!">
+        <input name="foo[bar]" type="hidden" value="Test Nested Key">
       </form>
       <?php endif; ?>
     </main>
