@@ -358,13 +358,12 @@ f3h.on('success', function(response) {
 });</code></pre>
       <p><b>Why doesn&rsquo;t my Google AdSense code refresh when I switch pages?</b></p>
       <p>Google AdSense code will be loaded automatically when you switch pages, but if the next page you visit has the same Google AdSense code as the previous page code, then the code will not be reloaded. To overcome that, you have to clear the cache item on every successful event. First of all, add special ID for the scripts that you want to force to always reload:</p>
-      <pre><code>&lt;script async id="<mark>google-script-1</mark>" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
+      <pre><code>&lt;script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
 &lt;ins class="adsbygoogle" data-ad-client="ca-pub-&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-ad-slot="&bull;&bull;&bull;&bull;&bull;&bull;&bull;"&gt;&lt;/ins&gt;
-&lt;script id="<mark>google-script-2</mark>"&gt;(adsbygoogle = window.adsbygoogle || []).push({})&lt;/script&gt;</code></pre>
+&lt;script id="<mark>google-script-1</mark>"&gt;(adsbygoogle = window.adsbygoogle || []).push({})&lt;/script&gt;</code></pre>
       <p>Then make sure to clear the cache every time a successful event occurs:</p>
       <pre><code>f3h.on('success', function() {
     delete this.scripts['<mark>google-script-1</mark>'];
-    delete this.scripts['<mark>google-script-2</mark>'];
 });</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
