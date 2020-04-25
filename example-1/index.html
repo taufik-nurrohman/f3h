@@ -39,6 +39,7 @@
       margin-right: 0;
     }
     </style>
+    <link href="/f3h/example-1/about/" rel="prefetch">
   </head>
   <body>
     <nav>
@@ -68,7 +69,7 @@
         document.title = 'Loading…';
     });
 
-    f3h.on('success', function(response, a) {
+    f3h.on('success', function(response, target) {
         if (404 !== this.status) {
             document.title = response.title;
             main.innerHTML = response.querySelector('main').innerHTML;
@@ -76,10 +77,9 @@
         } else {
             document.title = 'Error 404';
             main.innerHTML = '<h1>Error 404</h1><p>Page not found.</p>';
-            a.style.textDecoration = 'line-through';
-            a.removeAttribute('href');
+            target.style.textDecoration = 'line-through';
+            target.removeAttribute('href');
         }
-        console.log(JSON.parse(JSON.stringify(this.lot)));
     });
 
     </script>

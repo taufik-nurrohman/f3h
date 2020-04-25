@@ -12,6 +12,11 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.4
+
+ - Improved native HTML5 prefetch.
+ - Added `f3h.links` property to store the available links to prefetch in the current response.
+
 ### 1.0.3
 
  - Fixed scroll restoration bug, again.

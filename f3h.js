@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.3
+ *  F3H 1.0.4
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -79,6 +79,15 @@
         return 'function' === typeof x;
     }
 
+    function isLinkForF3H(node) {
+        var n = toCaseLower(name);
+        // Exclude `<link rel="prefetch">` tag that contains `data-f3h` or `f3h` attribute
+        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+            return 1;
+        }
+        return 0;
+    }
+
     function isNodeForm(x) {
         return 'form' === toCaseLower(x.nodeName);
     }
@@ -117,8 +126,18 @@
         return 0;
     }
 
-    function nodeAppend(node, to) {
-        to.appendChild(node);
+    function linkGetAll(base) {
+        var id, out = {}, link,
+            links = nodeGetAll('link[href][rel=prefetch]', base);
+        for (var i = 0, j = links.length; i < j; ++i) {
+            if (isLinkForF3H(link = links[i])) {
+                continue;
+            }
+            link.id = (id = link.id || name + ':' + idFrom(attributeGet(link, 'href') || contentGet(link)));
+            out[id] = nodeSave(link);
+            out[id][2].href = link.href; // Use the resolved URL!
+        }
+        return out;
     }
 
     function nodeGet(selector, base) {
@@ -127,6 +146,10 @@
 
     function nodeGetAll(selector, base) {
         return (base || doc).querySelectorAll(selector);
+    }
+
+    function nodeInsert(node, before, base) {
+        base.insertBefore(node, before && base === before.parentNode ? before : null);
     }
 
     function nodeLet(node) {
@@ -148,11 +171,17 @@
 
     function nodeSave(node) {
         var attr = node.attributes,
-            to = [toCaseLower(node.nodeName), contentGet(node), {}];
+            // `[name, content, attributes, nextElement]`
+            to = [toCaseLower(node.nodeName), contentGet(node), {}, node.nextElementSibling];
         for (var i = 0, j = attr.length; i < j; ++i) {
             to[2][attr[i].name] = attr[i].value;
         }
         return to;
+    }
+
+    // Ignore trailing `/` character(s) in URL
+    function slashEndLet(ref) {
+        return ref.replace(/\/+$/, "");
     }
 
     function preventDefault(e) {
@@ -234,7 +263,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.3';
+        $$.version = '1.0.4';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -271,7 +300,7 @@
                 return refNow; // Default URL hook
             },
             'sources': 'a[href],form',
-            'turbo': false, // Pre-fetch URL on hover?
+            'turbo': false, // Pre-fetch any URL on hover?
             'types': {
                 "": responseTypeHTML, // Default response type for extension-less URL
                 'ASP': responseTypeHTML,
@@ -300,9 +329,13 @@
             hooks = {},
             ref = refGet(), // Get current URL to be used as the default state after the last pop state
             refCurrent = ref, // Store current URL to a variable to be compared to the next URL
+
             requests = {},
+
+            links = linkGetAll(),
             scripts = scriptGetAll(),
             styles = styleGetAll(),
+
             state = Object.assign({}, $$.state, true === o ? {
                 cache: o
             } : (o || {})),
@@ -333,12 +366,12 @@
             return from;
         }
 
-        // Include submit button value to the form data
-        function doAppendValueStorageForButton(node) {
+        // Include submit button value to the form data ;)
+        function doAppendCurrentButtonValue(node) {
             var buttonValueStorage = doc.createElement('input'),
                 buttons = nodeGetAll('[name][type=submit][value]', node);
             buttonValueStorage.type = 'hidden';
-            nodeAppend(buttonValueStorage, node);
+            nodeInsert(buttonValueStorage, 0, node);
             for (var i = 0, j = buttons.length; i < j; ++i) {
                 eventSet(buttons[i], 'click', function() {
                     buttonValueStorage.name = this.name;
@@ -360,13 +393,15 @@
             hookFire('exit', [doc, node]);
             // Get response from cache if any
             if (state.cache) {
-                var cache = caches[hashLet(ref)]; // `[status, response, lot, xhrIsDocument]`
+                var cache = caches[slashEndLet(hashLet(ref))]; // `[status, response, lot, xhrIsDocument]`
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
                     cache[3] && isWindow && useHistory && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
+                    // Update `<link rel="prefetch">` data for the next page
+                    cache[3] && (links = doUpdateLinks(data[0]));
                     // Update CSS before markup change
                     cache[3] && (styles = doUpdateStyles(data[0]));
                     hookFire('success', data);
@@ -394,7 +429,9 @@
                 var lot = toHeadersAsProxy(xhr),
                     status = xhr.status;
                 if (GET === type && state.cache) {
-                    caches[hashLet(ref)] = [status, xhr.response, lot, xhrIsDocument];
+                    // Make sure `status` is not `0` due to the request abortion, to prevent `null` response being cached
+                    status &&
+                    (caches[slashEndLet(hashLet(ref))] = [status, xhr.response, lot, xhrIsDocument]);
                 }
                 $.lot = lot;
                 $.status = status;
@@ -406,6 +443,8 @@
                 dataSet();
                 xhrIsDocument && isWindow && useHistory && doScrollTo(html);
                 data = [xhr.response, node];
+                // Update `<link rel="prefetch">` data for the next page
+                xhrIsDocument && (links = doUpdateLinks(data[0]));
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('error', data);
@@ -426,7 +465,8 @@
                     // Redirection should delete cache related to response URL
                     // This is useful for case(s) like, when you have submitted
                     // a comment form and then you will be redirected to the same URL
-                    caches[redirect] && (delete caches[redirect]);
+                    var r = slashEndLet(redirect);
+                    caches[r] && (delete caches[r]);
                     // Do the normal fetch
                     doFetch(node, GET, redirect);
                     return;
@@ -459,16 +499,13 @@
         }
 
         function doFetchAbort(id) {
-            if (requests[id]) {
+            if (requests[id] && requests[id][0]) {
                 requests[id][0].abort();
                 delete requests[id];
             }
         }
 
         function doFetchAbortAll() {
-            if (!requests.length) {
-                return;
-            }
             for (var request in requests) {
                 doFetchAbort(request);
             }
@@ -506,8 +543,8 @@
         function doPreFetch(node, ref) {
             var xhr = doFetchBase(node, GET, ref), status;
             eventSet(xhr, 'load', function() {
-                if (status = xhr.status) {
-                    caches[hashLet(ref)] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
+                if (200 === (status = xhr.status)) {
+                    caches[slashEndLet(hashLet(ref))] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
                 }
             });
         }
@@ -540,6 +577,23 @@
             doScrollTo(targetGet(hashGet(refGet()), 1));
         }
 
+        function doUpdateLinks(compare) {
+            var id, linksToCompare = linkGetAll(compare), v;
+            for (id in links) {
+                if (!linksToCompare[id]) {
+                    delete links[id];
+                    nodeLet(targetGet(id));
+                }
+            }
+            for (id in linksToCompare) {
+                if (!links[id]) {
+                    links[id] = (v = linksToCompare[id]);
+                    nodeInsert(nodeRestore(v), v[3], head);
+                }
+            }
+            return links;
+        }
+
         function doUpdateScripts(compare) {
             var id, scriptsToCompare = scriptGetAll(compare), v;
             for (id in scripts) {
@@ -551,7 +605,7 @@
             for (id in scriptsToCompare) {
                 if (!scripts[id]) {
                     scripts[id] = (v = scriptsToCompare[id]);
-                    nodeAppend(nodeRestore(v), body);
+                    nodeInsert(nodeRestore(v), v[3], body);
                 }
             }
             return scripts;
@@ -568,7 +622,7 @@
             for (id in stylesToCompare) {
                 if (!styles[id]) {
                     styles[id] = (v = stylesToCompare[id]);
-                    nodeAppend(nodeRestore(v), head);
+                    nodeInsert(nodeRestore(v), v[3], head);
                 }
             }
             return styles;
@@ -644,7 +698,7 @@
         function onHoverOnce() {
             var t = this,
                 href = t.href;
-            if (!caches[hashLet(href)]) {
+            if (!caches[slashEndLet(hashLet(href))]) {
                 doPreFetch(t, href);
             }
             eventLet(t, 'mousemove', onHoverOnce);
@@ -671,7 +725,7 @@
             for (var i = 0, j = sources.length; i < j; ++i) {
                 eventSet(sources[i], eventNameGet(sources[i]), onFetch);
                 if (isNodeForm(sources[i])) {
-                    doAppendValueStorageForButton(sources[i]);
+                    doAppendCurrentButtonValue(sources[i]);
                 } else {
                     turbo && doPreFetchElement(sources[i]);
                 }
@@ -704,6 +758,7 @@
         };
         $.fire = hookFire;
         $.hooks = hooks;
+        $.links = links;
         $.lot = {};
         $.off = hookLet;
         $.on = hookSet;

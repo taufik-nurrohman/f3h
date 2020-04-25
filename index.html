@@ -65,7 +65,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>F3H v1.0.3</h1>
+      <h1>F3H v1.0.4</h1>
       <p>You can read <abbr title="Fetch">F3H</abbr> as how you would read <abbr title="Accessibility">A11Y</abbr> and <abbr title="Internationalization">I18N</abbr>.</p>
       <p>Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will store it to the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.</p>
       <hr>
@@ -77,9 +77,12 @@
       <ul>
         <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
         <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
-        <li>Accessible AJAX response as HTML elements (by default). With the basic knowledge on accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.</li>
+        <li>Accessible AJAX response as HTML elements (by default).</li>
+        <li>Instant click with native HTML5 Prefetch, improved by the power of JavaScript.</li>
+        <li>Progressively enhanced. If at any time the JavaScript fails to load, or if users are using an old web browser, or if users decide to disable the JavaScript features, or if some third-party JavaScript makes this application fail to work, your website will still be able to work as when it didn&rsquo;t have AJAX features.</li>
       </ul>
       <h2>Usage</h2>
+      <p>With the basic knowledge of accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.</p>
       <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html dir="ltr"&gt;
   &lt;head&gt;
@@ -170,6 +173,8 @@ F3H._.cancelAllRequests = function() {
       <h3>f3h.caches</h3>
       <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will remove all caches.</p>
       <pre><code>console.log(f3h.caches);</code></pre>
+      <h3>f3h.links</h3>
+      <p>Returns all of the links to prefetch available in the response.</p>
       <h3>f3h.lot</h3>
       <p>Return the HTTP response headers as object. Every property in it are case-insensitive.</p>
       <pre><code>f3h.on('success', function(response) {
@@ -178,7 +183,7 @@ F3H._.cancelAllRequests = function() {
       <h3>f3h.ref</h3>
       <p>This variable stores current URL that is being fetched by the application, including the hash part.</p>
       <h3>f3h.scripts</h3>
-      <p>Returns all of the JavaScript code available in the response body.</p>
+      <p>Returns all of the JavaScript code available in the response.</p>
       <h3>f3h.state</h3>
       <p>Return the modified application states.</p>
       <h3>f3h.status</h3>
@@ -191,7 +196,7 @@ F3H._.cancelAllRequests = function() {
     }
 });</code></pre>
       <h3>f3h.styles</h3>
-      <p>Returns all of the CSS code available in the response body.</p>
+      <p>Returns all of the CSS code available in the response.</p>
       <h3>f3h.abort(id)</h3>
       <p>Abort requests.</p>
       <pre><code>f3h.abort(); // Abort all requests
