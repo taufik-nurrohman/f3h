@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.5
+
+ - Fixed generic search form not appending search query in URL.
+
 ### 1.0.4
 
  - Improved native HTML5 prefetch.

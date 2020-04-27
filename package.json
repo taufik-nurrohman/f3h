@@ -1,7 +1,7 @@
 {
   "name": "@taufik-nurrohman/f3h",
   "description": "Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "f3h.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +12,12 @@
   },
   "keywords": [
     "ajax",
-    "fetch"
+    "click",
+    "fetch",
+    "form",
+    "instant",
+    "link",
+    "page"
   ],
   "author": "Taufik Nurrohman",
   "license": "MIT",

@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.4
+ *  F3H 1.0.5
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -263,7 +263,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.4';
+        $$.version = '1.0.5';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -677,13 +677,17 @@
 
         function onFetch(e) {
             doFetchAbortAll();
-            var t = this,
+            var t = this, q,
                 href = t.href,
                 action = t.action,
                 refNow = href || action,
                 type = toCaseUpper(t.method || GET);
             if (GET === type) {
                 doRefChange(refNow);
+                if (isNodeForm(t)) {
+                    q = (new URLSearchParams(new FormData(t))) + "";
+                    refNow = refNow.split(/[?&#]/)[0] + (q ? '?' + q : "");
+                }
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
             preventDefault(e);
