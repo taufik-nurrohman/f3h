@@ -435,16 +435,10 @@
                     return;
                 }
             }
-            var headers = state.lot || {},
-                data, fn, header, redirect,
-                xhr = doFetchBase(node, type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref),
+            var data, fn, redirect,
+                xhr = doFetchBase(node, type, ref, state.lot || {}),
                 xhrIsDocument = responseTypeHTML === xhr.responseType,
                 xhrPush = xhr.upload;
-            if (headers) {
-                for (header in headers) {
-                    xhr.setRequestHeader(header, headers[header]);
-                }
-            }
             function dataSet() {
                 // Store response from GET request(s) to cache
                 var lot = toHeadersAsProxy(xhr),
@@ -533,8 +527,9 @@
         }
 
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
-        function doFetchBase(node, type, ref) {
-            var xhr = new XMLHttpRequest;
+        function doFetchBase(node, type, ref, headers) {
+            ref = isFunction(state.ref) ? state.ref.call($, node, ref) : ref;
+            var header, xhr = new XMLHttpRequest;
             // Automatic response type based on current file extension
             var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
                 responseType = state.types[x] || responseTypeTXT;
@@ -546,6 +541,11 @@
             // if (POST === type) {
             //    xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
             // }
+            if (headers) {
+                for (header in headers) {
+                    xhr.setRequestHeader(header, headers[header]);
+                }
+            }
             xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
         }
@@ -719,7 +719,7 @@
                 doRefChange(refNow);
                 if (isNodeForm(t)) {
                     q = (new URLSearchParams(new FormData(t))) + "";
-                    refNow = refNow.split(/[?&#]/)[0] + (q ? '?' + q : "");
+                    refNow = slashEndLet(refNow.split(/[?&#]/)[0]) + (q ? '?' + q : "");
                 }
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
