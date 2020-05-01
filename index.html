@@ -119,6 +119,7 @@
         <li><a href="example-12/index.php" target="_blank">Form Data Value</a> (Requires PHP, test)</li>
         <li><a href="example-13/index.html" target="_blank">JavaScript and CSS Placement Test</a> (TODO)</li>
         <li><a href="example-14/index.html" target="_blank">Search Form Example</a></li>
+        <li><a href="example-15/index.html" target="_blank">jQuery Integration Example</a></li>
       </ul>
       <h2>Settings</h2>
       <pre><code>let f3h = new F3H(<var>cache</var>);</code></pre>
@@ -341,13 +342,16 @@ f3h.on('success', function(response) {
       <p><b>Can I integrate it with jQuery?</b></p>
       <p>Every application built using native JavaScript will be able to integrate with any third party JavaScript library. If you know how to select DOM elements using jQuery, then you are ready to go:</p>
       <pre><code>let f3h = new F3H,
+
+    $document = $(document),
     $main = $('main'),
     $nav = $('nav');
 
 f3h.on('success', function(response) {
-    document.title = response.title;
-    $main.html($(response).find('main').html());
-    $nav.html($(response).find('nav').html());
+    let $response = $(response);
+    $document.prop('title', $response.prop('title'));
+    $main.html($response.find('main').html());
+    $nav.html($response.find('nav').html());
 });</code></pre>
       <p><b>I get an error <code>TypeError: response is null</code> from the web console every time I submit a form. Why?</b></p>
       <p>Your form data processor may have redirected you to a certain page via 302 status (and the like) when the data you provided was sent successfully. Consider to use <code>200</code> hook instead of <code>success</code>, or be sure to check that the response status is <code>200</code> before doing anything to the response given:</p>
