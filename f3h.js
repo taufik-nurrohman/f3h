@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.5
+ *  F3H 1.0.6
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -16,6 +16,7 @@
         responseTypeJSON = 'json',
         responseTypeTXT = 'text',
 
+        replace = 'replace',
         search = 'search',
         test = 'test',
 
@@ -32,12 +33,33 @@
         return node.getAttribute(attr);
     }
 
+    function attributeHas(node, attr) {
+        return node.hasAttribute(attr);
+    }
+
     function attributeSet(node, attr, value) {
         return node.setAttribute(attr, value);
     }
 
     function contentGet(node) {
         return node.innerHTML;
+    }
+
+    // Evaluate string value into their appropriate data type
+    function eval2(v) {
+        if ('false' === v) {
+            return false;
+        }
+        if ("" === v || 'null' === v) {
+            return null;
+        }
+        if ('true' === v) {
+            return true;
+        }
+        if (/^-?(\d*\.)?\d+$/[test](v)) {
+            return +v;
+        }
+        return v;
     }
 
     function eventNameGet(node) {
@@ -81,8 +103,8 @@
 
     function isLinkForF3H(node) {
         var n = toCaseLower(name);
-        // Exclude `<link rel="prefetch">` tag that contains `data-f3h` or `f3h` attribute
-        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+        // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
+        if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
         }
         return 0;
@@ -103,7 +125,7 @@
         }
         var n = toCaseLower(name);
         // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
-        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+        if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
         }
         // Exclude JavaScript that contains `F3H` instantiation
@@ -120,7 +142,7 @@
     function isStyleForF3H(node) {
         var n = toCaseLower(name);
         // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
-        if (attributeGet(node, 'data-' + n) || attributeGet(node, n)) {
+        if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
         }
         return 0;
@@ -128,7 +150,7 @@
 
     function linkGetAll(base) {
         var id, out = {}, link,
-            links = nodeGetAll('link[href][rel=prefetch]', base);
+            links = nodeGetAll('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', base);
         for (var i = 0, j = links.length; i < j; ++i) {
             if (isLinkForF3H(link = links[i])) {
                 continue;
@@ -164,24 +186,24 @@
         var node = doc.createElement(from[0]);
         node.innerHTML = from[1];
         for (var k in from[2]) {
-            attributeSet(node, k, from[2][k]);
+            attributeSet(node, k, uneval2(from[2][k]));
         }
         return node;
     }
 
     function nodeSave(node) {
         var attr = node.attributes,
-            // `[name, content, attributes, nextElement]`
-            to = [toCaseLower(node.nodeName), contentGet(node), {}, node.nextElementSibling];
+            // `[name, content, attributes]`
+            to = [toCaseLower(node.nodeName), contentGet(node), {}];
         for (var i = 0, j = attr.length; i < j; ++i) {
-            to[2][attr[i].name] = attr[i].value;
+            to[2][attr[i].name] = eval2(attr[i].value);
         }
         return to;
     }
 
     // Ignore trailing `/` character(s) in URL
     function slashEndLet(ref) {
-        return ref.replace(/\/+$/, "");
+        return ref[replace](/\/+$/, "");
     }
 
     function preventDefault(e) {
@@ -238,17 +260,7 @@
             h = headers[header].split(': ');
             k = toCaseLower(h.shift());
             w = toCaseLower(v = h.join(': '));
-            // Evaluate string value into their appropriate data type
-            if ("" === w || 'null' === w) {
-                v = null;
-            } else if ('true' === w) {
-                v = true;
-            } else if ('false' === w) {
-                v = false;
-            } else if (/^-?(\d*\.)?\d+$/[test](v)) {
-                v = +v;
-            }
-            out[k] = v;
+            out[k] = eval2(v);
         }
         // Use proxy to make response header’s key to be case-insensitive
         return new Proxy(out, {
@@ -261,9 +273,23 @@
         });
     }
 
+    // Convert appropriate data type value into their string format
+    function uneval2(v) {
+        if (false === v) {
+            return 'false';
+        }
+        if (null === v) {
+            return 'null';
+        }
+        if (true === v) {
+            return 'true';
+        }
+        return v + "";
+    }
+
     (function($$) {
 
-        $$.version = '1.0.5';
+        $$.version = '1.0.6';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -400,7 +426,7 @@
                     cache[3] && isWindow && useHistory && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
-                    // Update `<link rel="prefetch">` data for the next page
+                    // Update `<link rel="*">` data for the next page
                     cache[3] && (links = doUpdateLinks(data[0]));
                     // Update CSS before markup change
                     cache[3] && (styles = doUpdateStyles(data[0]));
@@ -419,7 +445,7 @@
                 xhr = doFetchBase(node, type, isFunction(state.ref) ? state.ref.call($, node, ref) : ref),
                 xhrIsDocument = responseTypeHTML === xhr.responseType,
                 xhrPush = xhr.upload;
-            if (headers && headers.length) {
+            if (headers) {
                 for (header in headers) {
                     xhr.setRequestHeader(header, headers[header]);
                 }
@@ -443,7 +469,7 @@
                 dataSet();
                 xhrIsDocument && isWindow && useHistory && doScrollTo(html);
                 data = [xhr.response, node];
-                // Update `<link rel="prefetch">` data for the next page
+                // Update `<link rel="*">` data for the next page
                 xhrIsDocument && (links = doUpdateLinks(data[0]));
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
@@ -578,8 +604,12 @@
         }
 
         function doUpdateLinks(compare) {
-            var id, linksToCompare = linkGetAll(compare), v;
+            var id, linksToCompare = linkGetAll(compare),
+                node, placesToRestore = {}, v;
             for (id in links) {
+                if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
+                    placesToRestore[id] = node.nextElementSibling;
+                }
                 if (!linksToCompare[id]) {
                     delete links[id];
                     nodeLet(targetGet(id));
@@ -588,15 +618,19 @@
             for (id in linksToCompare) {
                 if (!links[id]) {
                     links[id] = (v = linksToCompare[id]);
-                    nodeInsert(nodeRestore(v), v[3], head);
+                    nodeInsert(nodeRestore(v), placesToRestore[id], head);
                 }
             }
             return links;
         }
 
         function doUpdateScripts(compare) {
-            var id, scriptsToCompare = scriptGetAll(compare), v;
+            var id, scriptsToCompare = scriptGetAll(compare),
+                node, placesToRestore = {}, v;
             for (id in scripts) {
+                if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
+                    placesToRestore[id] = node.nextElementSibling;
+                }
                 if (!scriptsToCompare[id]) {
                     delete scripts[id];
                     nodeLet(targetGet(id));
@@ -605,15 +639,19 @@
             for (id in scriptsToCompare) {
                 if (!scripts[id]) {
                     scripts[id] = (v = scriptsToCompare[id]);
-                    nodeInsert(nodeRestore(v), v[3], body);
+                    nodeInsert(nodeRestore(v), placesToRestore[id], body);
                 }
             }
             return scripts;
         }
 
         function doUpdateStyles(compare) {
-            var id, stylesToCompare = styleGetAll(compare), v;
+            var id, stylesToCompare = styleGetAll(compare),
+                node, placesToRestore = {}, v;
             for (id in styles) {
+                if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
+                    placesToRestore[id] = node.nextElementSibling;
+                }
                 if (!stylesToCompare[id]) {
                     delete styles[id];
                     nodeLet(targetGet(id));
@@ -622,7 +660,7 @@
             for (id in stylesToCompare) {
                 if (!styles[id]) {
                     styles[id] = (v = stylesToCompare[id]);
-                    nodeInsert(nodeRestore(v), v[3], head);
+                    nodeInsert(nodeRestore(v), placesToRestore[id], head);
                 }
             }
             return styles;
