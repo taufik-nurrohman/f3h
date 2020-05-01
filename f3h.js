@@ -229,7 +229,7 @@
 
     function styleGetAll(base) {
         var id, out = {}, style,
-            styles = nodeGetAll('link[href][rel=stylesheet],style:not([scoped])', base);
+            styles = nodeGetAll('link[rel=stylesheet],style', base);
         for (var i = 0, j = styles.length; i < j; ++i) {
             if (isStyleForF3H(style = styles[i])) {
                 continue;

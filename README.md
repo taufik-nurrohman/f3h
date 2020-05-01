@@ -15,6 +15,8 @@ Release Notes
 ### 1.0.6
 
  - Include `<link rel="dns-prefetch">`, `<link rel="preconnect">`, `<link rel="preload">` and `<link rel="prerender">` to the `f3h.links` as well.
+ - Fixed custom headers defined in `state.lot` not being sent to the request headers.
+ - Added jQuery example.
 
 ### 1.0.5
 
