@@ -344,11 +344,6 @@
 
     })(win[name] = function(o) {
 
-        // Drop feature(s) in legacy JavaScript environment
-        if (!(history && history.pushState)) {
-            return;
-        }
-
         var $ = this,
             $$ = win[name],
             caches = {},
