@@ -541,10 +541,8 @@
             // if (POST === type) {
             //    xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
             // }
-            if (headers) {
-                for (header in headers) {
-                    xhr.setRequestHeader(header, headers[header]);
-                }
+            for (header in headers) {
+                xhr.setRequestHeader(header, headers[header]);
             }
             xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
@@ -562,7 +560,7 @@
 
         // Pre-fetch page and store it into cache
         function doPreFetch(node, ref) {
-            var xhr = doFetchBase(node, GET, ref), status;
+            var xhr = doFetchBase(node, GET, ref, {}), status;
             eventSet(xhr, 'load', function() {
                 if (200 === (status = xhr.status)) {
                     caches[slashEndLet(hashLet(ref))] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
@@ -791,7 +789,7 @@
 
         $.caches = caches;
         $.fetch = function(ref, type, from) {
-            return doFetchBase(from, type, ref);
+            return doFetchBase(from, type, ref, {});
         };
         $.fire = hookFire;
         $.hooks = hooks;
