@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.6
+ *  F3H 1.0.7
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -112,6 +112,10 @@
 
     function isNodeForm(x) {
         return 'form' === toCaseLower(x.nodeName);
+    }
+
+    function isObject(x) {
+        return 'object' === typeof x;
     }
 
     function isSet(x) {
@@ -289,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.6';
+        $$.version = '1.0.7';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -435,14 +439,14 @@
                     return;
                 }
             }
-            var data, fn, redirect,
-                xhr = doFetchBase(node, type, ref, state.lot || {}),
+            var data, fn, lot, redirect, status,
+                xhr = doFetchBase(node, type, ref, state.lot),
                 xhrIsDocument = responseTypeHTML === xhr.responseType,
                 xhrPush = xhr.upload;
             function dataSet() {
                 // Store response from GET request(s) to cache
-                var lot = toHeadersAsProxy(xhr),
-                    status = xhr.status;
+                lot = toHeadersAsProxy(xhr);
+                status = xhr.status;
                 if (GET === type && state.cache) {
                     // Make sure `status` is not `0` due to the request abortion, to prevent `null` response being cached
                     status &&
@@ -471,32 +475,33 @@
             });
             eventSet(xhrPush, 'error', fn);
             eventSet(xhr, 'load', fn = function() {
-                // Handle internal server-side redirection
+                dataSet();
+                data = [xhr.response, node];
                 redirect = xhr.responseURL;
-                // `redirect !== hashLet(ref)` because URL hash is not included in `xhr.responseURL` object
-                // <https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseURL>
-                if (redirect && redirect !== hashLet(ref)) {
-                    nodeCurrent = win;
-                    // Redirection should delete cache related to response URL
-                    // This is useful for case(s) like, when you have submitted
-                    // a comment form and then you will be redirected to the same URL
+                // Handle internal server-side redirection
+                // <https://en.wikipedia.org/wiki/URL_redirection#HTTP_status_codes_3xx>
+                if (status >= 300 && status < 400) {
+                    // Redirection should delete a cache related to the response URL
+                    // This is useful for case(s) like, when you have submitted a
+                    // comment form and then you will be redirected to the same URL
                     var r = slashEndLet(redirect);
                     caches[r] && (delete caches[r]);
+                    // Trigger hook(s) immediately
+                    hookFire('success', data);
+                    hookFire(status, data);
                     // Do the normal fetch
-                    doFetch(node, GET, redirect);
+                    doFetch(nodeCurrent = win, GET, redirect || ref);
                     return;
                 }
-                dataSet();
                 xhrIsDocument && useHistory && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 if (GET === type) {
                     doRefChange(ref);
                 }
-                data = [xhr.response, node];
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
-                hookFire($.status, data);
+                hookFire(status, data);
                 sources = sourcesGet(state.sources);
                 // Update JavaScript after markup change
                 xhrIsDocument && (scripts = doUpdateScripts(data[0]));
@@ -541,8 +546,10 @@
             // if (POST === type) {
             //    xhr.setRequestHeader('content-type', node.enctype || 'multipart/form-data');
             // }
-            for (header in headers) {
-                xhr.setRequestHeader(header, headers[header]);
+            if (isObject(headers)) {
+                for (header in headers) {
+                    xhr.setRequestHeader(header, headers[header]);
+                }
             }
             xhr.send(POST === type ? new FormData(node) : null);
             return xhr;
@@ -560,7 +567,7 @@
 
         // Pre-fetch page and store it into cache
         function doPreFetch(node, ref) {
-            var xhr = doFetchBase(node, GET, ref, {}), status;
+            var xhr = doFetchBase(node, GET, ref), status;
             eventSet(xhr, 'load', function() {
                 if (200 === (status = xhr.status)) {
                     caches[slashEndLet(hashLet(ref))] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
@@ -789,7 +796,7 @@
 
         $.caches = caches;
         $.fetch = function(ref, type, from) {
-            return doFetchBase(from, type, ref, {});
+            return doFetchBase(from, type, ref);
         };
         $.fire = hookFire;
         $.hooks = hooks;
