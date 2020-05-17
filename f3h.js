@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.7
+ *  F3H 1.0.8
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.7';
+        $$.version = '1.0.8';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -331,14 +331,12 @@
             },
             'sources': 'a[href],form',
             'turbo': false, // Pre-fetch any URL on hover?
+            'type': responseTypeHTML,
             'types': {
                 "": responseTypeHTML, // Default response type for extension-less URL
-                'ASP': responseTypeHTML,
-                'HTM': responseTypeHTML,
-                'HTML': responseTypeHTML,
-                'JSON': responseTypeJSON,
-                'PHP': responseTypeHTML,
-                'XML': responseTypeHTML
+                'CSS': responseTypeTXT,
+                'JS': responseTypeTXT,
+                'JSON': responseTypeJSON
             }
         };
 
@@ -537,7 +535,7 @@
             var header, xhr = new XMLHttpRequest;
             // Automatic response type based on current file extension
             var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
-                responseType = state.types[x] || responseTypeTXT;
+                responseType = state.types[x] || state.type || responseTypeTXT;
             if (isFunction(responseType)) {
                 responseType = responseType.call($, ref);
             }

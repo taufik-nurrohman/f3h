@@ -12,10 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
-### 1.0.x
+### 1.0.8
 
- - Reset cached page&rsquo;s scroll position on normal click or submit events.
- - Added `state.type` option as the default response type for URL path with a file extension that is not defined in `state.types`.
+ - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
+ - Added `state.type` option as the default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the `state.types` object.
 
 ### 1.0.7
 
@@ -52,7 +52,7 @@ Release Notes
 
  - Response headers are now case-insensitive.
  - Clicking on the same source element multiple times should trigger the AJAX call once.
- - Added local cache feature which can be enabled by setting the `state.cache` value to `true`.
+ - Added local cache feature which can be enabled by setting the `state.cache` option value to `true`.
 
 ### 1.0.0
 

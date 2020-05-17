@@ -65,7 +65,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>F3H v1.0.7</h1>
+      <h1>F3H v1.0.8</h1>
       <p>You can read <abbr title="Fetch">F3H</abbr> as how you would read <abbr title="Accessibility">A11Y</abbr> and <abbr title="Internationalization">I18N</abbr>.</p>
       <p>Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will store it to the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.</p>
       <hr>
@@ -133,6 +133,7 @@
         ref: (source, ref) =&gt; { &hellip; },
         sources: 'a[href], form',
         turbo: false,
+        type: 'document',
         types: { &hellip; }
     });</code></pre>
       <ul>
@@ -145,6 +146,7 @@
         <li><var>state.ref</var> &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.</li>
         <li><var>state.turbo</var> &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.</li>
         <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
+        <li><var>state.type</var> &rarr; Default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the <code>state.types</code> object.</li>
         <li><var>state.types</var> &rarr; List of file extensions with the expected response type.</li>
       </ul>
       <h2>Methods and Properties</h2>
@@ -239,7 +241,7 @@ xhr.addEventListener('load', function() {
           </tr>
           <tr>
             <td><code>focus</code></td>
-            <td>Adding a <code>focus</code> hook will disable the default focus behavior, that is, to focus to the first element that has <code>autofocus</code> attribute.</td>
+            <td>Adding a <code>focus</code> hook will disable the default focus behavior, that is, to focus to the first element that has an <code>autofocus</code> attribute.</td>
           </tr>
           <tr>
             <td><code>pop</code></td>
@@ -255,23 +257,23 @@ xhr.addEventListener('load', function() {
           </tr>
           <tr>
             <td><code>scroll</code></td>
-            <td>Adding a <code>scroll</code> hook will disable the default scroll behavior, that is, to scroll to the first element that has <code>id</code> or <code>name</code> attribute with the same value as the current location hash value.</td>
+            <td>Adding a <code>scroll</code> hook will disable the default scroll behavior, that is, to scroll to the first element that has an <code>id</code> or <code>name</code> attribute with the same value as the current location hash value.</td>
           </tr>
           <tr>
             <td><code>success</code></td>
-            <td>Will be triggered on AJAX loading success event, regardless of the page status. Might result in a null response on URL redirection after form submission. Consider to use the <code>200</code> hook instead.</td>
+            <td>Will be triggered on AJAX loading success event, regardless of the page status. Might result with a <code>null</code> response on URL redirection after form submission. Consider to use the <code>200</code> hook instead.</td>
           </tr>
           <tr>
             <td><code>200</code></td>
-            <td>Will be triggered on AJAX loading event, with the page status of <code>200</code>.</td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>200</code>.</td>
           </tr>
           <tr>
             <td><code>404</code></td>
-            <td>Will be triggered on AJAX loading event, with the page status of <code>404</code>.</td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>404</code>.</td>
           </tr>
           <tr>
             <td><code>*</code></td>
-            <td>Will be triggered on AJAX loading event, with the page status of <code>*</code> where <code>*</code> is a HTTP status code as described in the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" rel="nofollow" target="_blank">HTTP status code reference</a>.</td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>*</code> where <code>*</code> is a HTTP status code as described in the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" rel="nofollow" target="_blank">HTTP status code reference</a>.</td>
           </tr>
         </tbody>
       </table>
@@ -319,7 +321,7 @@ if ($out) { /* &hellip; */ } else { /* &hellip; */ }</code></pre>
       <p>Use a standard link with form data as query string on the link element:</p>
       <pre><code>&lt;a href="/post.php?data[foo]=1&amp;amp;data[bar]=2"&gt;Send data!&lt;/a&gt;</code></pre>
       <p><b>I have a REST API functionality that returns data as JSON, but my URL doesn&rsquo;t end with extension <code>.json</code>. How do I set the response type as JSON under these circumstances?</b></p>
-      <p>The <code>F3H.state.types</code> object contains some data in the form of file extension as object key and the desired response type as object value. By default, the value of the object is set as string, but you can also specify it as a function that returns the type of response based on a specific pattern on the given URL.</p>
+      <p>The <code>F3H.state.types</code> object contains some data in the form of file extension as object key and the desired response type as object value. By default, the value of the object is set as string, but you can also specify it as a function that returns the type of response based on a specific pattern in the given URL.</p>
       <p>There is a <code>""</code> key to express the default response type for URL or file name that does not have extension. A typical clean URL that is commonly used for search engine optimization. You can use this property to specify the response type as JSON under certain conditions in the given link according to the standard URL naming pattern in your application:</p>
       <pre><code>F3H.state.types[""] = link =&gt; {
     // Assume your REST API link format is `/foo/bar?output=json`
