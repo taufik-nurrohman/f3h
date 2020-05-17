@@ -12,6 +12,11 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.x
+
+ - Reset cached page&rsquo;s scroll position on normal click or submit events.
+ - Added `state.type` option as the default response type for URL path with a file extension that is not defined in `state.types`.
+
 ### 1.0.7
 
  - Fixed double redirection bug.
