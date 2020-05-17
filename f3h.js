@@ -422,7 +422,7 @@
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
-                    cache[3] && isWindow && useHistory && doScrollTo(html);
+                    cache[3] && !isWindow && useHistory && doScrollTo(html);
                     doRefChange(ref);
                     data = [cache[1], node];
                     // Update `<link rel="*">` data for the next page
@@ -460,7 +460,7 @@
             });
             eventSet(xhr, 'error', fn = function() {
                 dataSet();
-                xhrIsDocument && isWindow && useHistory && doScrollTo(html);
+                xhrIsDocument && !isWindow && useHistory && doScrollTo(html);
                 data = [xhr.response, node];
                 // Update `<link rel="*">` data for the next page
                 xhrIsDocument && (links = doUpdateLinks(data[0]));
