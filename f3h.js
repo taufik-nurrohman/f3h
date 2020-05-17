@@ -601,67 +601,37 @@
             doScrollTo(targetGet(hashGet(refGet()), 1));
         }
 
-        function doUpdateLinks(compare) {
-            var id, linksToCompare = linkGetAll(compare),
+        function doUpdate(compare, to, getAll, defaultContainer) {
+            var id, toCompare = getAll(compare),
                 node, placesToRestore = {}, v;
-            for (id in links) {
+            for (id in to) {
                 if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
                     placesToRestore[id] = node.nextElementSibling;
                 }
-                if (!linksToCompare[id]) {
-                    delete links[id];
+                if (!toCompare[id]) {
+                    delete to[id];
                     nodeLet(targetGet(id));
                 }
             }
-            for (id in linksToCompare) {
-                if (!links[id]) {
-                    links[id] = (v = linksToCompare[id]);
-                    nodeInsert(nodeRestore(v), placesToRestore[id], head);
+            for (id in toCompare) {
+                if (!to[id]) {
+                    to[id] = (v = toCompare[id]);
+                    nodeInsert(nodeRestore(v), placesToRestore[id], defaultContainer);
                 }
             }
-            return links;
+            return to;
+        }
+
+        function doUpdateLinks(compare) {
+            return doUpdate(compare, links, linkGetAll, head);
         }
 
         function doUpdateScripts(compare) {
-            var id, scriptsToCompare = scriptGetAll(compare),
-                node, placesToRestore = {}, v;
-            for (id in scripts) {
-                if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
-                    placesToRestore[id] = node.nextElementSibling;
-                }
-                if (!scriptsToCompare[id]) {
-                    delete scripts[id];
-                    nodeLet(targetGet(id));
-                }
-            }
-            for (id in scriptsToCompare) {
-                if (!scripts[id]) {
-                    scripts[id] = (v = scriptsToCompare[id]);
-                    nodeInsert(nodeRestore(v), placesToRestore[id], body);
-                }
-            }
-            return scripts;
+            return doUpdate(compare, scripts, scriptGetAll, body);
         }
 
         function doUpdateStyles(compare) {
-            var id, stylesToCompare = styleGetAll(compare),
-                node, placesToRestore = {}, v;
-            for (id in styles) {
-                if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
-                    placesToRestore[id] = node.nextElementSibling;
-                }
-                if (!stylesToCompare[id]) {
-                    delete styles[id];
-                    nodeLet(targetGet(id));
-                }
-            }
-            for (id in stylesToCompare) {
-                if (!styles[id]) {
-                    styles[id] = (v = stylesToCompare[id]);
-                    nodeInsert(nodeRestore(v), placesToRestore[id], head);
-                }
-            }
-            return styles;
+            return doUpdate(compare, styles, styleGetAll, head);
         }
 
         function hookLet(name, fn) {
@@ -674,6 +644,10 @@
                         if (fn === hooks[name][i]) {
                             hooks[name].splice(i, 1);
                         }
+                    }
+                    // Clean-up empty hook(s)
+                    if (0 === j) {
+                        delete hooks[name];
                     }
                 } else {
                     delete hooks[name];
