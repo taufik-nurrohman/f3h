@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.8
+ *  F3H 1.0.9
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.8';
+        $$.version = '1.0.9';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -355,14 +355,16 @@
 
             requests = {},
 
-            links = linkGetAll(),
-            scripts = scriptGetAll(),
-            styles = styleGetAll(),
+            links,
+            scripts,
+            styles,
 
             state = Object.assign({}, $$.state, true === o ? {
                 cache: o
             } : (o || {})),
-            sources = sourcesGet(state.sources), nodeCurrent;
+            sources = sourcesGet(state.sources),
+
+            nodeCurrent;
 
         if (state.turbo) {
             state.cache = true; // Enable turbo feature will force enable cache feature
@@ -493,9 +495,9 @@
                 }
                 xhrIsDocument && useHistory && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
-                if (GET === type) {
-                    doRefChange(ref);
-                }
+                // if (GET === type) {
+                    doRefChange(redirect || ref);
+                // }
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
@@ -680,6 +682,10 @@
             // Set body and head variable value once, on document ready
             body = doc.body;
             head = doc.head;
+            // Make sure all element(s) to be captured on document ready
+            links = linkGetAll();
+            scripts = scriptGetAll();
+            styles = styleGetAll();
             onSourcesEventsSet([doc, win]);
             // Store the initial page into cache
             state.cache && doPreFetch(win, refGet());

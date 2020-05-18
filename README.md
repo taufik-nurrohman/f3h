@@ -12,6 +12,11 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.9
+
+ - Fixed server-side redirection&rsquo;s response URL that does not change the URL in address bar after redirection.
+ - Fixed a bug where JavaScript elements below the `F3H` instance are not captured on the first instantiation. Need to capture it after the document is ready.
+
 ### 1.0.8
 
  - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
