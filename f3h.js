@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.9
+ *  F3H 1.0.10
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.9';
+        $$.version = '1.0.10';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -493,7 +493,6 @@
                     doFetch(nodeCurrent = win, GET, redirect || ref);
                     return;
                 }
-                xhrIsDocument && useHistory && doScrollTo(html);
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 // if (GET === type) {
                     doRefChange(redirect || ref);
@@ -502,6 +501,7 @@
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
                 hookFire(status, data);
+                xhrIsDocument && useHistory && doScrollTo(html);
                 sources = sourcesGet(state.sources);
                 // Update JavaScript after markup change
                 xhrIsDocument && (scripts = doUpdateScripts(data[0]));

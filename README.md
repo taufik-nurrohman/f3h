@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.x
+
+ - Reset scroll position after updating the results.
+
 ### 1.0.9
 
  - Fixed server-side redirection&rsquo;s response URL that does not change the URL in address bar after redirection.
