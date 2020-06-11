@@ -797,4 +797,4 @@
 
     });
 
-})(this, this.document, 'F3H');
+})(window, document, 'F3H');

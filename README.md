@@ -12,9 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
-### 1.0.x
+### 1.0.10
 
  - Reset scroll position after updating the results.
+ - Fixed common issue with ES6 module which does not reference the `this` scope to `window` object by default.
 
 ### 1.0.9
 
