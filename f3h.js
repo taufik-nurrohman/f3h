@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.10
+ *  F3H 1.0.11
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.10';
+        $$.version = '1.0.11';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -683,9 +683,9 @@
             body = doc.body;
             head = doc.head;
             // Make sure all element(s) to be captured on document ready
-            links = linkGetAll();
-            scripts = scriptGetAll();
-            styles = styleGetAll();
+            $.links = links = linkGetAll();
+            $.scripts = scripts = scriptGetAll();
+            $.styles = styles = styleGetAll();
             onSourcesEventsSet([doc, win]);
             // Store the initial page into cache
             state.cache && doPreFetch(win, refGet());
@@ -778,15 +778,15 @@
         };
         $.fire = hookFire;
         $.hooks = hooks;
-        $.links = links;
+        $.links = {};
         $.lot = {};
         $.off = hookLet;
         $.on = hookSet;
         $.ref = null;
-        $.scripts = scripts;
+        $.scripts = {};
         $.state = state;
         $.status = null;
-        $.styles = styles;
+        $.styles = {};
 
         eventSet(win, 'DOMContentLoaded', onDocumentReady);
 
