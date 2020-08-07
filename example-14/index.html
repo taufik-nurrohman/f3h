@@ -7,10 +7,16 @@
   </head>
   <body>
     <main>
-      <p>Query string URL must be appended to the URL.</p>
+      <p>Query string URL must be appended to the current URL.</p>
       <form method="get">
         <p>
           <input autofocus name="q" type="text">
+          <button type="submit">Search</button>
+      </form>
+      <p>Example with different search path.</p>
+      <form action="test.html" method="get">
+        <p>
+          <input name="q" type="text">
           <button type="submit">Search</button>
       </form>
     </main>
@@ -21,6 +27,7 @@
         main = document.querySelector('main');
 
     f3h.on('success', function(response) {
+        document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
     });
 

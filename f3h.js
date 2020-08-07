@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.11
+ *  F3H 1.0.12
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.11';
+        $$.version = '1.0.12';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -321,7 +321,7 @@
                     0 === raw[search](/[.\/?]/) ||
                     0 === raw[search](home) ||
                     0 === raw[search](location.protocol + home) ||
-                    0 !== raw[search]('://');
+                   -1 === raw[search]('://');
             },
             'lot': {
                 'x-requested-with': name
@@ -495,7 +495,7 @@
                 }
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 // if (GET === type) {
-                    doRefChange(redirect || ref);
+                    doRefChange(-1 === ref[search]('#') ? (redirect || ref) : ref);
                 // }
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
@@ -699,7 +699,6 @@
                 refNow = href || action,
                 type = toCaseUpper(t.method || GET);
             if (GET === type) {
-                doRefChange(refNow);
                 if (isNodeForm(t)) {
                     q = (new URLSearchParams(new FormData(t))) + "";
                     refNow = slashEndLet(refNow.split(/[?&#]/)[0]) + (q ? '?' + q : "");
