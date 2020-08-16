@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.13
+
+ - Immediately change the URL if turbo feature is enabled.
+
 ### 1.0.12
 
  - Fixed URL contains hash being redirected to the non-hash version.

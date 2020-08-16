@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.12
+ *  F3H 1.0.13
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.12';
+        $$.version = '1.0.13';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -703,6 +703,10 @@
                     q = (new URLSearchParams(new FormData(t))) + "";
                     refNow = slashEndLet(refNow.split(/[?&#]/)[0]) + (q ? '?' + q : "");
                 }
+            }
+            // Immediately change the URL if turbo feature is enabled
+            if (state.turbo) {
+                doRefChange(refNow);
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
             preventDefault(e);
