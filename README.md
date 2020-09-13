@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.15
+
+ - Small bug fixes.
+
 ### 1.0.14
 
  - Small bug fixes.

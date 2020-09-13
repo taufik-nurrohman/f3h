@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.14
+ *  F3H 1.0.15
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.14';
+        $$.version = '1.0.15';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -494,9 +494,9 @@
                     return;
                 }
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
-                if (GET === type) {
+                // if (GET === type) {
                     doRefChange(-1 === ref[search]('#') ? (redirect || ref) : ref);
-                }
+                // }
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
@@ -703,10 +703,10 @@
                     q = (new URLSearchParams(new FormData(t))) + "";
                     refNow = slashEndLet(refNow.split(/[?&#]/)[0]) + (q ? '?' + q : "");
                 }
-            }
-            // Immediately change the URL if turbo feature is enabled
-            if (state.turbo) {
-                doRefChange(refNow);
+                // Immediately change the URL if turbo feature is enabled
+                if (state.turbo) {
+                    doRefChange(refNow);
+                }
             }
             requests[refNow] = [doFetch(t, type, refNow), t];
             preventDefault(e);
