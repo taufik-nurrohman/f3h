@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.13
+ *  F3H 1.0.14
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.13';
+        $$.version = '1.0.14';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -494,9 +494,9 @@
                     return;
                 }
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
-                // if (GET === type) {
+                if (GET === type) {
                     doRefChange(-1 === ref[search]('#') ? (redirect || ref) : ref);
-                // }
+                }
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
                 hookFire('success', data);
