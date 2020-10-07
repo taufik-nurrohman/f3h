@@ -119,7 +119,7 @@
     }
 
     function isSet(x) {
-        return 'undefined' !== typeof x;
+        return 'undefined' !== typeof x && null !== x;
     }
 
     function isScriptForF3H(node) {
