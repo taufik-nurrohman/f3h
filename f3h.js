@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.15
+ *  F3H 1.0.16
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -293,7 +293,7 @@
 
     (function($$) {
 
-        $$.version = '1.0.15';
+        $$.version = '1.0.16';
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
@@ -341,8 +341,6 @@
         };
 
         $$[instances] = {};
-
-        $$._ = $$.prototype;
 
     })(win[name] = function(o) {
 

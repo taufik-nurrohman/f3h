@@ -12,6 +12,10 @@ Your job is to make a website that works traditionally: clicking on a link will 
 Release Notes
 -------------
 
+### 1.0.16
+
+ - Removed `F3H._` method.
+
 ### 1.0.15
 
  - Small bug fixes.
