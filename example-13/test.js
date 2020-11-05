@@ -1,4 +1,4 @@
-var currentScript = document.currentScript,
+let currentScript = document.currentScript,
     embedMarkup = document.createElement('p');
 
 embedMarkup.style.cssText = 'display:block;padding:.5em 1em;border:1px solid;background:#ff0;color:#000;';

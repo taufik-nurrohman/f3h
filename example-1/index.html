@@ -59,18 +59,19 @@
     <script src="../f3h.js"></script>
     <script>
 
-    var f3h = new F3H({
+    let f3h = new F3H({
             turbo: true // Enable local cache feature and pre-fetch URL on hover
-        }),
-        main = document.querySelector('main'),
+        });
+
+    let main = document.querySelector('main'),
         nav = document.querySelector('nav');
 
-    f3h.on('exit', function() {
+    f3h.on('exit', () => {
         document.title = 'Loading…';
     });
 
-    f3h.on('success', function(response, target) {
-        if (404 !== this.status) {
+    f3h.on('success', (response, target) => {
+        if (404 !== f3h.status) {
             document.title = response.title;
             main.innerHTML = response.querySelector('main').innerHTML;
             nav.innerHTML = response.querySelector('nav').innerHTML;

@@ -16,10 +16,10 @@
     <script src="../f3h.js"></script>
     <script>
 
-    var f3h = new F3H,
+    let f3h = new F3H,
         main = document.querySelector('main');
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
     });

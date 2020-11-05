@@ -38,7 +38,7 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var f3h = new F3H({
+    let f3h = new F3H({
             history: false // Disable the history feature
         }),
         main = document.querySelector('main'),
@@ -57,7 +57,7 @@
         sections[main.offsetHeight] = title;
     }
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         main.insertAdjacentHTML('beforeend', '<hr>' + response.querySelector('main').innerHTML);
         nav.innerHTML = response.querySelector('nav').innerHTML;
         prev = nav.querySelector('[rel=prev]');
@@ -69,8 +69,8 @@
     nextToMore(document.title = 'Page 1');
 
     // Change document title on every section match
-    window.addEventListener('scroll', function() {
-        var visible = this.pageYOffset + (this.innerHeight / 2), top;
+    window.addEventListener('scroll', () => {
+        let visible = window.pageYOffset + (window.innerHeight / 2), top;
         for (top in sections) {
             if (+top < visible) {
                 continue;
@@ -78,7 +78,7 @@
             document.title = sections[top];
             break;
         }
-    }, false);
+    });
 
     </script>
   </body>

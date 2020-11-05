@@ -1,21 +1,22 @@
 /*!
  * ==============================================================
- *  F3H 1.0.16
+ *  F3H 1.0.17
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
  * --------------------------------------------------------------
  */
 
-(function(win, doc, name) {
+((win, doc, name) => {
 
-    var GET = 'GET',
+    let GET = 'GET',
         POST = 'POST',
 
         responseTypeHTML = 'document',
         responseTypeJSON = 'json',
         responseTypeTXT = 'text',
 
+        indexOf = 'indexOf',
         replace = 'replace',
         search = 'search',
         test = 'test',
@@ -45,8 +46,22 @@
         return node.innerHTML;
     }
 
+    // Convert appropriate data type value into their string format
+    function eval0(v) {
+        if (false === v) {
+            return 'false';
+        }
+        if (null === v) {
+            return 'null';
+        }
+        if (true === v) {
+            return 'true';
+        }
+        return v + "";
+    }
+
     // Evaluate string value into their appropriate data type
-    function eval2(v) {
+    function eval1(v) {
         if ('false' === v) {
             return false;
         }
@@ -84,7 +99,7 @@
 
     // <https://stackoverflow.com/a/8831937/1163000>
     function idFrom(text) {
-        var out = 0, c, i, j = text.length;
+        let out = 0, c, i, j = text.length;
         if (0 === j) {
             return out;
         }
@@ -102,7 +117,7 @@
     }
 
     function isLinkForF3H(node) {
-        var n = toCaseLower(name);
+        let n = toCaseLower(name);
         // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
         if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
@@ -127,7 +142,7 @@
         if (node.src && scriptCurrent.src === node.src) {
             return 1;
         }
-        var n = toCaseLower(name);
+        let n = toCaseLower(name);
         // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
         if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
@@ -144,7 +159,7 @@
     }
 
     function isStyleForF3H(node) {
-        var n = toCaseLower(name);
+        let n = toCaseLower(name);
         // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
         if (attributeHas(node, 'data-' + n) || attributeHas(node, n)) {
             return 1;
@@ -153,9 +168,9 @@
     }
 
     function linkGetAll(base) {
-        var id, out = {}, link,
+        let id, out = {}, link,
             links = nodeGetAll('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', base);
-        for (var i = 0, j = links.length; i < j; ++i) {
+        for (let i = 0, j = links.length; i < j; ++i) {
             if (isLinkForF3H(link = links[i])) {
                 continue;
             }
@@ -182,25 +197,25 @@
         if (!node) {
             return;
         }
-        var parent = node.parentNode;
+        let parent = node.parentNode;
         parent && parent.removeChild(node);
     }
 
     function nodeRestore(from) {
-        var node = doc.createElement(from[0]);
+        let node = doc.createElement(from[0]);
         node.innerHTML = from[1];
-        for (var k in from[2]) {
-            attributeSet(node, k, uneval2(from[2][k]));
+        for (let k in from[2]) {
+            attributeSet(node, k, eval0(from[2][k]));
         }
         return node;
     }
 
     function nodeSave(node) {
-        var attr = node.attributes,
+        let attr = node.attributes,
             // `[name, content, attributes]`
             to = [toCaseLower(node.nodeName), contentGet(node), {}];
-        for (var i = 0, j = attr.length; i < j; ++i) {
-            to[2][attr[i].name] = eval2(attr[i].value);
+        for (let i = 0, j = attr.length; i < j; ++i) {
+            to[2][attr[i].name] = eval1(attr[i].value);
         }
         return to;
     }
@@ -219,9 +234,9 @@
     }
 
     function scriptGetAll(base) {
-        var id, out = {}, script,
+        let id, out = {}, script,
             scripts = nodeGetAll('script', base);
-        for (var i = 0, j = scripts.length; i < j; ++i) {
+        for (let i = 0, j = scripts.length; i < j; ++i) {
             if (isScriptForF3H(script = scripts[i])) {
                 continue;
             }
@@ -232,9 +247,9 @@
     }
 
     function styleGetAll(base) {
-        var id, out = {}, style,
+        let id, out = {}, style,
             styles = nodeGetAll('link[rel=stylesheet],style', base);
-        for (var i = 0, j = styles.length; i < j; ++i) {
+        for (let i = 0, j = styles.length; i < j; ++i) {
             if (isStyleForF3H(style = styles[i])) {
                 continue;
             }
@@ -257,49 +272,35 @@
     }
 
     function toHeadersAsProxy(xhr) {
-        var out = {},
+        let out = {},
             headers = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/),
             header, h, k, v, w;
         for (header in headers) {
             h = headers[header].split(': ');
             k = toCaseLower(h.shift());
             w = toCaseLower(v = h.join(': '));
-            out[k] = eval2(v);
+            out[k] = eval1(v);
         }
         // Use proxy to make response header’s key to be case-insensitive
         return new Proxy(out, {
-            get: function(o, k) {
+            get: (o, k) => {
                 return o[toCaseLower(k)] || null;
             },
-            set: function(o, k, v) {
+            set: (o, k, v) => {
                 o[toCaseLower(k)] = v;
             }
         });
     }
 
-    // Convert appropriate data type value into their string format
-    function uneval2(v) {
-        if (false === v) {
-            return 'false';
-        }
-        if (null === v) {
-            return 'null';
-        }
-        if (true === v) {
-            return 'true';
-        }
-        return v + "";
-    }
+    ($$ => {
 
-    (function($$) {
-
-        $$.version = '1.0.16';
+        $$[instances] = {};
 
         $$.state = {
             'cache': false, // Store all response body to variable to be used later?
             'history': true,
-            'is': function(source, refNow) {
-                var target = source.target,
+            'is': (source, refNow) => {
+                let target = source.target,
                     // Get URL data as-is from the DOM attribute string
                     raw = attributeGet(source, 'href') || attributeGet(source, 'action') || "",
                     // Get resolved URL data from the DOM property
@@ -319,16 +320,14 @@
                 // Detect internal link starts from here
                 return "" === raw ||
                     0 === raw[search](/[.\/?]/) ||
-                    0 === raw[search](home) ||
-                    0 === raw[search](location.protocol + home) ||
-                   -1 === raw[search]('://');
+                    0 === raw[indexOf](home) ||
+                    0 === raw[indexOf](location.protocol + home) ||
+                   -1 === raw[indexOf]('://');
             },
             'lot': {
                 'x-requested-with': name
             },
-            'ref': function(source, refNow) {
-                return refNow; // Default URL hook
-            },
+            'ref': (source, refNow) => refNow, // Default URL hook
             'sources': 'a[href],form',
             'turbo': false, // Pre-fetch any URL on hover?
             'type': responseTypeHTML,
@@ -340,11 +339,11 @@
             }
         };
 
-        $$[instances] = {};
+        $$.version = '1.0.17';
 
     })(win[name] = function(o) {
 
-        var $ = this,
+        let $ = this,
             $$ = win[name],
             caches = {},
             hooks = {},
@@ -377,11 +376,11 @@
         $$[instances][Object.keys($$[instances]).length] = $;
 
         function sourcesGet(sources, root) {
-            var from = nodeGetAll(sources, root),
+            let from = nodeGetAll(sources, root),
                 refNow = refGet();
             if (isFunction(state.is)) {
-                var to = [];
-                for (var i = 0, j = from.length; i < j; ++i) {
+                let to = [];
+                for (let i = 0, j = from.length; i < j; ++i) {
                     state.is.call($, from[i], refNow) && to.push(from[i]);
                 }
                 return to;
@@ -391,11 +390,11 @@
 
         // Include submit button value to the form data ;)
         function doAppendCurrentButtonValue(node) {
-            var buttonValueStorage = doc.createElement('input'),
+            let buttonValueStorage = doc.createElement('input'),
                 buttons = nodeGetAll('[name][type=submit][value]', node);
             buttonValueStorage.type = 'hidden';
             nodeInsert(buttonValueStorage, 0, node);
-            for (var i = 0, j = buttons.length; i < j; ++i) {
+            for (let i = 0, j = buttons.length; i < j; ++i) {
                 eventSet(buttons[i], 'click', function() {
                     buttonValueStorage.name = this.name;
                     buttonValueStorage.value = this.value;
@@ -404,8 +403,8 @@
         }
 
         function doFetch(node, type, ref) {
-            var isWindow = node === win,
-                useHistory = state.history;
+            let isWindow = node === win,
+                useHistory = state.history, data;
             // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
             if (GET === type && node === nodeCurrent && !isWindow) {
@@ -416,7 +415,7 @@
             hookFire('exit', [doc, node]);
             // Get response from cache if any
             if (state.cache) {
-                var cache = caches[slashEndLet(hashLet(ref))]; // `[status, response, lot, xhrIsDocument]`
+                let cache = caches[slashEndLet(hashLet(ref))]; // `[status, response, lot, xhrIsDocument]`
                 if (cache) {
                     $.lot = cache[2];
                     $.status = cache[0];
@@ -437,7 +436,7 @@
                     return;
                 }
             }
-            var data, fn, lot, redirect, status,
+            let fn, lot, redirect, status,
                 xhr = doFetchBase(node, type, ref, state.lot),
                 xhrIsDocument = responseTypeHTML === xhr.responseType,
                 xhrPush = xhr.upload;
@@ -453,10 +452,10 @@
                 $.lot = lot;
                 $.status = status;
             }
-            eventSet(xhr, 'abort', function() {
+            eventSet(xhr, 'abort', () => {
                 dataSet(), hookFire('abort', [xhr.response, node]);
             });
-            eventSet(xhr, 'error', fn = function() {
+            eventSet(xhr, 'error', fn = () => {
                 dataSet();
                 xhrIsDocument && !isWindow && useHistory && doScrollTo(html);
                 data = [xhr.response, node];
@@ -472,7 +471,7 @@
                 hookFire('enter', data);
             });
             eventSet(xhrPush, 'error', fn);
-            eventSet(xhr, 'load', fn = function() {
+            eventSet(xhr, 'load', fn = () => {
                 dataSet();
                 data = [xhr.response, node];
                 redirect = xhr.responseURL;
@@ -482,7 +481,7 @@
                     // Redirection should delete a cache related to the response URL
                     // This is useful for case(s) like, when you have submitted a
                     // comment form and then you will be redirected to the same URL
-                    var r = slashEndLet(redirect);
+                    let r = slashEndLet(redirect);
                     caches[r] && (delete caches[r]);
                     // Trigger hook(s) immediately
                     hookFire('success', data);
@@ -493,7 +492,7 @@
                 }
                 // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
                 // if (GET === type) {
-                    doRefChange(-1 === ref[search]('#') ? (redirect || ref) : ref);
+                    doRefChange(-1 === ref[indexOf]('#') ? (redirect || ref) : ref);
                 // }
                 // Update CSS before markup change
                 xhrIsDocument && (styles = doUpdateStyles(data[0]));
@@ -507,10 +506,10 @@
                 hookFire('enter', data);
             });
             eventSet(xhrPush, 'load', fn);
-            eventSet(xhr, 'progress', function(e) {
+            eventSet(xhr, 'progress', e => {
                 dataSet(), hookFire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
-            eventSet(xhrPush, 'progress', function(e) {
+            eventSet(xhrPush, 'progress', e => {
                 dataSet(), hookFire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             return xhr;
@@ -524,7 +523,7 @@
         }
 
         function doFetchAbortAll() {
-            for (var request in requests) {
+            for (let request in requests) {
                 doFetchAbort(request);
             }
         }
@@ -532,9 +531,9 @@
         // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetchBase(node, type, ref, headers) {
             ref = isFunction(state.ref) ? state.ref.call($, node, ref) : ref;
-            var header, xhr = new XMLHttpRequest;
+            let header, xhr = new XMLHttpRequest;
             // Automatic response type based on current file extension
-            var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
+            let x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
                 responseType = state.types[x] || state.type || responseTypeTXT;
             if (isFunction(responseType)) {
                 responseType = responseType.call($, ref);
@@ -559,14 +558,14 @@
                 hookFire('focus', data);
                 return;
             }
-            var target = nodeGet('[autofocus]');
+            let target = nodeGet('[autofocus]');
             target && target.focus();
         }
 
         // Pre-fetch page and store it into cache
         function doPreFetch(node, ref) {
-            var xhr = doFetchBase(node, GET, ref), status;
-            eventSet(xhr, 'load', function() {
+            let xhr = doFetchBase(node, GET, ref), status;
+            eventSet(xhr, 'load', () => {
                 if (200 === (status = xhr.status)) {
                     caches[slashEndLet(hashLet(ref))] = [status, xhr.response, toHeadersAsProxy(xhr), responseTypeHTML === xhr.responseType];
                 }
@@ -602,7 +601,7 @@
         }
 
         function doUpdate(compare, to, getAll, defaultContainer) {
-            var id, toCompare = getAll(compare),
+            let id, toCompare = getAll(compare),
                 node, placesToRestore = {}, v;
             for (id in to) {
                 if (node = nodeGet('#' + id[replace](/[:.]/g, '\\$&'))) {
@@ -640,7 +639,7 @@
             }
             if (isSet(hooks[name])) {
                 if (isSet(fn)) {
-                    for (var i = 0, j = hooks[name].length; i < j; ++i) {
+                    for (let i = 0, j = hooks[name].length; i < j; ++i) {
                         if (fn === hooks[name][i]) {
                             hooks[name].splice(i, 1);
                         }
@@ -670,7 +669,7 @@
             if (!isSet(hooks[name])) {
                 return $;
             }
-            for (var i = 0, j = hooks[name].length; i < j; ++i) {
+            for (let i = 0, j = hooks[name].length; i < j; ++i) {
                 hooks[name][i].apply($, lot);
             }
             return $;
@@ -691,7 +690,7 @@
 
         function onFetch(e) {
             doFetchAbortAll();
-            var t = this, q,
+            let t = this, q,
                 href = t.href,
                 action = t.action,
                 refNow = href || action,
@@ -717,7 +716,7 @@
 
         // Pre-fetch URL on link hover
         function onHoverOnce() {
-            var t = this,
+            let t = this,
                 href = t.href;
             if (!caches[slashEndLet(hashLet(href))]) {
                 doPreFetch(t, href);
@@ -727,7 +726,7 @@
 
         function onPopState(e) {
             doFetchAbortAll();
-            var refNow = refGet();
+            let refNow = refGet();
             // Updating the hash value shouldn’t trigger the AJAX call!
             if (hashGet(refNow) && hashLet(refCurrent) === hashLet(refNow)) {
                 return;
@@ -736,14 +735,14 @@
         }
 
         function onSourcesEventsLet() {
-            for (var i = 0, j = sources.length; i < j; ++i) {
+            for (let i = 0, j = sources.length; i < j; ++i) {
                 eventLet(sources[i], eventNameGet(sources[i]), onFetch);
             }
         }
 
         function onSourcesEventsSet(data) {
-            var turbo = state.turbo;
-            for (var i = 0, j = sources.length; i < j; ++i) {
+            let turbo = state.turbo;
+            for (let i = 0, j = sources.length; i < j; ++i) {
                 eventSet(sources[i], eventNameGet(sources[i]), onFetch);
                 if (isNodeForm(sources[i])) {
                     doAppendCurrentButtonValue(sources[i]);
@@ -755,7 +754,7 @@
             doScrollToElement(data);
         }
 
-        $.abort = function(id) {
+        $.abort = id => {
             if (!id) {
                 doFetchAbortAll();
             } else if (requests[id]) {
@@ -764,7 +763,7 @@
             return $;
         };
 
-        $.pop = function() {
+        $.pop = () => {
             onSourcesEventsLet();
             eventLet(win, 'DOMContentLoaded', onDocumentReady);
             eventLet(win, 'hashchange', onHashChange);
@@ -774,9 +773,7 @@
         };
 
         $.caches = caches;
-        $.fetch = function(ref, type, from) {
-            return doFetchBase(from, type, ref);
-        };
+        $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
         $.fire = hookFire;
         $.hooks = hooks;
         $.links = {};

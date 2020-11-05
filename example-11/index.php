@@ -12,15 +12,15 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var f3h = new F3H,
+    let f3h = new F3H,
         main = document.querySelector('main');
 
-    f3h.on('error', function(response, source) {
+    f3h.on('error', (response, source) => {
         // Force page change
         window.location.href = source.href || source.action;
     });
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
     });

@@ -96,7 +96,7 @@
     &lt;script&gt;
     let f3h = new F3H,
         content = document.querySelector('#content');
-    f3h.on('success', function(response) {
+    f3h.on('success', response =&gt; {
         document.title = response.title;
         content.innerHTML = response.querySelector('#content').innerHTML;
     });
@@ -144,8 +144,8 @@
         <li><var>state.is</var> &rarr; Default filter function to exclude HTML elements selected by <code>state.sources</code> with certain criteria. For example, to disable AJAX events on HTML elements that has <code>target</code> attribute with value of <code>_blank</code>.</li>
         <li><var>state.lot</var> &rarr; List of HTTP headers to be added to the request headers.</li>
         <li><var>state.ref</var> &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.</li>
-        <li><var>state.turbo</var> &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.</li>
         <li><var>state.sources</var> &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.</li>
+        <li><var>state.turbo</var> &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.</li>
         <li><var>state.type</var> &rarr; Default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the <code>state.types</code> object.</li>
         <li><var>state.types</var> &rarr; List of file extensions with the expected response type.</li>
       </ul>
@@ -169,16 +169,28 @@ console.log([F3H.state, f3h.state]);</code></pre>
     major = version.split('.')[0];
 
 if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>f3h.abort(id)</h3>
+      <p>Abort requests.</p>
+      <pre><code>f3h.abort(); // Abort all requests
+f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/asdf`</code></pre>
       <h3>f3h.caches</h3>
       <p>This object stores your AJAX response status, body and headers as static cache. Refreshing the page will remove all caches.</p>
       <pre><code>console.log(f3h.caches);</code></pre>
+      <h3>f3h.fetch(ref, type, from)</h3>
+      <p>Internal method used to help doing the generic fetch request using <code>XMLHttpRequest</code>.</p>
+      <pre><code>let xhr = f3h.fetch('https://127.0.0.1/test.html', 'GET', window);
+xhr.addEventListener('load', () =&gt; {
+    console.log(xhr.status);
+});</code></pre>
       <h3>f3h.links</h3>
       <p>Returns all of the links to prefetch available in the response.</p>
       <h3>f3h.lot</h3>
       <p>Return the HTTP response headers as object. Every property in it are case-insensitive.</p>
-      <pre><code>f3h.on('success', function(response) {
-    console.log(this.lot);
+      <pre><code>f3h.on('success', response =&gt; {
+    console.log(f3h.lot);
 });</code></pre>
+      <h3>f3h.pop()</h3>
+      <p>Remove all AJAX events from the page.</p>
       <h3>f3h.ref</h3>
       <p>This variable stores current URL that is being fetched by the application, including the hash part.</p>
       <h3>f3h.scripts</h3>
@@ -187,8 +199,8 @@ if (+major &lt; 3) { &hellip; }</code></pre>
       <p>Return the modified application states.</p>
       <h3>f3h.status</h3>
       <p>Return the HTTP response status.</p>
-      <pre><code>f3h.on('success', function(response) {
-    if (404 === this.status) {
+      <pre><code>f3h.on('success', response =&gt; {
+    if (404 === f3h.status) {
         // Handle 404 page
     } else {
         // Handle normal page
@@ -196,18 +208,6 @@ if (+major &lt; 3) { &hellip; }</code></pre>
 });</code></pre>
       <h3>f3h.styles</h3>
       <p>Returns all of the CSS code available in the response.</p>
-      <h3>f3h.abort(id)</h3>
-      <p>Abort requests.</p>
-      <pre><code>f3h.abort(); // Abort all requests
-f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/asdf`</code></pre>
-      <h3>f3h.fetch(ref, type, from)</h3>
-      <p>Internal method used to help doing the generic fetch request using <code>XMLHttpRequest</code>.</p>
-      <pre><code>let xhr = f3h.fetch('https://127.0.0.1/test.html', 'GET', window);
-xhr.addEventListener('load', function() {
-    console.log(this.status);
-});</code></pre>
-      <h3>f3h.pop()</h3>
-      <p>Remove all AJAX events from the page.</p>
       <h2>Hooks</h2>
       <table border="1">
         <thead>
@@ -217,6 +217,18 @@ xhr.addEventListener('load', function() {
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td><code>200</code></td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>200</code>.</td>
+          </tr>
+          <tr>
+            <td><code>404</code></td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>404</code>.</td>
+          </tr>
+          <tr>
+            <td><code>*</code></td>
+            <td>Will be triggered on AJAX loading success event, with the page status of <code>*</code> where <code>*</code> is a HTTP status code as described in the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" rel="nofollow" target="_blank">HTTP status code reference</a>.</td>
+          </tr>
           <tr>
             <td><code>abort</code></td>
             <td>Will be triggered on AJAX aborting event.</td>
@@ -257,26 +269,21 @@ xhr.addEventListener('load', function() {
             <td><code>success</code></td>
             <td>Will be triggered on AJAX loading success event, regardless of the page status. Might result with a <code>null</code> response on URL redirection after form submission. Consider to use the <code>200</code> hook instead.</td>
           </tr>
-          <tr>
-            <td><code>200</code></td>
-            <td>Will be triggered on AJAX loading success event, with the page status of <code>200</code>.</td>
-          </tr>
-          <tr>
-            <td><code>404</code></td>
-            <td>Will be triggered on AJAX loading success event, with the page status of <code>404</code>.</td>
-          </tr>
-          <tr>
-            <td><code>*</code></td>
-            <td>Will be triggered on AJAX loading success event, with the page status of <code>*</code> where <code>*</code> is a HTTP status code as described in the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" rel="nofollow" target="_blank">HTTP status code reference</a>.</td>
-          </tr>
         </tbody>
       </table>
+      <h3>f3h.fire(name, lot)</h3>
+      <p>Trigger hooks.</p>
+      <pre><code>f3h.fire('success', [document, window]);</code></pre>
       <h3>f3h.hooks</h3>
       <p>Return the added hooks.</p>
       <pre><code>console.log(f3h.hooks);</code></pre>
+      <h3>f3h.off(name, fn)</h3>
+      <p>Remove a hook.</p>
+      <pre><code>f3h.off('success');</code></pre>
+      <pre><code>f3h.off('success', onSuccess); // With context</code></pre>
       <h3>f3h.on(name, fn)</h3>
       <p>Add a new hook.</p>
-      <pre><code>f3h.on('success', function(response) {
+      <pre><code>f3h.on('success', response =&gt; {
     console.log(response);
 });</code></pre>
       <pre><code>function onSuccess(response) {
@@ -284,13 +291,6 @@ xhr.addEventListener('load', function() {
 }
 
 f3h.on('success', onSuccess); // With context</code></pre>
-      <h3>f3h.off(name, fn)</h3>
-      <p>Remove a hook.</p>
-      <pre><code>f3h.off('success');</code></pre>
-      <pre><code>f3h.off('success', onSuccess); // With context</code></pre>
-      <h3>f3h.fire(name, lot)</h3>
-      <p>Trigger hooks.</p>
-      <pre><code>f3h.fire('success', [document, window]);</code></pre>
       <h2>Frequently Asked Questions</h2>
       <p><b>Can I mimic POST request via standard links?</b></p>
       <p>My purpose in making this application is to improve the standard navigation system on a HTML document that already able to work without AJAX features. To mimic POST request on standard links isn&rsquo;t natural and can cause unwanted responses when the AJAX feature does not work due to certain conditions.</p>
@@ -328,8 +328,8 @@ if ($out) { /* &hellip; */ } else { /* &hellip; */ }</code></pre>
       <p>And here&rsquo;s the way to process JSON or HTML data simultaneously on success:</p>
       <pre><code>let f3h = new F3H;
 
-f3h.on('success', function(response) {
-    if ('application/json' === this.lot['content-type']) {
+f3h.on('success', response =&gt; {
+    if ('application/json' === f3h.lot['content-type']) {
         // Handle JSON response
     } else {
         // Handle HTML response
@@ -343,7 +343,7 @@ f3h.on('success', function(response) {
     $main = $('main'),
     $nav = $('nav');
 
-f3h.on('success', function(response) {
+f3h.on('success', response=&gt; {
     let $response = $(response);
     $document.prop('title', $response.prop('title'));
     $main.html($response.find('main').html());
@@ -351,13 +351,13 @@ f3h.on('success', function(response) {
 });</code></pre>
       <p><b>I get an error <code>TypeError: response is null</code> from the web console every time I submit a form. Why?</b></p>
       <p>Your form data processor may have redirected you to a certain page via 302 status (and the like) when the data you provided was sent successfully. Consider to use <code>200</code> hook instead of <code>success</code>, or be sure to check that the response status is <code>200</code> before doing anything to the response given:</p>
-      <pre><code>f3h.on(200, function(response) {
+      <pre><code>f3h.on(200, response =&gt; {
     console.log(response);
 });</code></pre>
-      <pre><code>f3h.on('success', function(response) {
-    if (200 === this.status) {
+      <pre><code>f3h.on('success', response =&gt; {
+    if (200 === f3h.status) {
         // Handle normal page
-    } else if (404 === this.status) {
+    } else if (404 === f3h.status) {
         // Handle error page
     } else {
         // Send successful AJAX loading event to your web statistic
@@ -369,8 +369,8 @@ f3h.on('success', function(response) {
 &lt;ins class="adsbygoogle" data-ad-client="ca-pub-&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-ad-slot="&bull;&bull;&bull;&bull;&bull;&bull;&bull;"&gt;&lt;/ins&gt;
 &lt;script id="<mark>google-script-1</mark>"&gt;(adsbygoogle = window.adsbygoogle || []).push({})&lt;/script&gt;</code></pre>
       <p>Then make sure to clear the cache every time a successful event occurs:</p>
-      <pre><code>f3h.on('success', function() {
-    delete this.scripts['<mark>google-script-1</mark>'];
+      <pre><code>f3h.on('success', () =&gt; {
+    delete f3h.scripts['<mark>google-script-1</mark>'];
 });</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to <a href="https://paypal.me/tatautaufik" target="_blank">share a little financial support</a> with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>

@@ -40,7 +40,7 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var f3h = new F3H,
+    let f3h = new F3H,
         main = document.querySelector('main'),
         progress = document.createElement('div'),
         bar = document.createElement('span');
@@ -50,26 +50,26 @@
     progress.appendChild(bar);
     document.body.appendChild(progress);
 
-    f3h.on('error', function() {
+    f3h.on('error', () => {
         bar.style.width = '100%';
         bar.classList.add('error');
     });
 
-    f3h.on('exit', function() {
+    f3h.on('exit', () => {
         bar.style.width = '0%';
         bar.classList.remove('error');
         bar.classList.remove('success');
     });
 
-    f3h.on('pull', function(from, to) {
+    f3h.on('pull', (from, to) => {
         bar.style.width = ((to / from) * 100) + '%';
     });
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
         bar.classList.add('success');
-        console.log(this.lot);
+        console.log(f3h.lot);
     });
 
     </script>

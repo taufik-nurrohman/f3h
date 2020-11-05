@@ -12,11 +12,11 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var f3h = new F3H,
+    let f3h = new F3H,
         main = document.querySelector('main');
 
-    f3h.on('scroll', function() {
-        var id = window.location.hash,
+    f3h.on('scroll', () => {
+        let id = window.location.hash,
             target = id && document.querySelector(id);
         target && target.scrollIntoView({
             behavior: 'smooth',
@@ -25,7 +25,7 @@
         });
     });
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         document.title = response.title;
         main.innerHTML = response.querySelector('main').innerHTML;
     });

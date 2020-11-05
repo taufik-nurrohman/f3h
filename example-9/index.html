@@ -38,7 +38,7 @@
     <script src="../f3h.min.js"></script>
     <script>
 
-    var f3h = new F3H({
+    let f3h = new F3H({
             history: false // Disable the history feature
         }),
         main = document.querySelector('main'),
@@ -57,7 +57,7 @@
         sections[main.offsetHeight] = title;
     }
 
-    f3h.on('success', function(response) {
+    f3h.on('success', response => {
         main.insertAdjacentHTML('beforeend', '<hr>' + response.querySelector('main').innerHTML);
         nav.innerHTML = response.querySelector('nav').innerHTML;
         prev = nav.querySelector('[rel=prev]');
@@ -69,8 +69,8 @@
     nextToMore(document.title = 'Page 1');
 
     // Change document title on every section match
-    window.addEventListener('scroll', function() {
-        var visible = this.pageYOffset + (this.innerHeight / 2), top;
+    window.addEventListener('scroll', () => {
+        let visible = window.pageYOffset + (window.innerHeight / 2), top;
         for (top in sections) {
             if (+top < visible) {
                 continue;
@@ -78,12 +78,12 @@
             document.title = sections[top];
             break;
         }
-    }, false);
+    });
 
     // The code above is equal to the “Load More” example, with this extra ending scroll event detection
-    var body = document.body,
+    let body = document.body,
         threshold = 200; // 200 pixel(s) before end of the document
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', () => {
         if ((window.innerHeight + window.pageYOffset) >= body.offsetHeight - threshold) {
             if (next) {
                 next.click(); // Click the “Load More” link!
@@ -91,7 +91,7 @@
                 next = false;
             }
         }
-    }, false);
+    });
 
     </script>
   </body>
