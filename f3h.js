@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  F3H 1.0.17
+ *  F3H 1.0.18
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -339,7 +339,7 @@
             }
         };
 
-        $$.version = '1.0.17';
+        $$.version = '1.0.18';
 
     })(win[name] = function(o) {
 
@@ -676,10 +676,13 @@
         }
 
         function onDocumentReady() {
+            // Detect key down/up event
+            eventSet(doc, 'keydown', onKeyDown);
+            eventSet(doc, 'keyup', onKeyUp);
             // Set body and head variable value once, on document ready
             body = doc.body;
             head = doc.head;
-            // Make sure all element(s) to be captured on document ready
+            // Make sure all element(s) are captured on document ready
             $.links = links = linkGetAll();
             $.scripts = scripts = scriptGetAll();
             $.styles = styles = styleGetAll();
@@ -690,6 +693,10 @@
 
         function onFetch(e) {
             doFetchAbortAll();
+            // Use native web feature when user press the control key
+            if (keyIsCtrl) {
+                return;
+            }
             let t = this, q,
                 href = t.href,
                 action = t.action,
@@ -722,6 +729,17 @@
                 doPreFetch(t, href);
             }
             eventLet(t, 'mousemove', onHoverOnce);
+        }
+
+        // Check if user is pressing the control key before clicking on a link
+        let keyIsCtrl = false;
+
+        function onKeyDown(e) {
+            keyIsCtrl = e.ctrlKey;
+        }
+
+        function onKeyUp() {
+            keyIsCtrl = false;
         }
 
         function onPopState(e) {
@@ -767,6 +785,8 @@
             onSourcesEventsLet();
             eventLet(win, 'DOMContentLoaded', onDocumentReady);
             eventLet(win, 'hashchange', onHashChange);
+            eventLet(doc, 'keydown', onKeyDown);
+            eventLet(doc, 'keyup', onKeyUp);
             eventLet(win, 'popstate', onPopState);
             hookFire('pop', [doc, win]);
             return $.abort();
