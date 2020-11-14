@@ -14,7 +14,7 @@ Release Notes
 
 ### 1.0.18
 
- - Preserve native web features where possible (#11)
+ - Preserved native web features where possible (#11)
 
 ### 1.0.17
 
