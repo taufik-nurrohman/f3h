@@ -1,0 +1,391 @@
+extends _index.pug
+
+block state
+  - const version = '1.1.0'
+  - const title = 'F3H ' + version + ' \xB7 Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.'
+  - const description = 'Your job is to make a website that works traditionally. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically.'
+  - const theme = '#000'
+
+block style
+  style
+    | * {
+    |   box-sizing: border-box;
+    | }
+    | :root {
+    |   background: #fff;
+    |   color: #000;
+    |   border-top: 4px solid;
+    |   font: normal normal 16px/1.25 serif;
+    | }
+    | a {
+    |   color: #009;
+    |   text-decoration: none;
+    | }
+    | a, code {
+    |   word-wrap: break-word;
+    | }
+    | code {
+    |   font-family: monospace;
+    |   font-size: 80%;
+    | }
+    | footer, header, main, nav {
+    |   max-width: 700px;
+    |   margin: 0 auto;
+    | }
+    | hr {
+    |   border: 0;
+    |   color: inherit;
+    |   border-top: 1px dashed;
+    |   height: 0;
+    | }
+    | pre {
+    |   white-space: pre-wrap;
+    |   word-wrap: break-word;
+    | }
+    | pre code {
+    |   display: block;
+    |   background: #eee;
+    |   padding: 1em;
+    | }
+    | table {
+    |   width: 100%;
+    | }
+    | td, th {
+    |   text-align: left;
+    |   vertical-align: top;
+    | }
+    | body > p:first-child {
+    |   background: #ffa;
+    |   border: 1px dashed;
+    |   margin-top: 0;
+    |   padding: .75em 1em;
+    | }
+
+block content
+  p Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
+  header
+    h1 F3H #{version}
+    p You can read #[abbr(title='Fetch') F3H] as how you would read #[abbr(title='Accessibility') A11Y] and #[abbr(title='Internationalization') I18N].
+    p Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will store it to the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.
+    hr
+  main
+    p Progressive enhancement is a design principle that is focused in ensuring the availability of web page content in the most limited conditions, and if possible, to provide the most advanced features when the conditions are supportive. By enhancing features while maintaining the basic functions of HTML pages, this concept will ensure that if your advanced JavaScript features cannot work optimally under certain conditions, then at least the web page content that you want to provide is still accessible to most users.
+    p: a(href='example-1/index.html' target='_blank') #[b Demo]
+    h2 Features
+    ul
+      li Light-weight, no dependencies. It uses vanilla JavaScript.
+      li Simple #[abbr(title='Application Programming Interface') API]. Easy to master.
+      li Accessible AJAX response as HTML elements (by default).
+      li Instant click with native HTML5 Prefetch, improved by the power of JavaScript.
+      li Progressively enhanced. If at any time the JavaScript fails to load, or if users are using an old web browser, or if users decide to disable the JavaScript features, or if some third-party JavaScript makes this application fail to work, your website will still be able to work as when it didn&rsquo;t have AJAX features.
+    h2 Usage
+    h3 Browser
+    p With the basic knowledge of accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.
+    pre: code
+      | &lt;!DOCTYPE html&gt;
+      | &lt;html dir="ltr"&gt;
+      |   &lt;head&gt;
+      |     &lt;meta charset="utf-8"&gt;
+      |   &lt;/head&gt;
+      |   &lt;body&gt;
+      |     &lt;main id="content"&gt;
+      |       &lt;p&gt;Lorem &lt;a href="/path-to-internal-page"&gt;ipsum&lt;/a&gt; dolor sit amet.&lt;/p&gt;
+      |     &lt;/main&gt;
+      |     &lt;script src="#[a(href='f3h.min.js' target='_blank') @taufik-nurrohman/f3h/f3h.min.js]"&gt;&lt;/script&gt;
+      |     &lt;script&gt;
+      |     const f3h = new F3H;
+      |     const content = document.querySelector('#content');
+      |     f3h.on('success', response =&gt; {
+      |         document.title = response.title;
+      |         content.innerHTML = response.querySelector('#content').innerHTML;
+      |     });
+      |     &lt;/script&gt;
+      |   &lt;/body&gt;
+      | &lt;/html&gt;
+    h3 Node.js
+    p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn&rsquo;t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
+    pre: code
+      | import F3H from '@taufik-nurrohman/f3h';
+      |
+      | const f3h = new F3H;
+      |
+      | f3h.on('success', response => {
+      |     document.title = response.title;
+      |     let from = document.querySelector('main'),
+      |         to = response.querySelector('main');
+      |     from.innerHTML = to.innerHTML;
+      | });
+    h2 Examples
+    ul
+      li: a(href='example-0/index.html' target='_blank') No Idea?
+      li: a(href='example-2/index.html' target='_blank') Apply Events to Specific Elements
+      li #[a(href='example-3/index.html' target='_blank') Progress Animation Example] (Requires #[code Content-Length] response header)
+      li: a(href='example-4/index.html' target='_blank') CSS and JavaScript Evaluation Across Pages
+      li #[a(href='example-5/index.php' target='_blank') Basic Form Example] (Requires PHP)
+      li #[a(href='example-6/index.php' target='_blank') Upload Form Example] (Requires PHP)
+      li: a(href='example-7/index.html' target='_blank') Native Hash Change Events
+      li: a(href='example-8/index.html' target='_blank') Load More Example
+      li: a(href='example-9/index.html' target='_blank') Infinite Scroll Example
+      li: a(href='example-10/index.html' target='_blank') Smooth Scrolling Example
+      li #[a(href='example-11/index.php' target='_blank') Server-Side Redirection Example] (Requires PHP, experimental)
+      li #[a(href='example-12/index.php' target='_blank') Form Data Value] (Requires PHP, test)
+      li #[a(href='example-13/index.html' target='_blank') JavaScript and CSS Placement Test] (TODO)
+      li: a(href='example-14/index.html' target='_blank') Search Form Example
+      li: a(href='example-15/index.html' target='_blank') jQuery Integration Example
+    h2 Settings
+    pre: code const f3h = new F3H(#[var cache]);
+    pre: code
+      | const f3h = new F3H(#[var state] = {
+      |     cache: false,
+      |     history: true,
+      |     is: (source, ref) =&gt; { &hellip; },
+      |     lot: {
+      |         'x-requested-with': 'F3H'
+      |     },
+      |     ref: (source, ref) =&gt; { &hellip; },
+      |     sources: 'a[href], form',
+      |     turbo: false,
+      |     type: 'document',
+      |     types: { &hellip; }
+      | });
+    ul
+      li #[var cache] &rarr; See #[code state.cache].
+      li #[var state] &rarr; The configuration data.
+      li #[var state.cache] &rarr; Set to #[code true] to enable local cache feature. Only responses from the GET requests that will be cached by the application. Setting the value to #[code false] on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.
+      li #[var state.history] &rarr; Set to #[code false] to disable the history feature (loading different pages won&rsquo;t change the URL in the address bar).
+      li #[var state.is] &rarr; Default filter function to exclude HTML elements selected by #[code state.sources] with certain criteria. For example, to disable AJAX events on HTML elements that has #[code target] attribute with value of #[code _blank].
+      li #[var state.lot] &rarr; List of HTTP headers to be added to the request headers.
+      li #[var state.ref] &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.
+      li #[var state.sources] &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.
+      li #[var state.turbo] &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.
+      li #[var state.type] &rarr; Default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the #[code state.types] object.
+      li #[var state.types] &rarr; List of file extensions with the expected response type.
+    h2 Methods and Properties
+    h3 F3H.instances
+    p Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.
+    pre: code
+      | for (let key in F3H.instances) {
+      |     console.log(key);
+      |     console.log(F3H.instances[key]);
+      | }
+    h3 F3H.state
+    p This property stores the initial values of #[code f3h.state].
+    pre: code
+      | const f3h = new F3H({
+      |     foo: ['bar', 'baz', 'qux']
+      | });
+      |
+      | console.log([F3H.state, f3h.state]);
+    h3 F3H.version
+    p Return the application version.
+    pre: code
+      | let version = F3H.version,
+      |     major = version.split('.')[0];
+      |
+      | if (+major &lt; 3) { &hellip; }
+    h3 f3h.abort(request)
+    p Abort requests.
+    pre: code
+      | f3h.abort(); // Abort all requests
+      | f3h.abort('https://example.com/asdf'); // Abort request to `https://example.com/asdf`
+    h3 f3h.caches
+    p This object stores your AJAX response status, body and headers as static cache. Refreshing the page will remove all caches.
+    pre: code console.log(f3h.caches);
+    h3 f3h.fetch(ref, type, from)
+    p Internal method used to help doing the generic fetch request using #[code XMLHttpRequest].
+    pre: code
+      | let xhr = f3h.fetch('https://127.0.0.1/test.html', 'GET', window);
+      | xhr.addEventListener('load', () =&gt; {
+      |     console.log(xhr.status);
+      | });
+    h3 f3h.links
+    p Returns all of the links to prefetch available in the response.
+    h3 f3h.lot
+    p Return the HTTP response headers as object. Every property in it are case-insensitive.
+    pre: code
+      | f3h.on('success', response =&gt; {
+      |     console.log(f3h.lot);
+      | });
+    h3 f3h.pop()
+    p Remove all AJAX events from the page.
+    h3 f3h.ref
+    p This variable stores current URL that is being fetched by the application, including the hash part.
+    h3 f3h.scripts
+    p Returns all of the JavaScript code available in the response.
+    h3 f3h.state
+    p Return the modified application states.
+    h3 f3h.status
+    p Return the HTTP response status.
+    pre: code
+      | f3h.on('success', response =&gt; {
+      |     if (404 === f3h.status) {
+      |         // Handle 404 page
+      |     } else {
+      |         // Handle normal page
+      |     }
+      | });
+    h3 f3h.styles
+    p Returns all of the CSS code available in the response.
+    h2 Hooks
+    table(border='1')
+      thead
+        tr
+          th Name
+          th Description
+      tbody
+        tr
+          td #[code 200]
+          td Will be triggered on AJAX loading success event, with the page status of #[code 200].
+        tr
+          td #[code 404]
+          td Will be triggered on AJAX loading success event, with the page status of #[code 404].
+        tr
+          td #[code *]
+          td Will be triggered on AJAX loading success event, with the page status of #[code *] where #[code *] is a HTTP status code as described in the #[a(href='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes' rel='nofollow' target='_blank') HTTP status code reference].
+        tr
+          td #[code abort]
+          td Will be triggered on AJAX aborting event.
+        tr
+          td #[code enter]
+          td Will be triggered on AJAX sending event.
+        tr
+          td #[code error]
+          td Will be triggered on AJAX loading error event.
+        tr
+          td #[code exit]
+          td Will be triggered on the next AJAX loading event. e.g. just after user clicks on a link.
+        tr
+          td #[code focus]
+          td Adding a #[code focus] hook will disable the default focus behavior, that is, to focus to the first element that has an #[code autofocus] attribute.
+        tr
+          td #[code pop]
+          td Will be triggered after #[code f3h.pop()].
+        tr
+          td #[code pull]
+          td Will be triggered on AJAX downloading progress event (GET requests only).
+        tr
+          td #[code push]
+          td Will be triggered on AJAX uploading progress event (POST requests only).
+        tr
+          td #[code scroll]
+          td Adding a #[code scroll] hook will disable the default scroll behavior, that is, to scroll to the first element that has an #[code id] or #[code name] attribute with the same value as the current location hash value.
+        tr
+          td #[code success]
+          td Will be triggered on AJAX loading success event, regardless of the page status. Might result with a #[code null] response on URL redirection after form submission. Consider to use the #[code 200] hook instead.
+    h3 f3h.fire(hook, data)
+    p Trigger a hook.
+    pre: code f3h.fire('success', [document, window]);
+    h3 f3h.hooks
+    p Return the added hooks.
+    pre: code console.log(f3h.hooks);
+    h3 f3h.off(hook, fn)
+    p Remove a hook.
+    pre: code f3h.off('success');
+    pre: code f3h.off('success', onSuccess); // With context
+    h3 f3h.on(hook, fn)
+    p Add a new hook.
+    pre: code
+      | f3h.on('success', response =&gt; {
+      |     console.log(response);
+      | });
+    pre: code
+      | function onSuccess(response) {
+      |     console.log(response);
+      | }
+      |
+      | f3h.on('success', onSuccess); // With context
+    h2 Frequently Asked Questions
+    p: b Can I mimic POST request via standard links?
+    p My purpose in making this application is to improve the standard navigation system on a HTML document that already able to work without AJAX features. To mimic POST request on standard links isn&rsquo;t natural and can cause unwanted responses when the AJAX feature does not work due to certain conditions.
+    p However, you can still send POST requests via standard links as long as you have a server-side language that capable of doing that. For example, with PHP server-side language, you can use the #[code curl] extension to send POST request even without submitting a form:
+    pre: code
+      | &lt;?php // Example page in `/post.php`
+      |
+      | $curl = curl_init();
+      |
+      | curl_setopt($curl, CURLOPT_URL, '.');
+      | curl_setopt($curl, CURLOPT_POST, 1);
+      | curl_setopt($curl, CURLOPT_POSTFIELDS, $_SERVER['QUERY_STRING']);
+      |
+      | // Receive server response&hellip;
+      | curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+      |
+      | $out = curl_exec($curl);
+      |
+      | curl_close($curl);
+      |
+      | // Further processing&hellip;
+      | if ($out) { /* &hellip; */ } else { /* &hellip; */ }
+    p Use a standard link with form data as query string on the link element:
+    pre: code &lt;a href="/post.php?data[foo]=1&amp;amp;data[bar]=2"&gt;Send data!&lt;/a&gt;
+    p: b I have a REST API functionality that returns data as JSON, but my URL doesn&rsquo;t end with extension #[code .json]. How do I set the response type as JSON under these circumstances?
+    p The #[code F3H.state.types] object contains some data in the form of file extension as object key and the desired response type as object value. By default, the value of the object is set as string, but you can also specify it as a function that returns the type of response based on a specific pattern in the given URL.
+    p There is a #[code ""] key to express the default response type for URL or file name that does not have extension. A typical clean URL that is commonly used for search engine optimization. You can use this property to specify the response type as JSON under certain conditions in the given link according to the standard URL naming pattern in your application:
+    pre: code
+      | F3H.state.types[""] = link =&gt; {
+      |     // Assume your REST API link format is `/foo/bar?output=json`
+      |     if (link.match(/[?&amp;]output=json([&amp;#]|$)/)) {
+      |         return 'json';
+      |     }
+      |     // Return the default response for extension-less URL
+      |     return 'document';
+      | };
+    p And here&rsquo;s the way to process JSON or HTML data simultaneously on success:
+    pre: code
+      | const f3h = new F3H;
+      |
+      | f3h.on('success', response =&gt; {
+      |     if ('application/json' === f3h.lot['content-type']) {
+      |         // Handle JSON response
+      |     } else {
+      |         // Handle HTML response
+      |     }
+      | });
+    p: b Can I integrate it with jQuery?
+    p Every application built using native JavaScript will be able to integrate with any third party JavaScript library. If you know how to select DOM elements using jQuery, then you are ready to go:
+    pre: code
+      | const f3h = new F3H;
+      |
+      | let $document = $(document),
+      |     $main = $('main'),
+      |     $nav = $('nav');
+      |
+      | f3h.on('success', response =&gt; {
+      |     let $response = $(response);
+      |     $document.prop('title', $response.prop('title'));
+      |     $main.html($response.find('main').html());
+      |     $nav.html($response.find('nav').html());
+      | });
+    p: b I get an error #[code TypeError: response is null] from the web console every time I submit a form. Why?
+    p Your form data processor may have redirected you to a certain page via 302 status (and the like) when the data you provided was sent successfully. Consider to use #[code 200] hook instead of #[code success], or be sure to check that the response status is #[code 200] before doing anything to the response given:
+    pre: code
+      | f3h.on(200, response =&gt; {
+      |     console.log(response);
+      | });
+    pre: code
+      | f3h.on('success', response =&gt; {
+      |     if (200 === f3h.status) {
+      |         // Handle normal page
+      |     } else if (404 === f3h.status) {
+      |         // Handle error page
+      |     } else {
+      |         // Send successful AJAX loading event to your web statistic
+      |     }
+      | });
+    p: b Why doesn&rsquo;t my Google AdSense code refresh when I switch pages?
+    p Google AdSense code will be loaded automatically when you switch pages, but if the next page you visit has the same Google AdSense code as the previous page code, then the code will not be reloaded. To overcome that, you have to clear the cache item on every successful event. First of all, add special ID for the scripts that you want to force to always reload:
+    pre: code
+      | &lt;script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
+      | &lt;ins class="adsbygoogle" data-ad-client="ca-pub-&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-ad-slot="&bull;&bull;&bull;&bull;&bull;&bull;&bull;"&gt;&lt;/ins&gt;
+      | &lt;script id="#[mark google-script-1]"&gt;(adsbygoogle = window.adsbygoogle || []).push({})&lt;/script&gt;
+    p Then make sure to clear the cache every time a successful event occurs:
+    pre: code
+      | f3h.on('success', () =&gt; {
+      |     delete f3h.scripts['#[mark google-script-1]'];
+      | });
+    h2 License
+    p Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to #[a(href='https://paypal.me/tatautaufik' target='_blank') share a little financial support] with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.
+    p Thank you! ❤️
+  footer
+    hr
+    p &copy; 2020 #[a(href='/') Taufik Nurrohman]

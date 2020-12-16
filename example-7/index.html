@@ -1,29 +1,11 @@
-<!DOCTYPE html>
-<html dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width" name="viewport">
-    <title>Home</title>
-  </head>
-  <body>
-    <main>
-      <p>Clicking <a href="#foo">on</a> <a href="#bar">links</a> <a href="#baz">that</a> <a href="#qux">contains hash</a> should trigger the native hash change event unless it <a href="test.html#foo">directs you to another page</a>.</p>
-    </main>
-    <script src="../f3h.min.js"></script>
-    <script>
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><title>Home</title></head><body><main><p>Clicking <a href="#foo">on</a> <a href="#bar">links</a> <a href="#baz">that</a> <a href="#qux">contains hash</a> should trigger the native hash change event unless it <a href="test.html#foo">directs you to another page</a>.</p></main><script src="../f3h.min.js"></script><script>let f3h = new F3H,
+    main = document.querySelector('main');
 
-    let f3h = new F3H,
-        main = document.querySelector('main');
+f3h.on('success', response => {
+    document.title = response.title;
+    main.innerHTML = response.querySelector('main').innerHTML;
+});
 
-    f3h.on('success', response => {
-        document.title = response.title;
-        main.innerHTML = response.querySelector('main').innerHTML;
-    });
-
-    window.addEventListener('hashchange', e => {
-        console.log(e.type);
-    });
-
-    </script>
-  </body>
-</html>
+window.addEventListener('hashchange', e => {
+    console.log(e.type);
+});</script></body></html>

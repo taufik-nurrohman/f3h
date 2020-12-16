@@ -7,10 +7,24 @@ F3H: Fetch
 
 Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will save those data into the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.
 
+Contribute
+----------
+
+ - **Please do not make pull requests by editing the files that are in the root of the project. They are generated automatically by the build tool.**
+ - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
+ - Run `git clone https://github.com/taufik-nurrohman/f3h.git`
+ - Run `cd f3h && npm install`
+ - Edit the files in `.source/mjs` and `.source/pug` folder.
+ - Run `npm run export` to generate the production ready files.
+
 ---
 
 Release Notes
 -------------
+
+### 1.1.0
+
+Prioritize maintainability over file size. Say hello to Node.js and ES6! :wave:
 
 ### 1.0.18
 

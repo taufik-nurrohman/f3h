@@ -1,0 +1,31 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Page 3'
+
+block style
+  style
+    | img {
+    |   max-width: 100%;
+    |   height: auto;
+    | }
+    | footer, main, nav {
+    |   max-width: 700px;
+    |   margin-right: auto;
+    |   margin-left: auto;
+    | }
+
+block content
+  main
+    h2 Aenean Quam. In Scelerisque Sem At Dolor
+    p: img(alt="" height='350' src='https://via.placeholder.com/700x350.jpg?text=700x350' width='700')
+    p Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula vel nunc egestas porttitor.
+    h2 Nam Nec Ante
+    p: img(alt="" height='350' src='https://via.placeholder.com/700x350.jpg?text=700x350' width='700')
+    p Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh. Quisque volutpat condimentum velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nam nec ante. Sed lacinia, urna non tincidunt mattis, tortor neque adipiscing diam, a cursus ipsum ante quis turpis. Nulla facilisi. Ut fringilla. Suspendisse potenti. Nunc feugiat mi a tellus consequat imperdiet. Vestibulum sapien. Proin quam.
+    h2 Suspendisse In Justo Eu Magna Luctus Suscipit
+    p: img(alt="" height='350' src='https://via.placeholder.com/700x350.jpg?text=700x350' width='700')
+    p Etiam ultrices. Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer euismod lacus luctus magna. Quisque cursus, metus vitae pharetra auctor, sem massa mattis sem, at interdum magna augue eget diam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi lacinia molestie dui. Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum. Morbi in ipsum sit amet pede facilisis laoreet. Donec lacus nunc, viverra nec, blandit vel, egestas et, augue. Vestibulum tincidunt malesuada tellus.
+  nav
+    a(href='2.html' rel='prev') Previous
+    a(href='4.html' rel='next') Next

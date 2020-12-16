@@ -1,0 +1,25 @@
+extends ../../_index.pug
+
+block state
+  - const title = 'Contact \xB7 F3H'
+
+block style
+  include ../_style.pug
+
+block data
+  link(href='/f3h/example-1/archive/' rel='prefetch')
+  link(href='/f3h/example-1/contact/' rel='prefetch')
+
+block content
+  nav
+    ul
+      li: a(href='/f3h/example-1/') Home
+      li: a(href='/f3h/example-1/about/') About
+      li: a(href='/f3h/example-1/archive/') Archive
+      li: span Contact
+      li: a(href='/f3h/example-1/error/') Error
+  p You will see this paragraph if you are accessing this page directly.
+  main
+    h1 Contact
+    p Est usus legentis in #[a(href='mailto:hello@example.com') hello@example.com].
+    p: input(autofocus placeholder='Should auto-focus here.' type='text')

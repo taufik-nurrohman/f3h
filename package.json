@@ -1,15 +1,28 @@
 {
-  "name": "@taufik-nurrohman/f3h",
+  "author": "Taufik Nurrohman",
+  "bugs": {
+    "url": "https://github.com/taufik-nurrohman/f3h/issues"
+  },
   "description": "Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.",
-  "version": "1.0.18",
-  "main": "f3h.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-private-methods": "^7.12.1",
+    "@babel/preset-env": "^7.12.7",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@taufik-nurrohman/event": "^0.0.4",
+    "@taufik-nurrohman/from": "^0.0.2",
+    "@taufik-nurrohman/hook": "^0.0.2",
+    "@taufik-nurrohman/pattern": "^0.0.7",
+    "@taufik-nurrohman/to": "^0.0.6",
+    "npm-run-all": "^4.1.5",
+    "pug-cli": "^1.0.0-alpha6",
+    "rollup": "^2.34.2",
+    "rollup-plugin-license": "^2.2.0",
+    "terser": "^5.5.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/taufik-nurrohman/f3h.git"
-  },
+  "homepage": "https://taufik-nurrohman.js.org/f3h",
   "keywords": [
     "ajax",
     "click",
@@ -19,10 +32,22 @@
     "link",
     "page"
   ],
-  "author": "Taufik Nurrohman",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/taufik-nurrohman/f3h/issues"
+  "main": ".source/mjs/index.mjs",
+  "name": "@taufik-nurrohman/f3h",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taufik-nurrohman/f3h.git"
   },
-  "homepage": "https://taufik-nurrohman.github.com/f3h"
+  "scripts": {
+    "export": "npm-run-all --parallel js html",
+    "html": "npm-run-all html:export html:fix",
+    "html:export": "pug .source/pug --doctype html --out . --silent",
+    "html:fix": "rm _index.html && rm example-1/_style.html && mv example-4/test.css.html example-4/test.css && mv example-4/test.js.html example-4/test.js && mv example-5/index.php.html example-5/index.php && mv example-5/log.html example-5/log && mv example-6/index.php.html example-6/index.php && mv example-11/index.php.html example-11/index.php && mv example-11/test.php.html example-11/test.php && mv example-12/index.php.html example-12/index.php && mv example-13/test.css.html example-13/test.css && mv example-13/test.js.html example-13/test.js",
+    "js": "npm-run-all js:export js:minify",
+    "js:export": "rollup --config .source/source.js",
+    "js:minify": "terser f3h.js --compress --mangle --output f3h.min.js"
+  },
+  "type": "module",
+  "version": "1.1.0"
 }

@@ -1,0 +1,25 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../f3h.min.js']
+
+block data
+  | <!-- foo -->
+  | <link href="test.css" rel="stylesheet">
+  | <!-- bar -->
+  | <!-- baz -->
+
+block content
+  main
+    p: a(href='test.html') TODO: Preserve Script and Style Position
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on('success', response => {
+    |     document.title = response.title;
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });

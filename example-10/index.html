@@ -1,35 +1,17 @@
-<!DOCTYPE html>
-<html dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width" name="viewport">
-    <title>Home</title>
-  </head>
-  <body>
-    <main>
-      <p><a href="test.html#foo">Test!</a></p>
-    </main>
-    <script src="../f3h.min.js"></script>
-    <script>
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><title>Home</title></head><body><main><p><a href="test.html#foo">Test!</a></p></main><script src="../f3h.min.js"></script><script>let f3h = new F3H,
+    main = document.querySelector('main');
 
-    let f3h = new F3H,
-        main = document.querySelector('main');
-
-    f3h.on('scroll', () => {
-        let id = window.location.hash,
-            target = id && document.querySelector(id);
-        target && target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'start'
-        });
+f3h.on('scroll', () => {
+    let id = window.location.hash,
+        target = id && document.querySelector(id);
+    target && target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'start'
     });
+});
 
-    f3h.on('success', response => {
-        document.title = response.title;
-        main.innerHTML = response.querySelector('main').innerHTML;
-    });
-
-    </script>
-  </body>
-</html>
+f3h.on('success', response => {
+    document.title = response.title;
+    main.innerHTML = response.querySelector('main').innerHTML;
+});</script></body></html>

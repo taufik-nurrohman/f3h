@@ -1,0 +1,23 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../f3h.min.js']
+
+block content
+  main
+    p Clicking #[a(href='#foo') on] #[a(href='#bar') links] #[a(href='#baz') that] #[a(href='#qux') contains hash] should trigger the native hash change event unless it #[a(href='test.html#foo') directs you to another page].
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on('success', response => {
+    |     document.title = response.title;
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });
+    |
+    | window.addEventListener('hashchange', e => {
+    |     console.log(e.type);
+    | });

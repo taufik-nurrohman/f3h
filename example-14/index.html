@@ -1,36 +1,9 @@
-<!DOCTYPE html>
-<html dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width" name="viewport">
-    <title>Home</title>
-  </head>
-  <body>
-    <main>
-      <p>Query string URL must be appended to the current URL.</p>
-      <form method="get">
-        <p>
-          <input autofocus name="q" type="text">
-          <button type="submit">Search</button>
-      </form>
-      <p>Example with different search path.</p>
-      <form action="test.html" method="get">
-        <p>
-          <input name="q" type="text">
-          <button type="submit">Search</button>
-      </form>
-    </main>
-    <script src="../f3h.min.js"></script>
-    <script>
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><title>Home</title></head><body><main><p>Query string URL must be appended to the current URL.</p><form method="get"><p><input autofocus name="q" type="text">
+<button type="submit">Search</button></p></form><p>Example with different search path.</p><form action="test.html" method="get"><p><input name="q" type="text">
+<button type="submit">Search</button></p></form></main><script src="../f3h.min.js"></script><script>let f3h = new F3H,
+    main = document.querySelector('main');
 
-    let f3h = new F3H,
-        main = document.querySelector('main');
-
-    f3h.on('success', response => {
-        document.title = response.title;
-        main.innerHTML = response.querySelector('main').innerHTML;
-    });
-
-    </script>
-  </body>
-</html>
+f3h.on('success', response => {
+    document.title = response.title;
+    main.innerHTML = response.querySelector('main').innerHTML;
+});</script></body></html>
