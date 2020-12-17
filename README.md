@@ -14,17 +14,21 @@ Contribute
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/f3h.git`
  - Run `cd f3h && npm install`
- - Edit the files in `.source/mjs` and `.source/pug` folder.
- - Run `npm run export` to generate the production ready files.
+ - Edit the files in the `.source` folder.
+ - Run `npm run pack` to generate the production ready files.
 
 ---
 
 Release Notes
 -------------
 
+### 1.1.1
+
+ - Removed all CLI dependencies (use the available JavaScript API where possible).
+
 ### 1.1.0
 
-Prioritize maintainability over file size. Say hello to Node.js and ES6! :wave:
+ - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
 
 ### 1.0.18
 

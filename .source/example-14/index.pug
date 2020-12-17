@@ -1,0 +1,32 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../index.min.js']
+
+block content
+  main
+    p Query string URL must be appended to the current URL.
+    form(method='get')
+      p
+        input(autofocus name='q' type='text')
+        |
+        |
+        button(type='submit') Search
+    p Example with different search path.
+    form(action='test.html' method='get')
+      p
+        input(name='q' type='text')
+        |
+        |
+        button(type='submit') Search
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on('success', response => {
+    |     document.title = response.title;
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });

@@ -1,0 +1,42 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../index.min.js']
+
+block content
+  main
+    | <?php if ('POST' === $_SERVER['REQUEST_METHOD']): ?>
+    pre: code <?= json_encode($_POST, JSON_PRETTY_PRINT); ?>
+    p: a(href="") Back
+    | <?php else: ?>
+    form(method='post')
+      p: input(name='text' type='text' value='Title Here')
+      p: textarea(name='textarea') Content here.
+      p
+        label #[input(name='radio' type='radio' value='1')] Option 1
+        label #[input(name='radio' type='radio' value='2')] Option 2
+        label #[input(name='radio' type='radio' value='3')] Option 3
+      p
+        label #[input(name='checkbox' type='checkbox' value='1')] Toggle 1
+      p
+        select(name='select')
+          option Value 1
+          option(value='2') Value 2
+      p
+        button(name='act' type='submit' value='1') Action 1
+        button(name='act' type='submit' value='2') Action 2
+        button(name='act' type='submit' value='3') Action 3
+        button(name='undo' type='reset' value='1') Reset
+      input(name='hidden' type='hidden' value='Yo!')
+      input(name='foo[bar]' type='hidden' value='Test Nested Key')
+    | <?php endif; ?>
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on(200, response => {
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });
