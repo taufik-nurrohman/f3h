@@ -17,7 +17,6 @@
     "@taufik-nurrohman/pattern": "^0.0.7",
     "@taufik-nurrohman/to": "^0.0.6",
     "pug": "^3.0.0",
-    "read-package-json": "^3.0.0",
     "rollup": "^2.34.2",
     "terser": "^5.5.0"
   },
@@ -44,5 +43,5 @@
     "js": "node .source/_mjs.js"
   },
   "type": "module",
-  "version": "1.1.1"
+  "version": "1.1.2"
 }

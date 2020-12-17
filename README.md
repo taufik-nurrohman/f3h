@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.2
+
+ - Removed `read-package-json` dependency.
+
 ### 1.1.1
 
  - Removed all CLI dependencies (use the available JavaScript API where possible).

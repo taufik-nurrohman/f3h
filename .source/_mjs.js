@@ -1,5 +1,4 @@
-import {getFile, getFiles, setFile, setFolder} from './_h.js';
-import getState from 'read-package-json';
+import {getFile, getFiles, parseFile, setFile, setFolder} from './_h.js';
 
 import {rollup} from 'rollup';
 import {babel} from '@rollup/plugin-babel';
@@ -52,33 +51,24 @@ let license = '/*!\n *\n * ' + getFile('LICENSE').trim().replace(/\n/g, '\n * ')
 
 (async () => {
     const factory = await rollup(c);
+    const state = JSON.parse(getFile('package.json'));
     await factory.write(c.output);
     await factory.close();
-    getState('package.json', console.error, false, (error, state) => {
-        state.rollup = c;
-        delete state.scripts;
-        // Generate browser module…
-        let content = getFile(c.output.file);
-        content = license + '\n\n' + content;
-        content = content.replace(/%\((\S+)\)/g, (m0, m1) => {
-            // <https://stackoverflow.com/a/6394168>
-            return m1.split('.').reduce((o, k) => o[k], state);
-        });
-        setFile(c.output.file, content);
-        minify(content, {
-            compress: {
-                unsafe: true
-            }
-        }).then(result => {
-            setFile(c.output.file.replace(/\.js$/, '.min.js'), result.code);
-        });
-        // Generate Node.js module…
-        content = getFile('.source/index.mjs');
-        content = license + '\n\n' + content;
-        content = content.replace(/%\((\S+)\)/g, (m0, m1) => {
-            // <https://stackoverflow.com/a/6394168>
-            return m1.split('.').reduce((o, k) => o[k], state);
-        });
-        setFile('index.mjs', content);
+    state.rollup = c;
+    delete state.scripts;
+    // Generate browser module…
+    let content = getFile(c.output.file);
+    content = license + '\n\n' + parseFile(content, state);
+    setFile(c.output.file, content);
+    minify(content, {
+        compress: {
+            unsafe: true
+        }
+    }).then(result => {
+        setFile(c.output.file.replace(/\.js$/, '.min.js'), result.code);
     });
+    // Generate Node.js module…
+    content = getFile('.source/index.mjs');
+    content = license + '\n\n' + parseFile(content, state);
+    setFile('index.mjs', content);
 })();

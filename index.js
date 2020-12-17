@@ -943,7 +943,7 @@ var F3H = (function () {
         'JSON': responseTypeJSON
       }
     };
-    F3H.version = '1.1.1';
+    F3H.version = '1.1.2';
 
     return F3H;
 
