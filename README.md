@@ -22,6 +22,11 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.3
+
+ - Added `@taufik-nurrohman/file` and `@taufik-nurrohman/folder` as dependency.
+ - Output file for the browser is now using the [Universal Module Definition](https://github.com/umdjs/umd) format.
+
 ### 1.1.2
 
  - Removed `read-package-json` dependency.

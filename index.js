@@ -26,8 +26,11 @@
  *
  */
 
-var F3H = (function () {
-    'use strict';
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.F3H = factory());
+}(this, (function () { 'use strict';
 
     const isArray = x => Array.isArray(x);
     const isBoolean = x => false === x || true === x;
@@ -943,8 +946,8 @@ var F3H = (function () {
         'JSON': responseTypeJSON
       }
     };
-    F3H.version = '1.1.2';
+    F3H.version = '1.1.3';
 
     return F3H;
 
-}());
+})));

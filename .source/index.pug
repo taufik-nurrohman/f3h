@@ -75,7 +75,7 @@ block content
       li Simple #[abbr(title='Application Programming Interface') API]. Easy to master.
       li Accessible AJAX response as HTML elements (by default).
       li Instant click with native HTML5 Prefetch, improved by the power of JavaScript.
-      li Progressively enhanced. If at any time the JavaScript fails to load, or if users are using an old web browser, or if users decide to disable the JavaScript features, or if some third-party JavaScript makes this application fail to work, your website will still be able to work as when it didn&rsquo;t have AJAX features.
+      li Progressively enhanced. If at any time the JavaScript fails to load, or if users are using an old web browser, or if users decide to disable the JavaScript features, or if some third-party JavaScript makes this application fail to work, your website will still be able to work as when it didn&rsquo;t have any AJAX features.
     h2 Usage
     h3 Browser
     p With the basic knowledge of accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.
@@ -100,7 +100,19 @@ block content
       |     &lt;/script&gt;
       |   &lt;/body&gt;
       | &lt;/html&gt;
-    h3 Node.js
+    h3 CommonJS
+    pre: code
+      | const F3H = require('@taufik-nurrohman/f3h');
+      |
+      | const f3h = new F3H;
+      |
+      | f3h.on('success', response => {
+      |     document.title = response.title;
+      |     let from = document.querySelector('main'),
+      |         to = response.querySelector('main');
+      |     from.innerHTML = to.innerHTML;
+      | });
+    h3 ECMAScript
     p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn&rsquo;t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
     pre: code
       | import F3H from '@taufik-nurrohman/f3h';

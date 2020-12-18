@@ -1,8 +1,7 @@
 {
   "author": "Taufik Nurrohman",
-  "bugs": {
-    "url": "https://github.com/taufik-nurrohman/f3h/issues"
-  },
+  "browser": "index.min.js",
+  "bugs": "https://github.com/taufik-nurrohman/f3h/issues",
   "description": "Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.",
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -12,6 +11,8 @@
     "@rollup/plugin-babel": "^5.2.2",
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@taufik-nurrohman/event": "^0.0.4",
+    "@taufik-nurrohman/file": "^0.0.3",
+    "@taufik-nurrohman/folder": "^0.0.1",
     "@taufik-nurrohman/from": "^0.0.2",
     "@taufik-nurrohman/hook": "^0.0.2",
     "@taufik-nurrohman/pattern": "^0.0.7",
@@ -20,6 +21,16 @@
     "rollup": "^2.34.2",
     "terser": "^5.5.0"
   },
+  "exports": {
+    "import": "./index.mjs",
+    "require": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "index.min.js",
+    "index.mjs"
+  ],
+  "funding": "https://paypal.me/tatautaufik",
   "homepage": "https://taufik-nurrohman.js.org/f3h",
   "keywords": [
     "ajax",
@@ -31,7 +42,8 @@
     "page"
   ],
   "license": "MIT",
-  "main": "index.mjs",
+  "main": "index.js",
+  "module": "index.mjs",
   "name": "@taufik-nurrohman/f3h",
   "repository": {
     "type": "git",
@@ -39,9 +51,8 @@
   },
   "scripts": {
     "pack": "npm run html && npm run js",
-    "html": "node .source/_pug.js",
-    "js": "node .source/_mjs.js"
+    "html": "node .source/_pug.mjs",
+    "js": "node .source/_mjs.mjs"
   },
-  "type": "module",
-  "version": "1.1.2"
+  "version": "1.1.3"
 }
