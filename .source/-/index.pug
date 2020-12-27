@@ -1,7 +1,7 @@
 extends _index.pug
 
 block state
-  - const title = 'F3H ' + version
+  - const title = 'Fetch ' + version
   - const theme = '#000'
 
 block style
@@ -62,7 +62,7 @@ block style
 block content
   p Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
   header
-    h1 F3H #{version}
+    h1= title
     p You can read #[abbr(title='Fetch') F3H] as how you would read #[abbr(title='Accessibility') A11Y] and #[abbr(title='Internationalization') I18N].
     p Your job is to make a website that works traditionally: clicking on a link will direct you to a new page, sending and uploading data through a form will store it to the web storage. After you finish making it, this application will serve as a feature enhancer, which is, to enable AJAX features to your traditional web pages automatically, so that your web pages can load faster because you can specify which parts of the destination page you want to load into the current page.
     hr
