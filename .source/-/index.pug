@@ -244,43 +244,43 @@ block content
           th Description
       tbody
         tr
-          td #[code 200]
+          td: code 200
           td Will be triggered on AJAX loading success event, with the page status of #[code 200].
         tr
-          td #[code 404]
+          td: code 404
           td Will be triggered on AJAX loading success event, with the page status of #[code 404].
         tr
-          td #[code *]
+          td: code *
           td Will be triggered on AJAX loading success event, with the page status of #[code *] where #[code *] is a HTTP status code as described in the #[a(href='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes' rel='nofollow' target='_blank') HTTP status code reference].
         tr
-          td #[code abort]
+          td: code abort
           td Will be triggered on AJAX aborting event.
         tr
-          td #[code enter]
+          td: code enter
           td Will be triggered on AJAX sending event.
         tr
-          td #[code error]
+          td: code error
           td Will be triggered on AJAX loading error event.
         tr
-          td #[code exit]
+          td: code exit
           td Will be triggered on the next AJAX loading event. e.g. just after user clicks on a link.
         tr
-          td #[code focus]
+          td: code focus
           td Adding a #[code focus] hook will disable the default focus behavior, that is, to focus to the first element that has an #[code autofocus] attribute.
         tr
-          td #[code pop]
+          td: code pop
           td Will be triggered after #[code f3h.pop()].
         tr
-          td #[code pull]
+          td: code pull
           td Will be triggered on AJAX downloading progress event (GET requests only).
         tr
-          td #[code push]
+          td: code push
           td Will be triggered on AJAX uploading progress event (POST requests only).
         tr
-          td #[code scroll]
+          td: code scroll
           td Adding a #[code scroll] hook will disable the default scroll behavior, that is, to scroll to the first element that has an #[code id] or #[code name] attribute with the same value as the current location hash value.
         tr
-          td #[code success]
+          td: code success
           td Will be triggered on AJAX loading success event, regardless of the page status. Might result with a #[code null] response on URL redirection after form submission. Consider to use the #[code 200] hook instead.
     h3 f3h.fire(event, data)
     p Trigger a hook.
