@@ -15,8 +15,8 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
 }
 
 ?><!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement." name="description"><title>Home</title></head><body><main><h1>Files</h1><?php if ($files = glob(__DIR__ . '/*.*')): ?><ol><?php foreach ($files as $file): ?>
-<?php if ('index.php' === ($n = basename($file))) continue; ?><li><a target="_blank"><?= $n; ?></a></li><?php endforeach; ?></ol><?php endif; ?><form enctype="multipart/form-data" method="post"><p><input name="blob" type="file">
-<button name="save" hidden type="submit">Upload</button></p></form></main><script src="../index.min.js"></script><script>let f3h = new F3H,
+<?php if ('index.php' === ($n = basename($file))) continue; ?><li><a href="<?= $n; ?>" target="_blank"><?= $n; ?></a></li><?php endforeach; ?></ol><?php endif; ?></main><aside><form enctype="multipart/form-data" method="post"><p><input name="blob" type="file">
+<button name="save" hidden type="submit">Upload</button></p></form></aside><script src="../index.min.js"></script><script>let f3h = new F3H,
     main = document.querySelector('main');
 
 f3h.on('exit', (response, any) => {

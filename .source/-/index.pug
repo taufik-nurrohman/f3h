@@ -282,17 +282,17 @@ block content
         tr
           td #[code success]
           td Will be triggered on AJAX loading success event, regardless of the page status. Might result with a #[code null] response on URL redirection after form submission. Consider to use the #[code 200] hook instead.
-    h3 f3h.fire(hook, data)
+    h3 f3h.fire(event, data)
     p Trigger a hook.
     pre: code f3h.fire('success', [document, window]);
     h3 f3h.hooks
     p Return the added hooks.
     pre: code console.log(f3h.hooks);
-    h3 f3h.off(hook, fn)
+    h3 f3h.off(event, then)
     p Remove a hook.
     pre: code f3h.off('success');
     pre: code f3h.off('success', onSuccess); // With context
-    h3 f3h.on(hook, fn)
+    h3 f3h.on(event, then)
     p Add a new hook.
     pre: code
       | f3h.on('success', response =&gt; {

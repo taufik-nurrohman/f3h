@@ -28,9 +28,10 @@ block content
     ol
       | <?php foreach ($files as $file): ?>
       | <?php if ('index.php' === ($n = basename($file))) continue; ?>
-      li: a(href=!'<?= $n; ?>' target='_blank') <?= $n; ?>
+      li: a(href!='<?= $n; ?>' target='_blank') <?= $n; ?>
       | <?php endforeach; ?>
     | <?php endif; ?>
+  aside
     form(enctype='multipart/form-data' method='post')
       p
         input(name='blob' type='file')

@@ -14,7 +14,7 @@ Contribute
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/f3h.git`
  - Run `cd f3h && npm install`
- - Edit the files in the `.source` folder.
+ - Edit the files in the `.source/-` folder.
  - Run `npm run pack` to generate the production ready files.
 
 ---
@@ -22,14 +22,18 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.4
+
+ - Added `@taufik-nurrohman/document` as development dependency.
+
 ### 1.1.3
 
- - Added `@taufik-nurrohman/file` and `@taufik-nurrohman/folder` as dependency.
+ - Added `@taufik-nurrohman/file` and `@taufik-nurrohman/folder` as development dependency.
  - Output file for the browser is now using the [Universal Module Definition](https://github.com/umdjs/umd) format.
 
 ### 1.1.2
 
- - Removed `read-package-json` dependency.
+ - Removed `read-package-json` development dependency.
 
 ### 1.1.1
 
