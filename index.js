@@ -529,9 +529,9 @@
         cache: state
       } : state || {});
       $.source = source;
-      fire.bind($);
-      off$1.bind($);
-      on$1.bind($);
+      var fire$1 = fire.bind($),
+          off$2 = off$1.bind($),
+          on$2 = on$1.bind($);
 
       if (state.turbo) {
         state.cache = true; // Enable turbo feature will force enable cache feature
@@ -607,7 +607,7 @@
         nodeCurrent = node; // Store currently selected source element to a variable to be compared later
 
         $.ref = letSlashEnd(refCurrent = ref);
-        fire('exit', [D, node]); // Get response from cache if any
+        fire$1('exit', [D, node]); // Get response from cache if any
 
         if (state.cache) {
           var cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
@@ -622,13 +622,13 @@
             cache[3] && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
             cache[3] && (styles = doUpdateStyles(data[0]));
-            fire('success', data);
-            fire(cache[0], data);
+            fire$1('success', data);
+            fire$1(cache[0], data);
             sources = getSources(state.sources); // Update JavaScript after markup change
 
             cache[3] && (scripts = doUpdateScripts(data[0]));
             onSourcesEventsSet(data);
-            fire('enter', data);
+            fire$1('enter', data);
             return;
           }
         }
@@ -654,7 +654,7 @@
         }
 
         on('abort', request, function () {
-          dataSet(), fire('abort', [request.response, node]);
+          dataSet(), fire$1('abort', [request.response, node]);
         });
         on('error', request, fn = function fn() {
           dataSet();
@@ -664,12 +664,12 @@
           requestIsDocument && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
           requestIsDocument && (styles = doUpdateStyles(data[0]));
-          fire('error', data);
+          fire$1('error', data);
           sources = getSources(state.sources); // Update JavaScript after markup change
 
           requestIsDocument && (scripts = doUpdateScripts(data[0]));
           onSourcesEventsSet(data);
-          fire('enter', data);
+          fire$1('enter', data);
         });
         on('error', requestAsPush, fn);
         on('load', request, fn = function fn() {
@@ -685,8 +685,8 @@
             var r = letSlashEnd(redirect);
             caches[r] && delete caches[r]; // Trigger hook(s) immediately
 
-            fire('success', data);
-            fire(status, data); // Do the normal fetch
+            fire$1('success', data);
+            fire$1(status, data); // Do the normal fetch
 
             doFetch(nodeCurrent = W, GET, redirect || ref);
             return;
@@ -698,21 +698,21 @@
           // Update CSS before markup change
 
           requestIsDocument && (styles = doUpdateStyles(data[0]));
-          fire('success', data);
-          fire(status, data);
+          fire$1('success', data);
+          fire$1(status, data);
           requestIsDocument && useHistory && doScrollTo(R);
           sources = getSources(state.sources); // Update JavaScript after markup change
 
           requestIsDocument && (scripts = doUpdateScripts(data[0]));
           onSourcesEventsSet(data);
-          fire('enter', data);
+          fire$1('enter', data);
         });
         on('load', requestAsPush, fn);
         on('progress', request, function (e) {
-          dataSet(), fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+          dataSet(), fire$1('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
         });
         on('progress', requestAsPush, function (e) {
-          dataSet(), fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+          dataSet(), fire$1('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
         });
         return request;
       }
@@ -761,7 +761,7 @@
 
       function doFocusToElement(data) {
         if (hooks.focus) {
-          fire('focus', data);
+          fire$1('focus', data);
           return;
         }
 
@@ -795,7 +795,7 @@
 
       function doScrollToElement(data) {
         if (hooks.scroll) {
-          fire('scroll', data);
+          fire$1('scroll', data);
           return;
         }
 
@@ -969,12 +969,12 @@
         return doFetchBase(from, type, ref);
       };
 
-      $.fire = fire;
+      $.fire = fire$1;
       $.hooks = hooks;
       $.links = links;
       $.lot = null;
-      $.off = off$1;
-      $.on = on$1;
+      $.off = off$2;
+      $.on = on$2;
       $.ref = null;
       $.scripts = scripts;
       $.state = state;
@@ -988,7 +988,7 @@
         off('keydown', D, onKeyDown);
         off('keyup', D, onKeyUp);
         off('popstate', W, onPopState);
-        fire('pop', [D, W]);
+        fire$1('pop', [D, W]);
         return $.abort();
       };
 

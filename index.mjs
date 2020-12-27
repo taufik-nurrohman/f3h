@@ -29,7 +29,7 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromValue} from '@taufik-nurrohman/from';
-import {fire, hooks, off, on} from '@taufik-nurrohman/hook';
+import {fire as fireHook, hooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {toCaseLower, toCaseUpper, toValue} from '@taufik-nurrohman/to';
@@ -220,9 +220,9 @@ function F3H(source = D, state = {}) {
 
     $.source = source;
 
-    fire.bind($);
-    off.bind($);
-    on.bind($);
+    let fire = fireHook.bind($),
+        off = offHook.bind($),
+        on = onHook.bind($);
 
     if (state.turbo) {
         state.cache = true; // Enable turbo feature will force enable cache feature
