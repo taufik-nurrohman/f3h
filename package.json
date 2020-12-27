@@ -57,5 +57,5 @@
     "html": "node .source/pug.mjs",
     "js": "node .source/mjs.mjs"
   },
-  "version": "1.1.4"
+  "version": "1.1.5"
 }

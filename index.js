@@ -345,7 +345,7 @@
     }
 
     function getRef() {
-      return theLocation.href;
+      return letSlashEnd(theLocation.href);
     }
 
     function getScripts(scope) {
@@ -439,17 +439,17 @@
       return 0;
     }
 
+    function letDefault(e) {
+      e.preventDefault();
+    }
+
     function letHash(ref) {
       return ref.split('#')[0];
     } // Ignore trailing `/` character(s) in URL
 
 
     function letSlashEnd(ref) {
-      return ref.replace(/\/+$/, "");
-    }
-
-    function preventDefault(e) {
-      e.preventDefault();
+      return ref.replace(/\/+(?=[?&#]|$)/, "");
     } // <https://stackoverflow.com/a/8831937/1163000>
 
 
@@ -518,44 +518,52 @@
       if (!isSet(source) || isBoolean(source) || isObject(source)) {
         state = source;
         source = D;
+      } // Already instantiated, skip!
+
+
+      if (source[name]) {
+        return $;
       }
 
-      $.state = Object.assign({}, F3H.state, true === state ? {
+      $.state = state = Object.assign({}, F3H.state, true === state ? {
         cache: state
       } : state || {});
       $.source = source;
-      var sources = getSources($.state.sources);
+      fire.bind($);
+      off$1.bind($);
+      on$1.bind($);
 
-      if ($.state.turbo) {
-        $.state.cache = true; // Enable turbo feature will force enable cache feature
-      } // Store current instance to `F3H.instances`
+      if (state.turbo) {
+        state.cache = true; // Enable turbo feature will force enable cache feature
+      }
 
+      var caches = {},
+          links = null,
+          lot = null,
+          // Store current node to a variable to be compared to the next node
+      nodeCurrent = null,
+          // Get current URL to be used as the default state after the last pop state
+      ref = getRef(),
+          // Store current URL to a variable to be compared to the next URL
+      refCurrent = ref,
+          requests = {},
+          scripts = null,
+          sources = getSources(state.sources),
+          status = null,
+          styles = null; // Store current instance to `F3H.instances`
 
-      F3H.instances[$.source.id || $.source.name || Object.keys(F3H.instances).length] = $;
-      $.caches = {};
-      $.hooks = hooks;
-      $.links = {};
-      $.lot = {};
-      $.ref = null;
-      $.requests = {};
-      $.scripts = {};
-      $.status = null;
-      $.styles = {}; // Store current node to a variable to be compared to the next node
+      F3H.instances[source.id || source.name || Object.keys(F3H.instances).length] = $; // Mark current DOM as active to prevent duplicate instance
 
-      var nodeCurrent = null; // Get current URL to be used as the default state after the last pop state
-
-      var ref = getRef(); // Store current URL to a variable to be compared to the next URL
-
-      var refCurrent = ref;
+      source[name] = 1;
 
       function getSources(sources, root) {
-        var froms = getElements(sources, root, $.source),
-            theRef = getRef();
+        ref = getRef();
+        var froms = getElements(sources, root);
 
-        if (isFunction($.state.is)) {
+        if (isFunction(state.is)) {
           var to = [];
           froms.forEach(function (from) {
-            $.state.is.call($, from, theRef) && to.push(from);
+            state.is.call($, from, ref) && to.push(from);
           });
           return to;
         }
@@ -568,7 +576,7 @@
         var buttonValueStorage = setElement('input', {
           type: 'hidden'
         }),
-            buttons = getElements('[name][type=submit][value]', node, $.source);
+            buttons = getElements('[name][type=submit][value]', node);
         setChildLast(node, buttonValueStorage);
         buttons.forEach(function (button) {
           on('click', button, function () {
@@ -583,12 +591,12 @@
           return; // Clicking on the same URL should trigger the AJAX call. Just don’t duplicate it to the history!
         }
 
-        $.state.history && theHistory.pushState({}, "", ref);
+        state.history && theHistory.pushState({}, "", ref);
       }
 
       function doFetch(node, type, ref) {
         var nodeIsWindow = isWindow(node),
-            useHistory = $.state.history,
+            useHistory = state.history,
             data; // Compare currently selected source element with the previously stored source element, unless it is a window.
         // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
 
@@ -598,38 +606,36 @@
 
         nodeCurrent = node; // Store currently selected source element to a variable to be compared later
 
-        refCurrent = $.ref = ref;
-        $.fire('exit', [D, node]); // Get response from cache if any
+        $.ref = letSlashEnd(refCurrent = ref);
+        fire('exit', [D, node]); // Get response from cache if any
 
-        if ($.state.cache) {
-          var cache = $.caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
+        if (state.cache) {
+          var cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
 
           if (cache) {
-            $.lot = cache[2];
-            $.status = cache[0];
+            $.lot = lot = cache[2];
+            $.status = status = cache[0];
             cache[3] && !nodeIsWindow && useHistory && doScrollTo(R);
             doChangeRef(ref);
             data = [cache[1], node]; // Update `<link rel="*">` data for the next page
 
-            cache[3] && ($.links = doUpdateLinks(data[0])); // Update CSS before markup change
+            cache[3] && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
-            cache[3] && ($.styles = doUpdateStyles(data[0]));
-            $.fire('success', data);
-            $.fire(cache[0], data);
-            sources = getSources($.state.sources); // Update JavaScript after markup change
+            cache[3] && (styles = doUpdateStyles(data[0]));
+            fire('success', data);
+            fire(cache[0], data);
+            sources = getSources(state.sources); // Update JavaScript after markup change
 
-            cache[3] && ($.scripts = doUpdateScripts(data[0]));
+            cache[3] && (scripts = doUpdateScripts(data[0]));
             onSourcesEventsSet(data);
-            $.fire('enter', data);
+            fire('enter', data);
             return;
           }
         }
 
         var fn,
-            lot,
             redirect,
-            status,
-            request = doFetchBase(node, type, ref, $.state.lot),
+            request = doFetchBase(node, type, ref, state.lot),
             requestAsPush = request.upload,
             requestIsDocument = responseTypeHTML === request.responseType;
 
@@ -638,9 +644,9 @@
           lot = toHeadersAsProxy(request);
           status = request.status;
 
-          if (GET === type && $.state.cache) {
+          if (GET === type && state.cache) {
             // Make sure `status` is not `0` due to the request abortion, to prevent `null` response being cached
-            status && ($.caches[letSlashEnd(letHash(ref))] = [status, request.response, lot, requestIsDocument]);
+            status && (caches[letSlashEnd(letHash(ref))] = [status, request.response, lot, requestIsDocument]);
           }
 
           $.lot = lot;
@@ -648,22 +654,22 @@
         }
 
         on('abort', request, function () {
-          dataSet(), $.fire('abort', [request.response, node]);
+          dataSet(), fire('abort', [request.response, node]);
         });
         on('error', request, fn = function fn() {
           dataSet();
           requestIsDocument && !nodeIsWindow && useHistory && doScrollTo(R);
           data = [request.response, node]; // Update `<link rel="*">` data for the next page
 
-          requestIsDocument && ($.links = doUpdateLinks(data[0])); // Update CSS before markup change
+          requestIsDocument && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
-          requestIsDocument && ($.styles = doUpdateStyles(data[0]));
-          $.fire('error', data);
-          sources = getSources($.state.sources); // Update JavaScript after markup change
+          requestIsDocument && (styles = doUpdateStyles(data[0]));
+          fire('error', data);
+          sources = getSources(state.sources); // Update JavaScript after markup change
 
-          requestIsDocument && ($.scripts = doUpdateScripts(data[0]));
+          requestIsDocument && (scripts = doUpdateScripts(data[0]));
           onSourcesEventsSet(data);
-          $.fire('enter', data);
+          fire('enter', data);
         });
         on('error', requestAsPush, fn);
         on('load', request, fn = function fn() {
@@ -677,10 +683,10 @@
             // This is useful for case(s) like, when you have submitted a
             // comment form and then you will be redirected to the same URL
             var r = letSlashEnd(redirect);
-            $.caches[r] && delete $.caches[r]; // Trigger hook(s) immediately
+            caches[r] && delete caches[r]; // Trigger hook(s) immediately
 
-            $.fire('success', data);
-            $.fire(status, data); // Do the normal fetch
+            fire('success', data);
+            fire(status, data); // Do the normal fetch
 
             doFetch(nodeCurrent = W, GET, redirect || ref);
             return;
@@ -691,47 +697,47 @@
           doChangeRef(-1 === ref.indexOf('#') ? redirect || ref : ref); // }
           // Update CSS before markup change
 
-          requestIsDocument && ($.styles = doUpdateStyles(data[0]));
-          $.fire('success', data);
-          $.fire(status, data);
+          requestIsDocument && (styles = doUpdateStyles(data[0]));
+          fire('success', data);
+          fire(status, data);
           requestIsDocument && useHistory && doScrollTo(R);
-          sources = getSources($.state.sources); // Update JavaScript after markup change
+          sources = getSources(state.sources); // Update JavaScript after markup change
 
-          requestIsDocument && ($.scripts = doUpdateScripts(data[0]));
+          requestIsDocument && (scripts = doUpdateScripts(data[0]));
           onSourcesEventsSet(data);
-          $.fire('enter', data);
+          fire('enter', data);
         });
         on('load', requestAsPush, fn);
         on('progress', request, function (e) {
-          dataSet(), $.fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+          dataSet(), fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
         });
         on('progress', requestAsPush, function (e) {
-          dataSet(), $.fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+          dataSet(), fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
         });
         return request;
       }
 
       function doFetchAbort(id) {
-        if ($.requests[id] && $.requests[id][0]) {
-          $.requests[id][0].abort();
-          delete $.requests[id];
+        if (requests[id] && requests[id][0]) {
+          requests[id][0].abort();
+          delete requests[id];
         }
       }
 
       function doFetchAbortAll() {
-        for (var request in $.requests) {
+        for (var request in requests) {
           doFetchAbort(request);
         }
       } // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
 
 
       function doFetchBase(node, type, ref, headers) {
-        ref = isFunction($.state.ref) ? $.state.ref.call($, node, ref) : ref;
+        ref = isFunction(state.ref) ? state.ref.call($, node, ref) : ref;
         var header,
             request = new XMLHttpRequest(); // Automatic response type based on current file extension
 
         var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
-            responseType = $.state.types[x] || $.state.type || responseTypeTXT;
+            responseType = state.types[x] || state.type || responseTypeTXT;
 
         if (isFunction(responseType)) {
           responseType = responseType.call($, ref);
@@ -754,22 +760,21 @@
 
 
       function doFocusToElement(data) {
-        if ($.hooks.focus) {
-          $.fire('focus', data);
+        if (hooks.focus) {
+          fire('focus', data);
           return;
         }
 
-        var target = getElement('[autofocus]', $.source);
+        var target = getElement('[autofocus]', source);
         target && target.focus();
       } // Pre-fetch page and store it into cache
 
 
       function doPreFetch(node, ref) {
-        var request = doFetchBase(node, GET, ref),
-            status;
+        var request = doFetchBase(node, GET, ref);
         on('load', request, function () {
           if (200 === (status = request.status)) {
-            $.caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
+            caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
           }
         });
       }
@@ -789,8 +794,8 @@
 
 
       function doScrollToElement(data) {
-        if ($.hooks.scroll) {
-          $.fire('scroll', data);
+        if (hooks.scroll) {
+          fire('scroll', data);
           return;
         }
 
@@ -805,7 +810,7 @@
             v;
 
         for (id in to) {
-          if (node = getElement('#' + id.replace(/[:.]/g, '\\$&'), $.source)) {
+          if (node = getElement('#' + id.replace(/[:.]/g, '\\$&'), source)) {
             placesToRestore[id] = getNext(node);
           }
 
@@ -831,15 +836,15 @@
       }
 
       function doUpdateLinks(compare) {
-        return doUpdate(compare, $.links, getLinks, H);
+        return doUpdate(compare, links, getLinks, H);
       }
 
       function doUpdateScripts(compare) {
-        return doUpdate(compare, $.scripts, getScripts, B);
+        return doUpdate(compare, scripts, getScripts, B);
       }
 
       function doUpdateStyles(compare) {
-        return doUpdate(compare, $.styles, getStyles, H);
+        return doUpdate(compare, styles, getStyles, H);
       }
 
       function onDocumentReady() {
@@ -850,12 +855,12 @@
         B = D.body;
         H = D.head; // Make sure all element(s) are captured on document ready
 
-        $.links = getLinks();
-        $.scripts = getScripts();
-        $.styles = getStyles();
+        $.links = links = getLinks();
+        $.scripts = scripts = getScripts();
+        $.styles = styles = getStyles();
         onSourcesEventsSet([D, W]); // Store the initial page into cache
 
-        $.state.cache && doPreFetch(W, getRef());
+        state.cache && doPreFetch(W, getRef());
       }
 
       function onFetch(e) {
@@ -869,28 +874,28 @@
             q,
             href = t.href,
             action = t.action,
-            theRef = href || action,
+            ref = href || action,
             type = toCaseUpper(t.method || GET);
 
         if (GET === type) {
           if (isForm(t)) {
             q = new URLSearchParams(new FormData(t)) + "";
-            theRef = letSlashEnd(theRef.split(/[?&#]/)[0]) + (q ? '?' + q : "");
+            ref = letSlashEnd(ref.split(/[?&#]/)[0]) + (q ? '?' + q : "");
           } // Immediately change the URL if turbo feature is enabled
 
 
-          if ($.state.turbo) {
-            doChangeRef(theRef);
+          if (state.turbo) {
+            doChangeRef(ref);
           }
         }
 
-        $.requests[theRef] = [doFetch(t, type, theRef), t];
-        preventDefault(e);
+        requests[ref] = [doFetch(t, type, ref), t];
+        letDefault(e);
       }
 
       function onHashChange(e) {
         doScrollTo(getTarget(getHash(getRef()), 1));
-        preventDefault(e);
+        letDefault(e);
       } // Pre-fetch URL on link hover
 
 
@@ -898,7 +903,7 @@
         var t = this,
             href = t.href;
 
-        if (!$.caches[letSlashEnd(letHash(href))]) {
+        if (!caches[letSlashEnd(letHash(href))]) {
           doPreFetch(t, href);
         }
 
@@ -917,14 +922,14 @@
       }
 
       function onPopState(e) {
-        doFetchAbortAll();
-        var theRef = getRef(); // Updating the hash value shouldn’t trigger the AJAX call!
+        ref = getRef();
+        doFetchAbortAll(); // Updating the hash value shouldn’t trigger the AJAX call!
 
-        if (getHash(theRef) && letHash(refCurrent) === letHash(theRef)) {
+        if (getHash(ref) && letHash(refCurrent) === letHash(ref)) {
           return;
         }
 
-        $.requests[theRef] = [doFetch(W, GET, theRef), W];
+        requests[ref] = [doFetch(W, GET, ref), W];
       }
 
       function onSourcesEventsLet() {
@@ -934,7 +939,7 @@
       }
 
       function onSourcesEventsSet(data) {
-        var turbo = $.state.turbo;
+        var turbo = state.turbo;
         sources.forEach(function (source) {
           on(getEventName(source), source, onFetch);
 
@@ -951,20 +956,30 @@
       $.abort = function (request) {
         if (!request) {
           doFetchAbortAll();
-        } else if ($.requests[request]) {
+        } else if (requests[request]) {
           doFetchAbort(request);
         }
 
         return $;
       };
 
+      $.caches = caches;
+
       $.fetch = function (ref, type, from) {
         return doFetchBase(from, type, ref);
       };
 
-      $.fire = fire.bind($);
-      $.off = off$1.bind($);
-      $.on = on$1.bind($);
+      $.fire = fire;
+      $.hooks = hooks;
+      $.links = links;
+      $.lot = null;
+      $.off = off$1;
+      $.on = on$1;
+      $.ref = null;
+      $.scripts = scripts;
+      $.state = state;
+      $.styles = styles;
+      $.status = null;
 
       $.pop = function () {
         onSourcesEventsLet();
@@ -973,7 +988,7 @@
         off('keydown', D, onKeyDown);
         off('keyup', D, onKeyUp);
         off('popstate', W, onPopState);
-        $.fire('pop', [D, W]);
+        fire('pop', [D, W]);
         return $.abort();
       };
 
@@ -988,7 +1003,7 @@
       'cache': false,
       // Store all response body to variable to be used later?
       'history': true,
-      'is': function is(source, theRef) {
+      'is': function is(source, ref) {
         var target = source.target,
             // Get URL data as-is from the DOM attribute string
         raw = getAttribute(source, 'href') || getAttribute(source, 'action') || "",
@@ -1006,7 +1021,7 @@
         // so that we don’t break the native hash change event that you may want to add in the future
 
 
-        if (getHash(value) && letHash(theRef) === letHash(value)) {
+        if (getHash(value) && letHash(ref) === letHash(value)) {
           return false;
         } // Detect internal link starts from here
 
@@ -1016,8 +1031,8 @@
       'lot': {
         'x-requested-with': name
       },
-      'ref': function ref(source, theRef) {
-        return theRef;
+      'ref': function ref(source, _ref) {
+        return _ref;
       },
       // Default URL hook
       'sources': 'a[href],form',
@@ -1032,7 +1047,7 @@
         'JSON': responseTypeJSON
       }
     };
-    F3H.version = '1.1.4';
+    F3H.version = '1.1.5';
 
     return F3H;
 
