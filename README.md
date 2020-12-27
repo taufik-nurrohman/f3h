@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.5
+
+ - Updated.
+
 ### 1.1.4
 
  - Added `@taufik-nurrohman/document` as development dependency.
