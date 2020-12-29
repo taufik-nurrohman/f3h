@@ -141,7 +141,8 @@
     };
 
     const getName = node => {
-        return ((node || {}).nodeName || "").toLowerCase() || null;
+        let name = toCaseLower(node.nodeName || "");
+        return "" !== name ? name : null;
     };
 
     const getNext = node => {
@@ -188,6 +189,9 @@
     };
 
     const setAttribute = (node, attribute, value) => {
+        if (true === value) {
+            value = attribute;
+        }
         return node.setAttribute(attribute, fromValue(value)), node;
     };
 
@@ -241,6 +245,8 @@
     const theLocation = W.location;
 
     const theScript = D.currentScript;
+
+    const eventPreventDefault = e => e && e.preventDefault();
 
     const off = (name, node, then) => {
         node.removeEventListener(name, then);
@@ -316,6 +322,10 @@
         B,
         H;
 
+    function getCount(ofArray) {
+      return ofArray.length;
+    }
+
     function getEventName(node) {
       return isForm(node) ? 'submit' : 'click';
     }
@@ -331,14 +341,14 @@
           links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
           toSave;
 
-      for (var i = 0, j = links.length; i < j; ++i) {
+      for (var i = 0, j = getCount(links); i < j; ++i) {
         if (isLinkForF3H(link = links[i])) {
           continue;
         }
 
         link.id = id = link.id || name + ':' + toID(getAttribute(link, 'href') || getText(link));
         out[id] = toSave = fromElement(link);
-        out[id][toSave.length - 1].href = link.href; // Use the resolved URL!
+        out[id][getCount(toSave) - 1].href = link.href; // Use the resolved URL!
       }
 
       return out;
@@ -355,14 +365,14 @@
           scripts = getElements('script', scope),
           toSave;
 
-      for (var i = 0, j = scripts.length; i < j; ++i) {
+      for (var i = 0, j = getCount(scripts); i < j; ++i) {
         if (isScriptForF3H(script = scripts[i])) {
           continue;
         }
 
         script.id = id = script.id || name + ':' + toID(getAttribute(script, 'src') || getText(script));
         out[id] = toSave = fromElement(script);
-        out[id][toSave.length - 1].src = script.src; // Use the resolved URL!
+        out[id][getCount(toSave) - 1].src = script.src; // Use the resolved URL!
       }
 
       return out;
@@ -375,7 +385,7 @@
           styles = getElements('link[rel=stylesheet],style', scope),
           toSave;
 
-      for (var i = 0, j = styles.length; i < j; ++i) {
+      for (var i = 0, j = getCount(styles); i < j; ++i) {
         if (isStyleForF3H(style = styles[i])) {
           continue;
         }
@@ -384,7 +394,7 @@
         out[id] = toSave = fromElement(style);
 
         if ('link' === toSave[0]) {
-          out[id][toSave.length - 1].href = style.href; // Use the resolved URL!
+          out[id][getCount(toSave) - 1].href = style.href; // Use the resolved URL!
         }
       }
 
@@ -439,10 +449,6 @@
       return 0;
     }
 
-    function letDefault(e) {
-      e.preventDefault();
-    }
-
     function letHash(ref) {
       return ref.split('#')[0];
     } // Ignore trailing `/` character(s) in URL
@@ -457,7 +463,7 @@
       var out = 0,
           c,
           i,
-          j = text.length;
+          j = getCount(text);
 
       if (0 === j) {
         return out;
@@ -552,7 +558,7 @@
           status = null,
           styles = null; // Store current instance to `F3H.instances`
 
-      F3H.instances[source.id || source.name || Object.keys(F3H.instances).length] = $; // Mark current DOM as active to prevent duplicate instance
+      F3H.instances[source.id || source.name || getCount(Object.keys(F3H.instances))] = $; // Mark current DOM as active to prevent duplicate instance
 
       source[name] = 1;
 
@@ -890,12 +896,12 @@
         }
 
         requests[ref] = [doFetch(t, type, ref), t];
-        letDefault(e);
+        eventPreventDefault(e);
       }
 
       function onHashChange(e) {
         doScrollTo(getTarget(getHash(getRef()), 1));
-        letDefault(e);
+        eventPreventDefault(e);
       } // Pre-fetch URL on link hover
 
 
@@ -982,6 +988,11 @@
       $.status = null;
 
       $.pop = function () {
+        if (!source[name]) {
+          return $; // Already ejected!
+        }
+
+        delete source[name];
         onSourcesEventsLet();
         off('DOMContentLoaded', W, onDocumentReady);
         off('hashchange', W, onHashChange);
@@ -1047,7 +1058,7 @@
         'JSON': responseTypeJSON
       }
     };
-    F3H.version = '1.1.5';
+    F3H.version = '1.1.6';
 
     return F3H;
 
