@@ -141,8 +141,7 @@
     };
 
     const getName = node => {
-        let name = toCaseLower(node.nodeName || "");
-        return "" !== name ? name : null;
+        return toCaseLower(node && node.nodeName || "") || null;
     };
 
     const getNext = node => {
@@ -228,6 +227,9 @@
     };
 
     const setHTML = (node, content, trim = true) => {
+        if (null === content) {
+            return node;
+        }
         let state = 'innerHTML';
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
     };

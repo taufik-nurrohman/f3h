@@ -10,7 +10,7 @@
     "@babel/preset-env": "^7.12.11",
     "@rollup/plugin-babel": "^5.2.2",
     "@rollup/plugin-node-resolve": "^11.0.1",
-    "@taufik-nurrohman/document": "^0.1.1",
+    "@taufik-nurrohman/document": "^0.1.3",
     "@taufik-nurrohman/event": "^0.1.1",
     "@taufik-nurrohman/file": "^0.0.6",
     "@taufik-nurrohman/folder": "^0.0.4",
