@@ -357,10 +357,6 @@
     node.addEventListener(name, then, options);
   };
 
-  function _readOnlyError(name) {
-    throw new TypeError("\"" + name + "\" is read-only");
-  }
-
   function fire(name, data) {
     var $ = this;
 
@@ -380,7 +376,7 @@
     var $ = this;
 
     if (!isSet(name)) {
-      return hooks = (_readOnlyError("hooks"), {}), $;
+      return hooks = {}, $;
     }
 
     if (isSet(hooks[name])) {
@@ -1178,6 +1174,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.7';
+  F3H.version = '1.1.8';
   return F3H;
 });
