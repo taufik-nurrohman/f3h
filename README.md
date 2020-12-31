@@ -22,11 +22,7 @@ Contribute
 Release Notes
 -------------
 
-### 1.1.6, 1.1.7
-
- - Maintenance.
-
-### 1.1.5
+### 1.1.5, 1.1.6, 1.1.7
 
  - Maintenance.
 
