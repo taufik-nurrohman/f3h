@@ -113,10 +113,6 @@
     return x.toLowerCase();
   };
 
-  var toCaseUpper = function toCaseUpper(x) {
-    return x.toUpperCase();
-  };
-
   var toNumber = function toNumber(x, base) {
     if (base === void 0) {
       base = 10;
@@ -428,6 +424,48 @@
     return new RegExp(pattern, isSet(opt) ? opt : 'g');
   };
 
+  var toCaseLower$1 = function toCaseLower(x) {
+    return x.toLowerCase();
+  };
+
+  var toCaseUpper = function toCaseUpper(x) {
+    return x.toUpperCase();
+  };
+
+  var toNumber$1 = function toNumber(x, base) {
+    if (base === void 0) {
+      base = 10;
+    }
+
+    return base ? parseInt(x, base) : parseFloat(x);
+  };
+
+  var toValue$1 = function toValue(x) {
+    if (isArray(x)) {
+      return x.map(function (v) {
+        return toValue(v);
+      });
+    }
+
+    if (isNumeric(x)) {
+      return toNumber$1(x);
+    }
+
+    if (isObject(x)) {
+      for (var k in x) {
+        x[k] = toValue(x[k]);
+      }
+
+      return x;
+    }
+
+    return {
+      'false': false,
+      'null': null,
+      'true': true
+    }[x] || x;
+  };
+
   var name = 'F3H',
       GET = 'GET',
       POST = 'POST',
@@ -526,7 +564,7 @@
   }
 
   function isLinkForF3H(node) {
-    var n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
 
     if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
       return 1;
@@ -541,7 +579,7 @@
       return 1;
     }
 
-    var n = toCaseLower(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
 
     if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
       return 1;
@@ -556,7 +594,7 @@
   }
 
   function isStyleForF3H(node) {
-    var n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
 
     if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
       return 1;
@@ -606,18 +644,18 @@
 
     for (header in headers) {
       h = headers[header].split(': ');
-      k = toCaseLower(h.shift());
-      w = toCaseLower(v = h.join(': '));
-      out[k] = toValue(v);
+      k = toCaseLower$1(h.shift());
+      w = toCaseLower$1(v = h.join(': '));
+      out[k] = toValue$1(v);
     } // Use proxy to make case-insensitive response header’s key
 
 
     return new Proxy(out, {
       get: function get(o, k) {
-        return o[toCaseLower(k)] || null;
+        return o[toCaseLower$1(k)] || null;
       },
       set: function set(o, k, v) {
-        o[toCaseLower(k)] = v;
+        o[toCaseLower$1(k)] = v;
       }
     });
   }
@@ -1174,6 +1212,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.8';
+  F3H.version = '1.1.9';
   return F3H;
 });

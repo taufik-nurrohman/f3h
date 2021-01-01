@@ -10,15 +10,13 @@ block content
     form(method='get')
       p
         input(autofocus name='q' type='text')
-        |
-        |
+        = ' '
         button(type='submit') Search
     p Example with different search path.
     form(action='test.html' method='get')
       p
         input(name='q' type='text')
-        |
-        |
+        = ' '
         button(type='submit') Search
 
 block script
