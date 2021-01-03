@@ -1,10 +1,11 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
-import {fromValue} from '@taufik-nurrohman/from';
+import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {fire as fireHook, hooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
-import {toCaseLower, toCaseUpper, toValue} from '@taufik-nurrohman/to';
+import {getOffset, setScroll} from '@taufik-nurrohman/rect';
+import {toCaseLower, toCaseUpper, toCount, toObjectCount, toValue} from '@taufik-nurrohman/to';
 
 let name = '%(rollup.output.name)',
 
@@ -19,10 +20,6 @@ let name = '%(rollup.output.name)',
 
     B, H;
 
-function getCount(ofArray) {
-    return ofArray.length;
-}
-
 function getEventName(node) {
     return isForm(node) ? 'submit' : 'click';
 }
@@ -34,13 +31,13 @@ function getHash(ref) {
 function getLinks(scope) {
     let id, out = {}, link,
         links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope), toSave;
-    for (let i = 0, j = getCount(links); i < j; ++i) {
+    for (let i = 0, j = toCount(links); i < j; ++i) {
         if (isLinkForF3H(link = links[i])) {
             continue;
         }
         link.id = (id = link.id || name + ':' + toID(getAttribute(link, 'href') || getText(link)));
         out[id] = (toSave = fromElement(link));
-        out[id][getCount(toSave) - 1].href = link.href; // Use the resolved URL!
+        out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
     }
     return out;
 }
@@ -52,13 +49,13 @@ function getRef() {
 function getScripts(scope) {
     let id, out = {}, script,
         scripts = getElements('script', scope), toSave;
-    for (let i = 0, j = getCount(scripts); i < j; ++i) {
+    for (let i = 0, j = toCount(scripts); i < j; ++i) {
         if (isScriptForF3H(script = scripts[i])) {
             continue;
         }
         script.id = (id = script.id || name + ':' + toID(getAttribute(script, 'src') || getText(script)));
         out[id] = (toSave = fromElement(script));
-        out[id][getCount(toSave) - 1].src = script.src; // Use the resolved URL!
+        out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
     }
     return out;
 }
@@ -66,14 +63,14 @@ function getScripts(scope) {
 function getStyles(scope) {
     let id, out = {}, style,
         styles = getElements('link[rel=stylesheet],style', scope), toSave;
-    for (let i = 0, j = getCount(styles); i < j; ++i) {
+    for (let i = 0, j = toCount(styles); i < j; ++i) {
         if (isStyleForF3H(style = styles[i])) {
             continue;
         }
         style.id = (id = style.id || name + ':' + toID(getAttribute(style, 'href') || getText(style)));
         out[id] = (toSave = fromElement(style));
         if ('link' === toSave[0]) {
-            out[id][getCount(toSave) - 1].href = style.href; // Use the resolved URL!
+            out[id][toCount(toSave) - 1].href = style.href; // Use the resolved URL!
         }
     }
     return out;
@@ -133,7 +130,9 @@ function letSlashEnd(ref) {
 
 // <https://stackoverflow.com/a/8831937/1163000>
 function toID(text) {
-    let out = 0, c, i, j = getCount(text);
+    let c, i,
+        j = toCount(text),
+        out = 0;
     if (0 === j) {
         return out;
     }
@@ -186,7 +185,7 @@ function F3H(source = D, state = {}) {
         return $;
     }
 
-    $.state = state = Object.assign({}, F3H.state, true === state ? {
+    $.state = state = fromStates(F3H.state, true === state ? {
         cache: state
     } : (state || {}));
 
@@ -216,7 +215,7 @@ function F3H(source = D, state = {}) {
         styles = null;
 
     // Store current instance to `F3H.instances`
-    F3H.instances[source.id || source.name || getCount(Object.keys(F3H.instances))] = $;
+    F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $;
 
     // Mark current DOM as active to prevent duplicate instance
     source[name] = 1;
@@ -434,8 +433,9 @@ function F3H(source = D, state = {}) {
         if (!node) {
             return;
         }
-        R.scrollLeft = B.scrollLeft = node.offsetLeft;
-        R.scrollTop = B.scrollTop = node.offsetTop;
+        let theOffset = getOffset(node);
+        setScroll(B, theOffset);
+        setScroll(R, theOffset);
     }
 
     // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
@@ -509,12 +509,12 @@ function F3H(source = D, state = {}) {
         let t = this, q,
             href = t.href,
             action = t.action,
-            ref = href || action,
+            ref = letSlashEnd(href || action),
             type = toCaseUpper(t.method || GET);
         if (GET === type) {
             if (isForm(t)) {
                 q = (new URLSearchParams(new FormData(t))) + "";
-                ref = letSlashEnd(ref.split(/[?&#]/)[0]) + (q ? '?' + q : "");
+                ref = ref.split(/[?&#]/)[0] + (q ? '?' + q : "");
             }
             // Immediately change the URL if turbo feature is enabled
             if (state.turbo) {

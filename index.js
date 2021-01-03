@@ -353,6 +353,14 @@
     node.addEventListener(name, then, options);
   };
 
+  var fromStates = function fromStates() {
+    for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
+      lot[_key] = arguments[_key];
+    }
+
+    return Object.assign.apply(Object, [{}].concat(lot));
+  };
+
   function fire(name, data) {
     var $ = this;
 
@@ -424,6 +432,16 @@
     return new RegExp(pattern, isSet(opt) ? opt : 'g');
   };
 
+  var getOffset = function getOffset(node) {
+    return [node.offsetLeft, node.offsetTop];
+  };
+
+  var setScroll = function setScroll(node, data) {
+    node.scrollLeft = data[0];
+    node.scrollTop = data[1];
+    return node;
+  };
+
   var toCaseLower$1 = function toCaseLower(x) {
     return x.toLowerCase();
   };
@@ -432,12 +450,24 @@
     return x.toUpperCase();
   };
 
+  var toCount = function toCount(x) {
+    return x.length;
+  };
+
   var toNumber$1 = function toNumber(x, base) {
     if (base === void 0) {
       base = 10;
     }
 
     return base ? parseInt(x, base) : parseFloat(x);
+  };
+
+  var toObjectCount = function toObjectCount(x) {
+    return toCount(toObjectKeys(x));
+  };
+
+  var toObjectKeys = function toObjectKeys(x) {
+    return Object.keys(x);
   };
 
   var toValue$1 = function toValue(x) {
@@ -476,10 +506,6 @@
       B,
       H;
 
-  function getCount(ofArray) {
-    return ofArray.length;
-  }
-
   function getEventName(node) {
     return isForm(node) ? 'submit' : 'click';
   }
@@ -495,14 +521,14 @@
         links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
         toSave;
 
-    for (var i = 0, j = getCount(links); i < j; ++i) {
+    for (var i = 0, j = toCount(links); i < j; ++i) {
       if (isLinkForF3H(link = links[i])) {
         continue;
       }
 
       link.id = id = link.id || name + ':' + toID(getAttribute(link, 'href') || getText(link));
       out[id] = toSave = fromElement(link);
-      out[id][getCount(toSave) - 1].href = link.href; // Use the resolved URL!
+      out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
     }
 
     return out;
@@ -519,14 +545,14 @@
         scripts = getElements('script', scope),
         toSave;
 
-    for (var i = 0, j = getCount(scripts); i < j; ++i) {
+    for (var i = 0, j = toCount(scripts); i < j; ++i) {
       if (isScriptForF3H(script = scripts[i])) {
         continue;
       }
 
       script.id = id = script.id || name + ':' + toID(getAttribute(script, 'src') || getText(script));
       out[id] = toSave = fromElement(script);
-      out[id][getCount(toSave) - 1].src = script.src; // Use the resolved URL!
+      out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
     }
 
     return out;
@@ -539,7 +565,7 @@
         styles = getElements('link[rel=stylesheet],style', scope),
         toSave;
 
-    for (var i = 0, j = getCount(styles); i < j; ++i) {
+    for (var i = 0, j = toCount(styles); i < j; ++i) {
       if (isStyleForF3H(style = styles[i])) {
         continue;
       }
@@ -548,7 +574,7 @@
       out[id] = toSave = fromElement(style);
 
       if ('link' === toSave[0]) {
-        out[id][getCount(toSave) - 1].href = style.href; // Use the resolved URL!
+        out[id][toCount(toSave) - 1].href = style.href; // Use the resolved URL!
       }
     }
 
@@ -614,10 +640,10 @@
 
 
   function toID(text) {
-    var out = 0,
-        c,
+    var c,
         i,
-        j = getCount(text);
+        j = toCount(text),
+        out = 0;
 
     if (0 === j) {
       return out;
@@ -685,7 +711,7 @@
       return $;
     }
 
-    $.state = state = Object.assign({}, F3H.state, true === state ? {
+    $.state = state = fromStates(F3H.state, true === state ? {
       cache: state
     } : state || {});
     $.source = source;
@@ -712,7 +738,7 @@
         status = null,
         styles = null; // Store current instance to `F3H.instances`
 
-    F3H.instances[source.id || source.name || getCount(Object.keys(F3H.instances))] = $; // Mark current DOM as active to prevent duplicate instance
+    F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $; // Mark current DOM as active to prevent duplicate instance
 
     source[name] = 1;
 
@@ -948,8 +974,9 @@
         return;
       }
 
-      R.scrollLeft = B.scrollLeft = node.offsetLeft;
-      R.scrollTop = B.scrollTop = node.offsetTop;
+      var theOffset = getOffset(node);
+      setScroll(B, theOffset);
+      setScroll(R, theOffset);
     } // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
 
 
@@ -1034,13 +1061,13 @@
           q,
           href = t.href,
           action = t.action,
-          ref = href || action,
+          ref = letSlashEnd(href || action),
           type = toCaseUpper(t.method || GET);
 
       if (GET === type) {
         if (isForm(t)) {
           q = new URLSearchParams(new FormData(t)) + "";
-          ref = letSlashEnd(ref.split(/[?&#]/)[0]) + (q ? '?' + q : "");
+          ref = ref.split(/[?&#]/)[0] + (q ? '?' + q : "");
         } // Immediately change the URL if turbo feature is enabled
 
 
@@ -1212,6 +1239,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.9';
+  F3H.version = '1.1.10';
   return F3H;
 });
