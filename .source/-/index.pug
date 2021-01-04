@@ -68,7 +68,7 @@ block content
     hr
   main
     p Progressive enhancement is a design principle that is focused in ensuring the availability of web page content in the most limited conditions, and if possible, to provide the most advanced features when the conditions are supportive. By enhancing features while maintaining the basic functions of HTML pages, this concept will ensure that if your advanced JavaScript features cannot work optimally under certain conditions, then at least the web page content that you want to provide is still accessible to most users.
-    p: a(href='example-1/index.html' target='_blank') #[b Demo]
+    p: a(href='test/1/index.html' target='_blank') #[b Demo]
     h2 Features
     ul
       li Light-weight, no dependencies. It uses vanilla JavaScript.
@@ -87,9 +87,9 @@ block content
       |   &lt;/head&gt;
       |   &lt;body&gt;
       |     &lt;main id="content"&gt;
-      |       &lt;p&gt;Lorem &lt;a href="/path-to-internal-page"&gt;ipsum&lt;/a&gt; dolor sit amet.&lt;/p&gt;
+      |       &lt;p&gt;Lorem &lt;a href="./path-to-page"&gt;ipsum&lt;/a&gt; dolor sit amet.&lt;/p&gt;
       |     &lt;/main&gt;
-      |     &lt;script src="#[a(href='index.min.js' target='_blank') index.min.js]"&gt;&lt;/script&gt;
+      |     &lt;script src="#[a(href='index.min.js' target='_blank') ./index.min.js]"&gt;&lt;/script&gt;
       |     &lt;script&gt;
       |     const f3h = new F3H;
       |     const content = document.querySelector('#content');
@@ -128,22 +128,61 @@ block content
       | });
     h2 Examples
     ul
-      li: a(href='example-0/index.html' target='_blank') No Idea?
-      li: a(href='example-2/index.html' target='_blank') Apply Events to Specific Elements
-      li #[a(href='example-3/index.html' target='_blank') Progress Animation Example] (Requires #[code Content-Length] response header)
-      li: a(href='example-4/index.html' target='_blank') CSS and JavaScript Evaluation Across Pages
-      li #[a(href='example-5/index.php' target='_blank') Basic Form Example] (Requires PHP)
-      li #[a(href='example-6/index.php' target='_blank') Upload Form Example] (Requires PHP)
-      li: a(href='example-7/index.html' target='_blank') Native Hash Change Events
-      li: a(href='example-8/index.html' target='_blank') Load More Example
-      li: a(href='example-9/index.html' target='_blank') Infinite Scroll Example
-      li: a(href='example-10/index.html' target='_blank') Smooth Scrolling Example
-      li #[a(href='example-11/index.php' target='_blank') Server-Side Redirection Example] (Requires PHP, experimental)
-      li #[a(href='example-12/index.php' target='_blank') Form Data Value] (Requires PHP, test)
-      li #[a(href='example-13/index.html' target='_blank') JavaScript and CSS Placement Test] (TODO)
-      li: a(href='example-14/index.html' target='_blank') Search Form Example
-      li: a(href='example-15/index.html' target='_blank') jQuery Integration Example
+      li: a(href='test/index.html' target='_blank') No Idea?
+      li: a(href='test/2/index.html' target='_blank') Apply Events to Specific Elements
+      li #[a(href='test/3/index.html' target='_blank') Progress Animation Example] (Requires #[code Content-Length] response header)
+      li: a(href='test/4/index.html' target='_blank') CSS and JavaScript Evaluation Across Pages
+      li #[a(href='test/5/index.php' target='_blank') Basic Form Example] (Requires PHP)
+      li #[a(href='test/6/index.php' target='_blank') Upload Form Example] (Requires PHP)
+      li: a(href='test/7/index.html' target='_blank') Native Hash Change Events
+      li: a(href='test/8/index.html' target='_blank') Load More Example
+      li: a(href='test/9/index.html' target='_blank') Infinite Scroll Example
+      li: a(href='test/10/index.html' target='_blank') Smooth Scrolling Example
+      li #[a(href='test/11/index.php' target='_blank') Server-Side Redirection Example] (Requires PHP, experimental)
+      li #[a(href='test/12/index.php' target='_blank') Form Data Value] (Requires PHP, test)
+      li #[a(href='test/13/index.html' target='_blank') JavaScript and CSS Placement Test] (TODO)
+      li: a(href='test/14/index.html' target='_blank') Search Form Example
+      li: a(href='test/15/index.html' target='_blank') jQuery Integration Example
     h2 Settings
+    table(border='1')
+      thead
+        tr
+          th Name
+          th Description
+      tbody
+        tr
+          td: code cache
+          td See #[code state.cache].
+        tr
+          td: code state
+          td The configuration data.
+        tr
+          td: code state.cache
+          td Set to #[code true] to enable local cache feature. Only responses from the GET requests that will be cached by the application. Setting the value to #[code false] on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.
+        tr
+          td: code state.history
+          td Set to #[code false] to disable the history feature (loading different pages won&rsquo;t change the URL in the address bar).
+        tr
+          td: code state.is
+          td Default filter function to exclude HTML elements selected by #[code state.sources] with certain criteria. For example, to disable AJAX events on HTML elements that has #[code target] attribute with value of #[code _blank].
+        tr
+          td: code state.lot
+          td List of HTTP headers to be added to the request headers.
+        tr
+          td: code state.ref
+          td Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.
+        tr
+          td: code state.sources
+          td A CSS selector that selects the HTML elements you want to bind the AJAX events to.
+        tr
+          td: code state.turbo
+          td Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.
+        tr
+          td: code state.type
+          td Default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the #[code state.types] object.
+        tr
+          td: code state.types
+          td List of file extensions with the expected response type.
     pre: code const f3h = new F3H(#[var cache]);
     pre: code
       | const f3h = new F3H(#[var state] = {
@@ -159,18 +198,6 @@ block content
       |     type: 'document',
       |     types: { &hellip; }
       | });
-    ul
-      li #[var cache] &rarr; See #[code state.cache].
-      li #[var state] &rarr; The configuration data.
-      li #[var state.cache] &rarr; Set to #[code true] to enable local cache feature. Only responses from the GET requests that will be cached by the application. Setting the value to #[code false] on a website that already has a long built-in cache expiration time might not give any meaningful difference as caches will be stored in the browser, natively.
-      li #[var state.history] &rarr; Set to #[code false] to disable the history feature (loading different pages won&rsquo;t change the URL in the address bar).
-      li #[var state.is] &rarr; Default filter function to exclude HTML elements selected by #[code state.sources] with certain criteria. For example, to disable AJAX events on HTML elements that has #[code target] attribute with value of #[code _blank].
-      li #[var state.lot] &rarr; List of HTTP headers to be added to the request headers.
-      li #[var state.ref] &rarr; Default URL filter to replace the reference URL to fetch from the source element, without replacing the original URL value in the source element.
-      li #[var state.sources] &rarr; A CSS selector that selects the HTML elements you want to bind the AJAX events to.
-      li #[var state.turbo] &rarr; Pre-fetch URL on hover for faster web page browsing experience. Enabling this feature will automatically enable the local cache feature.
-      li #[var state.type] &rarr; Default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the #[code state.types] object.
-      li #[var state.types] &rarr; List of file extensions with the expected response type.
     h2 Methods and Properties
     h3 F3H.instances
     p Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.

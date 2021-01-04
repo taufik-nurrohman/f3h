@@ -1,0 +1,29 @@
+extends ../../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../../index.min.js']
+
+block content
+  main
+    p: a(href='test.html#foo') Test!
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on('scroll', () => {
+    |     let id = window.location.hash,
+    |         target = id && document.querySelector(id);
+    |     target && target.scrollIntoView({
+    |         behavior: 'smooth',
+    |         block: 'start',
+    |         inline: 'start'
+    |     });
+    | });
+    |
+    | f3h.on('success', response => {
+    |     document.title = response.title;
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });

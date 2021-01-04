@@ -25,4 +25,4 @@ for (let path in paths) {
     }
 }
 
-file.move('example-5/log.html', 'example-5', 'log');
+file.move('test/5/log.html', 'test/5', 'log');

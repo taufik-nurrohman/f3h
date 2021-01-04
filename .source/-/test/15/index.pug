@@ -1,0 +1,22 @@
+extends ../../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js', '../../index.min.js']
+
+block content
+  main
+    p: a(href='test.html') Test!
+
+block script
+  script
+    | let f3h = new F3H,
+    |
+    |     $document = $(document),
+    |     $main = $('main');
+    |
+    | f3h.on('success', response => {
+    |     let $response = $(response);
+    |     $document.prop('title', $response.prop('title'));
+    |     $main.html($response.find('main').html());
+    | });

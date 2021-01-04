@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.11
+
+ - Restructured the test files.
+
 ### 1.1.5, 1.1.6, 1.1.7, 1.1.8, 1.1.9, 1.1.10
 
  - Maintenance.

@@ -1,0 +1,13 @@
+extends ../../_index.pug
+
+block state
+  - const title = 'Search Test'
+
+block content
+  main
+    p This is the search page.
+    form(action='test.html' method='get')
+      p
+        input(autofocus name='q' type='text')
+        = ' '
+        button(type='submit') Search
