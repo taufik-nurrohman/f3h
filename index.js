@@ -664,15 +664,12 @@
         headers = request.getAllResponseHeaders().trim().split(/[\r\n]+/),
         header,
         h,
-        k,
-        v,
-        w;
+        k;
 
     for (header in headers) {
       h = headers[header].split(': ');
       k = toCaseLower$1(h.shift());
-      w = toCaseLower$1(v = h.join(': '));
-      out[k] = toValue$1(v);
+      out[k] = toValue$1(h.join(': '));
     } // Use proxy to make case-insensitive response header’s key
 
 
@@ -1239,6 +1236,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.11';
+  F3H.version = '1.1.12';
   return F3H;
 });

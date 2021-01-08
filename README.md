@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.12
+
+ - Updated.
+
 ### 1.1.11
 
  - Restructured the test files.

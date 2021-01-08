@@ -1,7 +1,7 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {fire as fireHook, hooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
+import {fire as fireHook, hooks as theHooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {getOffset, setScroll} from '@taufik-nurrohman/rect';
@@ -148,12 +148,11 @@ function toID(text) {
 function toHeadersAsProxy(request) {
     let out = {},
         headers = request.getAllResponseHeaders().trim().split(/[\r\n]+/),
-        header, h, k, v, w;
+        header, h, k;
     for (header in headers) {
         h = headers[header].split(': ');
         k = toCaseLower(h.shift());
-        w = toCaseLower(v = h.join(': '));
-        out[k] = toValue(v);
+        out[k] = toValue(h.join(': '));
     }
     // Use proxy to make case-insensitive response header’s key
     return new Proxy(out, {
@@ -407,7 +406,7 @@ function F3H(source = D, state = {}) {
 
     // Focus to the first element that has `autofocus` attribute
     function doFocusToElement(data) {
-        if (hooks.focus) {
+        if (theHooks.focus) {
             fire('focus', data);
             return;
         }
@@ -440,7 +439,7 @@ function F3H(source = D, state = {}) {
 
     // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
     function doScrollToElement(data) {
-        if (hooks.scroll) {
+        if (theHooks.scroll) {
             fire('scroll', data);
             return;
         }
@@ -593,7 +592,7 @@ function F3H(source = D, state = {}) {
     $.caches = caches;
     $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
     $.fire = fire;
-    $.hooks = hooks;
+    $.hooks = theHooks;
     $.links = links;
     $.lot = null;
     $.off = off;
