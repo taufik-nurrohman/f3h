@@ -29,15 +29,18 @@ function getHash(ref) {
 }
 
 function getLinks(scope) {
-    let id, out = {}, link,
+    let id, out = {}, href, link,
         links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope), toSave;
     for (let i = 0, j = toCount(links); i < j; ++i) {
         if (isLinkForF3H(link = links[i])) {
             continue;
         }
-        link.id = (id = link.id || name + ':' + toID(getAttribute(link, 'href') || getText(link)));
+        href = getAttribute(link, 'href');
+        link.id = (id = link.id || name + ':' + toID(href || getText(link)));
         out[id] = (toSave = fromElement(link));
-        out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
+        if (href) {
+            out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
+        }
     }
     return out;
 }
@@ -47,29 +50,33 @@ function getRef() {
 }
 
 function getScripts(scope) {
-    let id, out = {}, script,
+    let id, out = {}, src, script,
         scripts = getElements('script', scope), toSave;
     for (let i = 0, j = toCount(scripts); i < j; ++i) {
         if (isScriptForF3H(script = scripts[i])) {
             continue;
         }
-        script.id = (id = script.id || name + ':' + toID(getAttribute(script, 'src') || getText(script)));
+        src = getAttribute(script, 'src');
+        script.id = (id = script.id || name + ':' + toID(src || getText(script)));
         out[id] = (toSave = fromElement(script));
-        out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
+        if (src) {
+            out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
+        }
     }
     return out;
 }
 
 function getStyles(scope) {
-    let id, out = {}, style,
+    let id, out = {}, href, style,
         styles = getElements('link[rel=stylesheet],style', scope), toSave;
     for (let i = 0, j = toCount(styles); i < j; ++i) {
         if (isStyleForF3H(style = styles[i])) {
             continue;
         }
-        style.id = (id = style.id || name + ':' + toID(getAttribute(style, 'href') || getText(style)));
+        href = getAttribute(style, 'href');
+        style.id = (id = style.id || name + ':' + toID(href || getText(style)));
         out[id] = (toSave = fromElement(style));
-        if ('link' === toSave[0]) {
+        if (href) {
             out[id][toCount(toSave) - 1].href = style.href; // Use the resolved URL!
         }
     }
@@ -453,7 +460,8 @@ function F3H(source = D, state = {}) {
             }
             if (!toCompare[id]) {
                 delete to[id];
-                letElement(getTarget(id));
+                let target = getTarget(id);
+                target && letElement(target);
             }
         }
         for (id in toCompare) {

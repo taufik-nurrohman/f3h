@@ -525,6 +525,7 @@
   function getLinks(scope) {
     var id,
         out = {},
+        href,
         link,
         links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
         toSave;
@@ -534,9 +535,13 @@
         continue;
       }
 
-      link.id = id = link.id || name + ':' + toID(getAttribute(link, 'href') || getText(link));
+      href = getAttribute(link, 'href');
+      link.id = id = link.id || name + ':' + toID(href || getText(link));
       out[id] = toSave = fromElement(link);
-      out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
+
+      if (href) {
+        out[id][toCount(toSave) - 1].href = link.href; // Use the resolved URL!
+      }
     }
 
     return out;
@@ -549,6 +554,7 @@
   function getScripts(scope) {
     var id,
         out = {},
+        src,
         script,
         scripts = getElements('script', scope),
         toSave;
@@ -558,9 +564,13 @@
         continue;
       }
 
-      script.id = id = script.id || name + ':' + toID(getAttribute(script, 'src') || getText(script));
+      src = getAttribute(script, 'src');
+      script.id = id = script.id || name + ':' + toID(src || getText(script));
       out[id] = toSave = fromElement(script);
-      out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
+
+      if (src) {
+        out[id][toCount(toSave) - 1].src = script.src; // Use the resolved URL!
+      }
     }
 
     return out;
@@ -569,6 +579,7 @@
   function getStyles(scope) {
     var id,
         out = {},
+        href,
         style,
         styles = getElements('link[rel=stylesheet],style', scope),
         toSave;
@@ -578,10 +589,11 @@
         continue;
       }
 
-      style.id = id = style.id || name + ':' + toID(getAttribute(style, 'href') || getText(style));
+      href = getAttribute(style, 'href');
+      style.id = id = style.id || name + ':' + toID(href || getText(style));
       out[id] = toSave = fromElement(style);
 
-      if ('link' === toSave[0]) {
+      if (href) {
         out[id][toCount(toSave) - 1].href = style.href; // Use the resolved URL!
       }
     }
@@ -1010,7 +1022,8 @@
 
         if (!toCompare[id]) {
           delete to[id];
-          letElement(getTarget(id));
+          var target = getTarget(id);
+          target && letElement(target);
         }
       }
 
@@ -1242,6 +1255,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.13';
+  F3H.version = '1.1.14';
   return F3H;
 });
