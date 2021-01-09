@@ -1,7 +1,7 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {fire as fireHook, hooks as theHooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
+import {context as contextHook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {getOffset, setScroll} from '@taufik-nurrohman/rect';
@@ -181,7 +181,7 @@ function F3H(source = D, state = {}) {
 
     // Already instantiated, skip!
     if (source[name]) {
-        return $;
+        return;
     }
 
     $.state = state = fromStates(F3H.state, true === state ? {
@@ -189,10 +189,6 @@ function F3H(source = D, state = {}) {
     } : (state || {}));
 
     $.source = source;
-
-    let fire = fireHook.bind($),
-        off = offHook.bind($),
-        on = onHook.bind($);
 
     if (state.turbo) {
         state.cache = true; // Enable turbo feature will force enable cache feature
@@ -212,6 +208,8 @@ function F3H(source = D, state = {}) {
         sources = getSources(state.sources),
         status = null,
         styles = null;
+
+    let {fire, hooks} = contextHook($);
 
     // Store current instance to `F3H.instances`
     F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $;
@@ -406,7 +404,7 @@ function F3H(source = D, state = {}) {
 
     // Focus to the first element that has `autofocus` attribute
     function doFocusToElement(data) {
-        if (theHooks.focus) {
+        if (hooks.focus) {
             fire('focus', data);
             return;
         }
@@ -439,7 +437,7 @@ function F3H(source = D, state = {}) {
 
     // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
     function doScrollToElement(data) {
-        if (theHooks.scroll) {
+        if (hooks.scroll) {
             fire('scroll', data);
             return;
         }
@@ -591,12 +589,8 @@ function F3H(source = D, state = {}) {
 
     $.caches = caches;
     $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
-    $.fire = fire;
-    $.hooks = theHooks;
     $.links = links;
     $.lot = null;
-    $.off = off;
-    $.on = on;
     $.ref = null;
     $.scripts = scripts;
     $.state = state;

@@ -361,62 +361,70 @@
     return Object.assign.apply(Object, [{}].concat(lot));
   };
 
-  function fire(name, data) {
-    var $ = this;
+  function context($) {
+    var hooks = {};
 
-    if (!isSet(hooks[name])) {
+    function fire(name, data) {
+      if (!isSet(hooks[name])) {
+        return $;
+      }
+
+      hooks[name].forEach(function (then) {
+        return then.apply($, data);
+      });
       return $;
     }
 
-    hooks[name].forEach(function (then) {
-      return then.apply($, data);
-    });
-    return $;
-  }
+    function off(name, then) {
+      if (!isSet(name)) {
+        return hooks = {}, $;
+      }
 
-  var hooks = {};
+      if (isSet(hooks[name])) {
+        if (isSet(then)) {
+          for (var i = 0, _j = hooks[name].length; i < _j; ++i) {
+            if (then === hooks[name][i]) {
+              hooks[name].splice(i, 1);
+              break;
+            }
+          } // Clean-up empty hook(s)
 
-  function off$1(name, then) {
-    var $ = this;
 
-    if (!isSet(name)) {
-      return hooks = {}, $;
-    }
-
-    if (isSet(hooks[name])) {
-      if (isSet(then)) {
-        for (var i = 0, _j = hooks[name].length; i < _j; ++i) {
-          if (then === hooks[name][i]) {
-            hooks[name].splice(i, 1);
-            break;
+          if (0 === j) {
+            delete hooks[name];
           }
-        } // Clean-up empty hook(s)
-
-
-        if (0 === j) {
+        } else {
           delete hooks[name];
         }
-      } else {
-        delete hooks[name];
       }
+
+      return $;
     }
 
+    function on(name, then) {
+      if (!isSet(hooks[name])) {
+        hooks[name] = [];
+      }
+
+      if (isSet(then)) {
+        hooks[name].push(then);
+      }
+
+      return $;
+    }
+
+    $.hooks = hooks;
+    $.fire = fire;
+    $.off = off;
+    $.on = on;
     return $;
   }
 
-  function on$1(name, then) {
-    var $ = this;
-
-    if (!isSet(hooks[name])) {
-      hooks[name] = [];
-    }
-
-    if (isSet(then)) {
-      hooks[name].push(then);
-    }
-
-    return $;
-  }
+  var $ = context({});
+  var fire = $.fire;
+  var off$1 = $.off;
+  var on$1 = $.on;
+  var hooks = $.hooks;
 
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
@@ -705,16 +713,13 @@
 
 
     if (source[name]) {
-      return $;
+      return;
     }
 
     $.state = state = fromStates(F3H.state, true === state ? {
       cache: state
     } : state || {});
     $.source = source;
-    var fire$1 = fire.bind($),
-        off$2 = off$1.bind($),
-        on$2 = on$1.bind($);
 
     if (state.turbo) {
       state.cache = true; // Enable turbo feature will force enable cache feature
@@ -733,7 +738,12 @@
         scripts = null,
         sources = getSources(state.sources),
         status = null,
-        styles = null; // Store current instance to `F3H.instances`
+        styles = null;
+
+    var _contextHook = context($),
+        fire = _contextHook.fire,
+        hooks = _contextHook.hooks; // Store current instance to `F3H.instances`
+
 
     F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $; // Mark current DOM as active to prevent duplicate instance
 
@@ -790,7 +800,7 @@
       nodeCurrent = node; // Store currently selected source element to a variable to be compared later
 
       $.ref = letSlashEnd(refCurrent = ref);
-      fire$1('exit', [D, node]); // Get response from cache if any
+      fire('exit', [D, node]); // Get response from cache if any
 
       if (state.cache) {
         var cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
@@ -805,13 +815,13 @@
           cache[3] && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
           cache[3] && (styles = doUpdateStyles(data[0]));
-          fire$1('success', data);
-          fire$1(cache[0], data);
+          fire('success', data);
+          fire(cache[0], data);
           sources = getSources(state.sources); // Update JavaScript after markup change
 
           cache[3] && (scripts = doUpdateScripts(data[0]));
           onSourcesEventsSet(data);
-          fire$1('enter', data);
+          fire('enter', data);
           return;
         }
       }
@@ -837,7 +847,7 @@
       }
 
       on('abort', request, function () {
-        dataSet(), fire$1('abort', [request.response, node]);
+        dataSet(), fire('abort', [request.response, node]);
       });
       on('error', request, fn = function fn() {
         dataSet();
@@ -847,12 +857,12 @@
         requestIsDocument && (links = doUpdateLinks(data[0])); // Update CSS before markup change
 
         requestIsDocument && (styles = doUpdateStyles(data[0]));
-        fire$1('error', data);
+        fire('error', data);
         sources = getSources(state.sources); // Update JavaScript after markup change
 
         requestIsDocument && (scripts = doUpdateScripts(data[0]));
         onSourcesEventsSet(data);
-        fire$1('enter', data);
+        fire('enter', data);
       });
       on('error', requestAsPush, fn);
       on('load', request, fn = function fn() {
@@ -868,8 +878,8 @@
           var r = letSlashEnd(redirect);
           caches[r] && delete caches[r]; // Trigger hook(s) immediately
 
-          fire$1('success', data);
-          fire$1(status, data); // Do the normal fetch
+          fire('success', data);
+          fire(status, data); // Do the normal fetch
 
           doFetch(nodeCurrent = W, GET, redirect || ref);
           return;
@@ -881,21 +891,21 @@
         // Update CSS before markup change
 
         requestIsDocument && (styles = doUpdateStyles(data[0]));
-        fire$1('success', data);
-        fire$1(status, data);
+        fire('success', data);
+        fire(status, data);
         requestIsDocument && useHistory && doScrollTo(R);
         sources = getSources(state.sources); // Update JavaScript after markup change
 
         requestIsDocument && (scripts = doUpdateScripts(data[0]));
         onSourcesEventsSet(data);
-        fire$1('enter', data);
+        fire('enter', data);
       });
       on('load', requestAsPush, fn);
       on('progress', request, function (e) {
-        dataSet(), fire$1('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+        dataSet(), fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
       });
       on('progress', requestAsPush, function (e) {
-        dataSet(), fire$1('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
+        dataSet(), fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
       });
       return request;
     }
@@ -944,7 +954,7 @@
 
     function doFocusToElement(data) {
       if (hooks.focus) {
-        fire$1('focus', data);
+        fire('focus', data);
         return;
       }
 
@@ -979,7 +989,7 @@
 
     function doScrollToElement(data) {
       if (hooks.scroll) {
-        fire$1('scroll', data);
+        fire('scroll', data);
         return;
       }
 
@@ -1153,12 +1163,8 @@
       return doFetchBase(from, type, ref);
     };
 
-    $.fire = fire$1;
-    $.hooks = hooks;
     $.links = links;
     $.lot = null;
-    $.off = off$2;
-    $.on = on$2;
     $.ref = null;
     $.scripts = scripts;
     $.state = state;
@@ -1177,7 +1183,7 @@
       off('keydown', D, onKeyDown);
       off('keyup', D, onKeyUp);
       off('popstate', W, onPopState);
-      fire$1('pop', [D, W]);
+      fire('pop', [D, W]);
       return $.abort();
     };
 
@@ -1236,6 +1242,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.12';
+  F3H.version = '1.1.13';
   return F3H;
 });
