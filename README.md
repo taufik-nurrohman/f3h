@@ -22,11 +22,11 @@ Contribute
 Release Notes
 -------------
 
-### 1.1.15
+### 1.1.16
 
  - Allowed to disable AJAX features by adding `data-f3h` or `f3h` attribute with `false` value to the source elements.
 
-### 1.1.12, 1.1.13, 1.1.14
+### 1.1.14
 
  - Maintenance.
 
@@ -34,7 +34,7 @@ Release Notes
 
  - Restructured the test files.
 
-### 1.1.5, 1.1.6, 1.1.7, 1.1.8, 1.1.9, 1.1.10
+### 1.1.10
 
  - Maintenance.
 

@@ -109,11 +109,11 @@
     return "" + x;
   };
 
-  var toCaseLower = function toCaseLower(x) {
+  var toCaseLower$1 = function toCaseLower(x) {
     return x.toLowerCase();
   };
 
-  var toNumber = function toNumber(x, base) {
+  var toNumber$1 = function toNumber(x, base) {
     if (base === void 0) {
       base = 10;
     }
@@ -121,7 +121,7 @@
     return parseInt(x, base);
   };
 
-  var toValue = function toValue(x) {
+  var toValue$1 = function toValue(x) {
     if (isArray(x)) {
       return x.map(function (v) {
         return toValue(v);
@@ -129,7 +129,7 @@
     }
 
     if (isNumeric(x)) {
-      return toNumber(x);
+      return toNumber$1(x);
     }
 
     if (isObject(x)) {
@@ -168,7 +168,7 @@
     }
 
     var value = node.getAttribute(attribute);
-    return parseValue ? toValue(value) : value;
+    return parseValue ? toValue$1(value) : value;
   };
 
   var getAttributes = function getAttributes(node, parseValue) {
@@ -182,7 +182,7 @@
 
     for (var i = 0, j = attributes.length; i < j; ++i) {
       value = attributes[i].value;
-      values[attributes[i].name] = parseValue ? toValue(value) : value;
+      values[attributes[i].name] = parseValue ? toValue$1(value) : value;
     }
 
     return values;
@@ -213,7 +213,7 @@
   };
 
   var getName = function getName(node) {
-    return toCaseLower(node && node.nodeName || "") || null;
+    return toCaseLower$1(node && node.nodeName || "") || null;
   };
 
   var getNext = function getNext(node) {
@@ -421,10 +421,10 @@
   }
 
   var $ = context({});
-  var fire = $.fire;
-  var off$1 = $.off;
-  var on$1 = $.on;
-  var hooks = $.hooks;
+  $.fire;
+  $.off;
+  $.on;
+  $.hooks;
 
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
@@ -450,7 +450,7 @@
     return node;
   };
 
-  var toCaseLower$1 = function toCaseLower(x) {
+  var toCaseLower = function toCaseLower(x) {
     return x.toLowerCase();
   };
 
@@ -462,7 +462,7 @@
     return x.length;
   };
 
-  var toNumber$1 = function toNumber(x, base) {
+  var toNumber = function toNumber(x, base) {
     if (base === void 0) {
       base = 10;
     }
@@ -478,7 +478,7 @@
     return Object.keys(x);
   };
 
-  var toValue$1 = function toValue(x) {
+  var toValue = function toValue(x) {
     if (isArray(x)) {
       return x.map(function (v) {
         return toValue(v);
@@ -486,7 +486,7 @@
     }
 
     if (isNumeric(x)) {
-      return toNumber$1(x);
+      return toNumber(x);
     }
 
     if (isObject(x)) {
@@ -497,11 +497,19 @@
       return x;
     }
 
-    return {
-      'false': false,
-      'null': null,
-      'true': true
-    }[x] || x;
+    if ('false' === x) {
+      return false;
+    }
+
+    if ('null' === x) {
+      return null;
+    }
+
+    if ('true' === x) {
+      return true;
+    }
+
+    return x;
   };
 
   var name = 'F3H',
@@ -610,9 +618,9 @@
   }
 
   function isLinkForF3H(node) {
-    var n = toCaseLower$1(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
+    var n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
 
-    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }
 
   function isScriptForF3H(node) {
@@ -621,9 +629,9 @@
       return 1;
     }
 
-    var n = toCaseLower$1(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
+    var n = toCaseLower(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
 
-    if (toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
+    if (toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
       return 1;
     } // Exclude JavaScript that contains `F3H` instantiation
 
@@ -636,20 +644,20 @@
   }
 
   function isSourceForF3H(node) {
-    var n = toCaseLower$1(name);
+    var n = toCaseLower(name);
 
     if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
       return 1; // Default value is `true`
     } // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
 
 
-    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }
 
   function isStyleForF3H(node) {
-    var n = toCaseLower$1(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
+    var n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
 
-    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }
 
   function letHash(ref) {
@@ -691,17 +699,17 @@
 
     for (header in headers) {
       h = headers[header].split(': ');
-      k = toCaseLower$1(h.shift());
-      out[k] = toValue$1(h.join(': '));
+      k = toCaseLower(h.shift());
+      out[k] = toValue(h.join(': '));
     } // Use proxy to make case-insensitive response header’s key
 
 
     return new Proxy(out, {
       get: function get(o, k) {
-        return o[toCaseLower$1(k)] || null;
+        return o[toCaseLower(k)] || null;
       },
       set: function set(o, k, v) {
-        o[toCaseLower$1(k)] = v;
+        o[toCaseLower(k)] = v;
       }
     });
   }
@@ -1261,6 +1269,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.15';
+  F3H.version = '1.1.16';
   return F3H;
 });
