@@ -761,17 +761,20 @@
 
     function getSources(sources, root) {
       ref = getRef();
-      var froms = getElements(sources, root).filter(isSourceForF3H);
+      var froms = getElements(sources, root),
+          to = [];
 
       if (isFunction(state.is)) {
-        var to = [];
         froms.forEach(function (from) {
-          state.is.call($, from, ref) && to.push(from);
+          state.is.call($, from, ref) && isSourceForF3H(from) && to.push(from);
         });
-        return to;
+      } else {
+        froms.forEach(function (from) {
+          isSourceForF3H(from) && to.push(from);
+        });
       }
 
-      return froms;
+      return to;
     } // Include submit button value to the form data ;)
 
 

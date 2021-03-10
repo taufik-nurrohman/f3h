@@ -226,15 +226,18 @@ function F3H(source = D, state = {}) {
 
     function getSources(sources, root) {
         ref = getRef();
-        let froms = getElements(sources, root, source).filter(isSourceForF3H);
+        let froms = getElements(sources, root, source),
+            to = [];
         if (isFunction(state.is)) {
-            let to = [];
             froms.forEach(from => {
-                state.is.call($, from, ref) && to.push(from);
+                state.is.call($, from, ref) && isSourceForF3H(from) && to.push(from);
             });
-            return to;
+        } else {
+            froms.forEach(from => {
+                isSourceForF3H(from) && to.push(from);
+            });
         }
-        return froms;
+        return to;
     }
 
     // Include submit button value to the form data ;)
