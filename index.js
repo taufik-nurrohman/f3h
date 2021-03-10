@@ -610,13 +610,9 @@
   }
 
   function isLinkForF3H(node) {
-    var n = toCaseLower$1(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
 
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
-      return 1;
-    }
-
-    return 0;
+    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }
 
   function isScriptForF3H(node) {
@@ -627,7 +623,7 @@
 
     var n = toCaseLower$1(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
 
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
+    if (toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
       return 1;
     } // Exclude JavaScript that contains `F3H` instantiation
 
@@ -639,14 +635,16 @@
     return 0;
   }
 
+  function isSourceForF3H(node) {
+    var n = toCaseLower$1(name); // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
+
+    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+  }
+
   function isStyleForF3H(node) {
-    var n = toCaseLower$1(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
 
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
-      return 1;
-    }
-
-    return 0;
+    return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }
 
   function letHash(ref) {
@@ -763,7 +761,7 @@
 
     function getSources(sources, root) {
       ref = getRef();
-      var froms = getElements(sources, root);
+      var froms = getElements(sources, root).filter(isSourceForF3H);
 
       if (isFunction(state.is)) {
         var to = [];
@@ -887,7 +885,7 @@
           // Redirection should delete a cache related to the response URL
           // This is useful for case(s) like, when you have submitted a
           // comment form and then you will be redirected to the same URL
-          var r = letSlashEnd(redirect);
+          var r = letSlashEnd(letHash(redirect));
           caches[r] && delete caches[r]; // Trigger hook(s) immediately
 
           fire('success', data);
@@ -1255,6 +1253,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.14';
+  F3H.version = '1.1.15';
   return F3H;
 });

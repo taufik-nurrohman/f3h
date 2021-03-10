@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.15
+
+ - Allowed to disable AJAX features by adding `data-f3h` or `f3h` attribute with `false` value to the source elements.
+
 ### 1.1.12, 1.1.13, 1.1.14
 
  - Maintenance.
@@ -91,18 +95,18 @@ Release Notes
 
 ### 1.0.10
 
- - Reset scroll position after updating the results.
  - Fixed common issue with ES6 module which does not reference the `this` scope to `window` object by default.
+ - Reset scroll position after updating the results.
 
 ### 1.0.9
 
- - Fixed server-side redirection&rsquo;s response URL that does not change the URL in address bar after redirection.
  - Fixed a bug where JavaScript elements below the `F3H` instance are not captured on the first instantiation. Need to capture it after the document is ready.
+ - Fixed server-side redirection&rsquo;s response URL that does not change the URL in address bar after redirection.
 
 ### 1.0.8
 
- - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
  - Added `state.type` option as the default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the `state.types` object.
+ - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
 
 ### 1.0.7
 
@@ -110,9 +114,9 @@ Release Notes
 
 ### 1.0.6
 
- - Include `<link rel="dns-prefetch">`, `<link rel="preconnect">`, `<link rel="preload">` and `<link rel="prerender">` to the `f3h.links` as well.
- - Fixed custom headers defined in `state.lot` not being sent to the request headers.
  - Added jQuery example.
+ - Fixed custom headers defined in `state.lot` not being sent to the request headers.
+ - Include `<link rel="dns-prefetch">`, `<link rel="preconnect">`, `<link rel="preload">` and `<link rel="prerender">` to the `f3h.links` as well.
 
 ### 1.0.5
 
@@ -120,26 +124,26 @@ Release Notes
 
 ### 1.0.4
 
- - Improved native HTML5 prefetch.
  - Added `f3h.links` property to store the available links to prefetch in the current response.
+ - Improved native HTML5 prefetch.
 
 ### 1.0.3
 
- - Fixed scroll restoration bug, again.
  - Added ability to add/remove external CSS and JavaScript files automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles.
  - Added ability to add/remove inline CSS and JavaScript code automatically by comparing between current document&rsquo;s scripts and styles and response document&rsquo;s scripts and styles. No need to modify your Google AdSense code. Yay!
+ - Fixed scroll restoration bug, again.
 
 ### 1.0.2
 
+ - Added turbo feature that allows users to pre-fetch link URL on hover by setting the `state.turbo` to `true`.
  - Fixed scroll restoration bug on history back.
  - Removed `f3h.sources` property since it was never generated in live unless you have put the response body to the current document. But when it is generated, it was too late.
- - Added turbo feature that allows users to pre-fetch link URL on hover by setting the `state.turbo` to `true`.
 
 ### 1.0.1
 
- - Response headers are now case-insensitive.
- - Clicking on the same source element multiple times should trigger the AJAX call once.
  - Added local cache feature which can be enabled by setting the `state.cache` option value to `true`.
+ - Clicking on the same source element multiple times should trigger the AJAX call once.
+ - Response headers are now case-insensitive.
 
 ### 1.0.0
 

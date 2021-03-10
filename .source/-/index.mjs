@@ -1,4 +1,4 @@
-import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
+import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {context as contextHook} from '@taufik-nurrohman/hook';
@@ -93,11 +93,8 @@ function isForm(node) {
 
 function isLinkForF3H(node) {
     let n = toCaseLower(name);
-    // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
-        return 1;
-    }
-    return 0;
+    // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
 }
 
 function isScriptForF3H(node) {
@@ -107,7 +104,7 @@ function isScriptForF3H(node) {
     }
     let n = toCaseLower(name);
     // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
+    if (toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
         return 1;
     }
     // Exclude JavaScript that contains `F3H` instantiation
@@ -117,13 +114,16 @@ function isScriptForF3H(node) {
     return 0;
 }
 
+function isSourceForF3H(node) {
+    let n = toCaseLower(name);
+    // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+}
+
 function isStyleForF3H(node) {
     let n = toCaseLower(name);
-    // Exclude CSS tag that contains `data-f3h` or `f3h` attribute
-    if (hasAttribute(node, 'data-' + n) || hasAttribute(node, n)) {
-        return 1;
-    }
-    return 0;
+    // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
+    return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
 }
 
 function letHash(ref) {
@@ -226,7 +226,7 @@ function F3H(source = D, state = {}) {
 
     function getSources(sources, root) {
         ref = getRef();
-        let froms = getElements(sources, root, source);
+        let froms = getElements(sources, root, source).filter(isSourceForF3H);
         if (isFunction(state.is)) {
             let to = [];
             froms.forEach(from => {
@@ -338,7 +338,7 @@ function F3H(source = D, state = {}) {
                 // Redirection should delete a cache related to the response URL
                 // This is useful for case(s) like, when you have submitted a
                 // comment form and then you will be redirected to the same URL
-                let r = letSlashEnd(redirect);
+                let r = letSlashEnd(letHash(redirect));
                 caches[r] && (delete caches[r]);
                 // Trigger hook(s) immediately
                 fire('success', data);
