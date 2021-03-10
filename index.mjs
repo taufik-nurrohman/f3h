@@ -26,7 +26,7 @@
  *
  */
 
-import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
+import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {context as contextHook} from '@taufik-nurrohman/hook';
@@ -131,7 +131,7 @@ function isScriptForF3H(node) {
         return 1;
     }
     let n = toCaseLower(name);
-    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
+    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
     if (toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
         return 1;
     }
@@ -144,6 +144,9 @@ function isScriptForF3H(node) {
 
 function isSourceForF3H(node) {
     let n = toCaseLower(name);
+    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
+        return 1; // Default value is `true`
+    }
     // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
     return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
 }

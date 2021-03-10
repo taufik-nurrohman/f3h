@@ -621,7 +621,7 @@
       return 1;
     }
 
-    var n = toCaseLower$1(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
+    var n = toCaseLower$1(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
 
     if (toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
       return 1;
@@ -636,7 +636,12 @@
   }
 
   function isSourceForF3H(node) {
-    var n = toCaseLower$1(name); // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
+    var n = toCaseLower$1(name);
+
+    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
+      return 1; // Default value is `true`
+    } // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
+
 
     return toValue$1(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
   }

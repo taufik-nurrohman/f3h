@@ -93,9 +93,6 @@ function isForm(node) {
 
 function isLinkForF3H(node) {
     let n = toCaseLower(name);
-    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
-        return 1;
-    }
     // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
     return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
 }
@@ -106,10 +103,7 @@ function isScriptForF3H(node) {
         return 1;
     }
     let n = toCaseLower(name);
-    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
-        return 1;
-    }
-    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute
+    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
     if (toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
         return 1;
     }
@@ -123,7 +117,7 @@ function isScriptForF3H(node) {
 function isSourceForF3H(node) {
     let n = toCaseLower(name);
     if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
-        return 1;
+        return 1; // Default value is `true`
     }
     // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
     return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
@@ -131,9 +125,6 @@ function isSourceForF3H(node) {
 
 function isStyleForF3H(node) {
     let n = toCaseLower(name);
-    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
-        return 1;
-    }
     // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
     return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
 }
