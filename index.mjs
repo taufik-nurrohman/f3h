@@ -708,6 +708,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.1.16';
+F3H.version = '1.1.17';
 
 export default F3H;

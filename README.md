@@ -22,6 +22,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.1.17
+
+ - Maintenance.
+
 ### 1.1.16
 
  - Allowed to disable AJAX features by adding `data-f3h` or `f3h` attribute with `false` value to the source elements.

@@ -79,6 +79,14 @@
     return 'string' === typeof x;
   };
 
+  var fromStates = function fromStates() {
+    for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
+      lot[_key] = arguments[_key];
+    }
+
+    return Object.assign.apply(Object, [{}].concat(lot));
+  };
+
   var fromValue = function fromValue(x) {
     if (isArray(x)) {
       return x.map(function (v) {
@@ -109,19 +117,35 @@
     return "" + x;
   };
 
-  var toCaseLower$1 = function toCaseLower(x) {
+  var toCaseLower = function toCaseLower(x) {
     return x.toLowerCase();
   };
 
-  var toNumber$1 = function toNumber(x, base) {
+  var toCaseUpper = function toCaseUpper(x) {
+    return x.toUpperCase();
+  };
+
+  var toCount = function toCount(x) {
+    return x.length;
+  };
+
+  var toNumber = function toNumber(x, base) {
     if (base === void 0) {
       base = 10;
     }
 
-    return parseInt(x, base);
+    return base ? parseInt(x, base) : parseFloat(x);
   };
 
-  var toValue$1 = function toValue(x) {
+  var toObjectCount = function toObjectCount(x) {
+    return toCount(toObjectKeys(x));
+  };
+
+  var toObjectKeys = function toObjectKeys(x) {
+    return Object.keys(x);
+  };
+
+  var toValue = function toValue(x) {
     if (isArray(x)) {
       return x.map(function (v) {
         return toValue(v);
@@ -129,7 +153,7 @@
     }
 
     if (isNumeric(x)) {
-      return toNumber$1(x);
+      return toNumber(x);
     }
 
     if (isObject(x)) {
@@ -140,11 +164,19 @@
       return x;
     }
 
-    return {
-      'false': false,
-      'null': null,
-      'true': true
-    }[x] || x;
+    if ('false' === x) {
+      return false;
+    }
+
+    if ('null' === x) {
+      return null;
+    }
+
+    if ('true' === x) {
+      return true;
+    }
+
+    return x;
   };
 
   var D = document;
@@ -168,7 +200,7 @@
     }
 
     var value = node.getAttribute(attribute);
-    return parseValue ? toValue$1(value) : value;
+    return parseValue ? toValue(value) : value;
   };
 
   var getAttributes = function getAttributes(node, parseValue) {
@@ -182,7 +214,7 @@
 
     for (var i = 0, j = attributes.length; i < j; ++i) {
       value = attributes[i].value;
-      values[attributes[i].name] = parseValue ? toValue$1(value) : value;
+      values[attributes[i].name] = parseValue ? toValue(value) : value;
     }
 
     return values;
@@ -213,7 +245,7 @@
   };
 
   var getName = function getName(node) {
-    return toCaseLower$1(node && node.nodeName || "") || null;
+    return toCaseLower(node && node.nodeName || "") || null;
   };
 
   var getNext = function getNext(node) {
@@ -353,14 +385,6 @@
     node.addEventListener(name, then, options);
   };
 
-  var fromStates = function fromStates() {
-    for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
-      lot[_key] = arguments[_key];
-    }
-
-    return Object.assign.apply(Object, [{}].concat(lot));
-  };
-
   function context($) {
     var hooks = {};
 
@@ -448,68 +472,6 @@
     node.scrollLeft = data[0];
     node.scrollTop = data[1];
     return node;
-  };
-
-  var toCaseLower = function toCaseLower(x) {
-    return x.toLowerCase();
-  };
-
-  var toCaseUpper = function toCaseUpper(x) {
-    return x.toUpperCase();
-  };
-
-  var toCount = function toCount(x) {
-    return x.length;
-  };
-
-  var toNumber = function toNumber(x, base) {
-    if (base === void 0) {
-      base = 10;
-    }
-
-    return base ? parseInt(x, base) : parseFloat(x);
-  };
-
-  var toObjectCount = function toObjectCount(x) {
-    return toCount(toObjectKeys(x));
-  };
-
-  var toObjectKeys = function toObjectKeys(x) {
-    return Object.keys(x);
-  };
-
-  var toValue = function toValue(x) {
-    if (isArray(x)) {
-      return x.map(function (v) {
-        return toValue(v);
-      });
-    }
-
-    if (isNumeric(x)) {
-      return toNumber(x);
-    }
-
-    if (isObject(x)) {
-      for (var k in x) {
-        x[k] = toValue(x[k]);
-      }
-
-      return x;
-    }
-
-    if ('false' === x) {
-      return false;
-    }
-
-    if ('null' === x) {
-      return null;
-    }
-
-    if ('true' === x) {
-      return true;
-    }
-
-    return x;
   };
 
   var name = 'F3H',
@@ -1269,6 +1231,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.16';
+  F3H.version = '1.1.17';
   return F3H;
 });
