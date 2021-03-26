@@ -29,7 +29,7 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {context as contextHook} from '@taufik-nurrohman/hook';
+import {hook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {getOffset, setScroll} from '@taufik-nurrohman/rect';
@@ -247,7 +247,7 @@ function F3H(source = D, state = {}) {
         status = null,
         styles = null;
 
-    let {fire, hooks} = contextHook($);
+    let {fire, hooks} = hook($);
 
     // Store current instance to `F3H.instances`
     F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $;
@@ -708,6 +708,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.1.17';
+F3H.version = '1.1.18';
 
 export default F3H;

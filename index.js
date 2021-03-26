@@ -385,7 +385,7 @@
     node.addEventListener(name, then, options);
   };
 
-  function context($) {
+  function hook($) {
     var hooks = {};
 
     function fire(name, data) {
@@ -443,12 +443,6 @@
     $.on = on;
     return $;
   }
-
-  var $ = context({});
-  $.fire;
-  $.off;
-  $.on;
-  $.hooks;
 
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
@@ -725,9 +719,9 @@
         status = null,
         styles = null;
 
-    var _contextHook = context($),
-        fire = _contextHook.fire,
-        hooks = _contextHook.hooks; // Store current instance to `F3H.instances`
+    var _hook = hook($),
+        fire = _hook.fire,
+        hooks = _hook.hooks; // Store current instance to `F3H.instances`
 
 
     F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $; // Mark current DOM as active to prevent duplicate instance
@@ -1231,6 +1225,6 @@
       'JSON': responseTypeJSON
     }
   };
-  F3H.version = '1.1.17';
+  F3H.version = '1.1.18';
   return F3H;
 });
