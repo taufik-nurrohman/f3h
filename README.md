@@ -14,7 +14,7 @@ Contribute
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/f3h.git`
  - Run `cd f3h && npm install`
- - Edit the files in the `.source/-` folder.
+ - Edit the files in the `.github/src/-` folder.
  - Run `npm run pack` to generate the production ready files.
 
 ---
@@ -22,7 +22,7 @@ Contribute
 Release Notes
 -------------
 
-### 1.1.18
+### 1.1.19
 
  - Maintenance.
 

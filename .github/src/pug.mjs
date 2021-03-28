@@ -4,9 +4,10 @@ import * as folder from '@taufik-nurrohman/folder';
 import {compile} from 'pug';
 
 const state = JSON.parse(file.getContent('package.json'));
+state.year = (new Date).getFullYear();
 
 let content,
-    paths = folder.getContent('.source/-', 'pug', true);
+    paths = folder.getContent('.github/src/-', 'pug', true);
 
 delete state.scripts;
 
@@ -17,7 +18,7 @@ for (let path in paths) {
             doctype: 'html',
             filename: path // What is this for by the way?
         });
-        path = path.replace('/.source/-/', '/');
+        path = path.replace('/.github/src/-/', '/');
         path = path.replace(/\.pug$/, "");
         path += file.x(path) ? "" : '.html';
         folder.set(file.parent(path) ?? '.', true);
