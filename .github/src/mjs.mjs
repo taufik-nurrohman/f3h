@@ -12,6 +12,8 @@ import beautify from 'js-beautify';
 let license = file.getContent('.github/src/-/LICENSE').trim(),
     state = JSON.parse(file.getContent('package.json'));
 
+state.year = (new Date).getFullYear();
+
 file.setContent('LICENSE', file.parseContent(license, state));
 
 license = license.replace(/\n/g, '\n * ');
@@ -53,7 +55,6 @@ function factory(from, to, name, format, options = {}) {
         await generator.write(c.output);
         await generator.close();
         state.rollup = c;
-        state.year = (new Date).getFullYear();
         delete state.scripts;
         // Generate browser module…
         let content = file.getContent(c.output.file);
