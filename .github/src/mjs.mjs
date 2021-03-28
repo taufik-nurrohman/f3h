@@ -7,6 +7,8 @@ import resolve from '@rollup/plugin-node-resolve';
 
 import {minify} from 'terser';
 
+import beautify from 'js-beautify';
+
 let license = file.getContent('.github/src/-/LICENSE').trim(),
     state = JSON.parse(file.getContent('package.json'));
 
@@ -56,7 +58,10 @@ function factory(from, to, name, format, options = {}) {
         // Generate browser module…
         let content = file.getContent(c.output.file);
         content = file.parseContent(license + '\n\n' + content, state);
-        file.setContent(c.output.file, content);
+        file.setContent(c.output.file, beautify.js(content, {
+            indent_char: ' ',
+            indent_size: 4
+        }));
         minify(content, {
             compress: {
                 unsafe: true
@@ -67,7 +72,10 @@ function factory(from, to, name, format, options = {}) {
         // Generate Node.js module…
         content = file.getContent(from);
         content = file.parseContent(license + '\n\n' + content, state);
-        file.setContent(to.replace(/\.js$/, '.mjs'), content);
+        file.setContent(to.replace(/\.js$/, '.mjs'), beautify.js(content, {
+            indent_char: ' ',
+            indent_size: 4
+        }));
     })();
 }
 

@@ -1,4 +1,4 @@
 body::before {
-  content: 'Message from test.css';
-  display: block;
+content: 'Message from test.css';
+display: block;
 }
