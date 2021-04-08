@@ -10,21 +10,19 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
         ]) . "\n";
     }
     file_put_contents(__DIR__ . '/log', $log);
-    header('Location: .');
+    header('Location: ./index.php');
     exit;
 }
 
 ?>
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement." name="description">
     <title>Home</title>
   </head>
-
   <body>
     <main>
       <h1>Notes</h1><?php if ($content = file_get_contents(__DIR__ . '/log')): ?><p><?= strtr(trim('<b>' . $content), [
@@ -45,5 +43,4 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
       });
     </script>
   </body>
-
 </html>

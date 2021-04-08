@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement." name="description">
     <title>Home</title>
   </head>
-
   <body>
     <main><?php if ('POST' === $_SERVER['REQUEST_METHOD']): ?>
       <pre><code><?= json_encode($_POST, JSON_PRETTY_PRINT); ?></code></pre>
@@ -33,5 +31,4 @@
       });
     </script>
   </body>
-
 </html>

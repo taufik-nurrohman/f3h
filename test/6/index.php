@@ -4,27 +4,25 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     if (!empty($_FILES['blob'])) {
         if (empty($_FILES['blob']['error'])) {
             move_uploaded_file($_FILES['blob']['tmp_name'], __DIR__ . '/' . uniqid() . '.' . pathinfo($_FILES['blob']['name'], PATHINFO_EXTENSION));
-            header('Location: ?error=0');
+            header('Location: ./index.php?error=0');
             exit;
         }
-        header('Location: ?error=' . $_FILES['blob']['error']);
+        header('Location: ./index.php?error=' . $_FILES['blob']['error']);
         exit;
     }
-    header('Location: ?error');
+    header('Location: ./index.php?error');
     exit;
 }
 
 ?>
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement." name="description">
     <title>Home</title>
   </head>
-
   <body>
     <main>
       <h1>Files</h1><?php if ($files = glob(__DIR__ . '/*.*')): ?><ol><?php foreach ($files as $file): ?>
@@ -56,5 +54,4 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
       }, false);
     </script>
   </body>
-
 </html>

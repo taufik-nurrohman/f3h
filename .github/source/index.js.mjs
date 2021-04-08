@@ -1,5 +1,5 @@
 import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
-import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
+import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {hook} from '@taufik-nurrohman/hook';
 import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
@@ -7,7 +7,7 @@ import {toPattern} from '@taufik-nurrohman/pattern';
 import {getOffset, setScroll} from '@taufik-nurrohman/rect';
 import {toCaseLower, toCaseUpper, toCount, toObjectCount, toValue} from '@taufik-nurrohman/to';
 
-let name = '%(rollup.output.name)',
+let name = '%(js.name)',
 
     GET = 'GET',
     POST = 'POST',
@@ -533,12 +533,12 @@ function F3H(source = D, state = {}) {
             }
         }
         requests[ref] = [doFetch(t, type, ref), t];
-        eventPreventDefault(e);
+        offEventDefault(e);
     }
 
     function onHashChange(e) {
         doScrollTo(getTarget(getHash(getRef()), 1));
-        eventPreventDefault(e);
+        offEventDefault(e);
     }
 
     // Pre-fetch URL on link hover

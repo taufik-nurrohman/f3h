@@ -1,88 +1,11 @@
-/*!
- *
- * The MIT License (MIT)
- *
- * Copyright © 2021 Taufik Nurrohman
- *
- * <https://github.com/taufik-nurrohman/f3h>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the “Software”), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- */
-
-import {
-    D,
-    R,
-    W,
-    fromElement,
-    getAttribute,
-    getElement,
-    getElements,
-    getName,
-    getNext,
-    getText,
-    hasAttribute,
-    hasParent,
-    isWindow,
-    letElement,
-    setChildLast,
-    setElement,
-    setNext,
-    setPrev,
-    theHistory,
-    theLocation,
-    theScript,
-    toElement
-} from '@taufik-nurrohman/document';
-import {
-    eventPreventDefault,
-    off as offEvent,
-    on as onEvent
-} from '@taufik-nurrohman/event';
-import {
-    fromStates,
-    fromValue
-} from '@taufik-nurrohman/from';
-import {
-    hook
-} from '@taufik-nurrohman/hook';
-import {
-    isBoolean,
-    isFunction,
-    isInstance,
-    isObject,
-    isSet
-} from '@taufik-nurrohman/is';
-import {
-    toPattern
-} from '@taufik-nurrohman/pattern';
-import {
-    getOffset,
-    setScroll
-} from '@taufik-nurrohman/rect';
-import {
-    toCaseLower,
-    toCaseUpper,
-    toCount,
-    toObjectCount,
-    toValue
-} from '@taufik-nurrohman/to';
+import {D, R, W, fromElement, getAttribute, getElement, getElements, getName, getNext, getText, hasAttribute, hasParent, isWindow, letElement, setChildLast, setElement, setNext, setPrev, theHistory, theLocation, theScript, toElement} from '@taufik-nurrohman/document';
+import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
+import {fromStates, fromValue} from '@taufik-nurrohman/from';
+import {hook} from '@taufik-nurrohman/hook';
+import {isBoolean, isFunction, isInstance, isObject, isSet} from '@taufik-nurrohman/is';
+import {toPattern} from '@taufik-nurrohman/pattern';
+import {getOffset, setScroll} from '@taufik-nurrohman/rect';
+import {toCaseLower, toCaseUpper, toCount, toObjectCount, toValue} from '@taufik-nurrohman/to';
 
 let name = 'F3H',
 
@@ -106,10 +29,8 @@ function getHash(ref) {
 }
 
 function getLinks(scope) {
-    let id, out = {},
-        href, link,
-        links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
-        toSave;
+    let id, out = {}, href, link,
+        links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope), toSave;
     for (let i = 0, j = toCount(links); i < j; ++i) {
         if (isLinkForF3H(link = links[i])) {
             continue;
@@ -129,10 +50,8 @@ function getRef() {
 }
 
 function getScripts(scope) {
-    let id, out = {},
-        src, script,
-        scripts = getElements('script', scope),
-        toSave;
+    let id, out = {}, src, script,
+        scripts = getElements('script', scope), toSave;
     for (let i = 0, j = toCount(scripts); i < j; ++i) {
         if (isScriptForF3H(script = scripts[i])) {
             continue;
@@ -148,10 +67,8 @@ function getScripts(scope) {
 }
 
 function getStyles(scope) {
-    let id, out = {},
-        href, style,
-        styles = getElements('link[rel=stylesheet],style', scope),
-        toSave;
+    let id, out = {}, href, style,
+        styles = getElements('link[rel=stylesheet],style', scope), toSave;
     for (let i = 0, j = toCount(styles); i < j; ++i) {
         if (isStyleForF3H(style = styles[i])) {
             continue;
@@ -302,10 +219,7 @@ function F3H(source = D, state = {}) {
         status = null,
         styles = null;
 
-    let {
-        fire,
-        hooks
-    } = hook($);
+    let {fire, hooks} = hook($);
 
     // Store current instance to `F3H.instances`
     F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $;
@@ -353,8 +267,7 @@ function F3H(source = D, state = {}) {
 
     function doFetch(node, type, ref) {
         let nodeIsWindow = isWindow(node),
-            useHistory = state.history,
-            data;
+            useHistory = state.history, data;
         // Compare currently selected source element with the previously stored source element, unless it is a window.
         // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
         if (GET === type && node === nodeCurrent && !nodeIsWindow) {
@@ -390,7 +303,6 @@ function F3H(source = D, state = {}) {
             request = doFetchBase(node, type, ref, state.lot),
             requestAsPush = request.upload,
             requestIsDocument = responseTypeHTML === request.responseType;
-
         function dataSet() {
             // Store response from GET request(s) to cache
             lot = toHeadersAsProxy(request);
@@ -398,7 +310,7 @@ function F3H(source = D, state = {}) {
             if (GET === type && state.cache) {
                 // Make sure `status` is not `0` due to the request abortion, to prevent `null` response being cached
                 status &&
-                    (caches[letSlashEnd(letHash(ref))] = [status, request.response, lot, requestIsDocument]);
+                (caches[letSlashEnd(letHash(ref))] = [status, request.response, lot, requestIsDocument]);
             }
             $.lot = lot;
             $.status = status;
@@ -443,7 +355,7 @@ function F3H(source = D, state = {}) {
             }
             // Just to be sure. Don’t worry, this wouldn’t make a duplicate history
             // if (GET === type) {
-            doChangeRef(-1 === ref.indexOf('#') ? (redirect || ref) : ref);
+                doChangeRef(-1 === ref.indexOf('#') ? (redirect || ref) : ref);
             // }
             // Update CSS before markup change
             requestIsDocument && (styles = doUpdateStyles(data[0]));
@@ -547,8 +459,7 @@ function F3H(source = D, state = {}) {
 
     function doUpdate(compare, to, getAll, defaultContainer) {
         let id, toCompare = getAll(compare),
-            node, placesToRestore = {},
-            v;
+            node, placesToRestore = {}, v;
         for (id in to) {
             if (node = getElement('#' + id.replace(/[:.]/g, '\\$&'), source)) {
                 placesToRestore[id] = getNext(node);
@@ -606,8 +517,7 @@ function F3H(source = D, state = {}) {
         if (keyIsCtrl) {
             return;
         }
-        let t = this,
-            q,
+        let t = this, q,
             href = t.href,
             action = t.action,
             ref = letSlashEnd(href || action),
@@ -623,12 +533,12 @@ function F3H(source = D, state = {}) {
             }
         }
         requests[ref] = [doFetch(t, type, ref), t];
-        eventPreventDefault(e);
+        offEventDefault(e);
     }
 
     function onHashChange(e) {
         doScrollTo(getTarget(getHash(getRef()), 1));
-        eventPreventDefault(e);
+        offEventDefault(e);
     }
 
     // Pre-fetch URL on link hover
@@ -753,7 +663,7 @@ F3H.state = {
             0 === raw.search(/[.\/?]/) ||
             0 === raw.indexOf(home) ||
             0 === raw.indexOf(theLocation.protocol + home) ||
-            -1 === raw.indexOf('://');
+           -1 === raw.indexOf('://');
     },
     'lot': {
         'x-requested-with': name
@@ -770,6 +680,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.1.19';
+F3H.version = '1.1.20';
 
 export default F3H;
