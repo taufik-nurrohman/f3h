@@ -986,6 +986,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.1.21';
+    F3H.version = '1.1.22';
     return F3H;
 });
