@@ -22,7 +22,7 @@ Contribute
 Release Notes
 -------------
 
-### 1.1.22
+### 1.1.23
 
  - Maintenance.
 
