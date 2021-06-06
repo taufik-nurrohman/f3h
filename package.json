@@ -4,7 +4,7 @@
   "bugs": "https://github.com/taufik-nurrohman/f3h/issues",
   "dependencies": {
     "@taufik-nurrohman/document": "^0.1.7",
-    "@taufik-nurrohman/event": "^0.2.2",
+    "@taufik-nurrohman/event": "^0.3.0",
     "@taufik-nurrohman/from": "^0.0.7",
     "@taufik-nurrohman/has": "^0.0.3",
     "@taufik-nurrohman/hook": "^0.1.2",
@@ -51,5 +51,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "1.1.23"
+  "version": "1.2.0"
 }

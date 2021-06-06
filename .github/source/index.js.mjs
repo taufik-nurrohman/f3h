@@ -603,6 +603,16 @@ function F3H(source = D, state = {}) {
 
     $.caches = caches;
     $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
+    $.kick = ref => {
+        let trigger = setElement('a', {
+            'href': ref
+        });
+        onEvent('click', trigger, onFetch, {
+            once: true
+        });
+        trigger.click();
+        letElement(trigger);
+    };
     $.links = links;
     $.lot = null;
     $.ref = null;

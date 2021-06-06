@@ -1,0 +1,33 @@
+extends ../../_index.pug
+
+block state
+  - const title = 'Home'
+  - const scripts = ['../../index.min.js']
+
+block content
+  main
+    p #[button(onclick='refresh();') Soft Refresh] #[button(onclick='window.location.reload();') Hard Refresh]
+    script#test
+      | (p => {
+      |     p.innerHTML = new Date;
+      |     document.querySelector('main').appendChild(p);
+      | })(document.createElement('p'));
+
+block script
+  script
+    | let f3h = new F3H,
+    |     main = document.querySelector('main');
+    |
+    | f3h.on('exit', () => {
+    |     document.title = 'Loading…';
+    | });
+    |
+    | f3h.on('success', response => {
+    |     delete f3h.scripts.test;
+    |     document.title = response.title;
+    |     main.innerHTML = response.querySelector('main').innerHTML;
+    | });
+    |
+    | function refresh() {
+    |     f3h.kick(window.location.href);
+    | }

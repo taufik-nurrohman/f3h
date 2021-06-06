@@ -918,6 +918,16 @@
         };
         $.caches = caches;
         $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
+        $.kick = ref => {
+            let trigger = setElement('a', {
+                'href': ref
+            });
+            onEvent('click', trigger, onFetch, {
+                once: true
+            });
+            trigger.click();
+            letElement(trigger);
+        };
         $.links = links;
         $.lot = null;
         $.ref = null;
@@ -984,6 +994,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.1.23';
+    F3H.version = '1.2.0';
     return F3H;
 });

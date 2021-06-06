@@ -143,6 +143,7 @@ block content
       li #[a(href='test/13/index.html' target='_blank') JavaScript and CSS Placement Test] (TODO)
       li: a(href='test/14/index.html' target='_blank') Search Form Example
       li: a(href='test/15/index.html' target='_blank') jQuery Integration Example
+      li: a(href='test/16/index.html' target='_blank') Soft Redirection Example
     h2 Settings
     table(border='1')
       thead
@@ -235,6 +236,13 @@ block content
       | let xhr = f3h.fetch('https://127.0.0.1/test.html', 'GET', window);
       | xhr.addEventListener('load', () =&gt; {
       |     console.log(xhr.status);
+      | });
+    h3 f3h.kick(ref)
+    p Trigger AJAX redirection to the #[code ref]. Useful for doing manual redirection of a page after an update action is done.
+    pre: code
+      | // Refresh current page view
+      | button.addEventListener('click', () => {
+      |     f3h.kick(window.location.href);
       | });
     h3 f3h.links
     p Returns all of the links to prefetch available in the response.

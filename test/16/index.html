@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement." name="description">
+    <title>Home</title>
+  </head>
+  <body>
+    <main>
+      <p><button onclick="refresh();">Soft Refresh</button> <button onclick="window.location.reload();">Hard Refresh</button></p>
+      <script id="test">
+        (p => {
+            p.innerHTML = new Date;
+            document.querySelector('main').appendChild(p);
+        })(document.createElement('p'));
+      </script>
+    </main>
+    <script src="../../index.min.js"></script>
+    <script>
+      let f3h = new F3H,
+          main = document.querySelector('main');
+
+      f3h.on('exit', () => {
+          document.title = 'Loading…';
+      });
+
+      f3h.on('success', response => {
+          delete f3h.scripts.test;
+          document.title = response.title;
+          main.innerHTML = response.querySelector('main').innerHTML;
+      });
+
+      function refresh() {
+          f3h.kick(window.location.href);
+      }
+    </script>
+  </body>
+</html>
