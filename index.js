@@ -393,7 +393,7 @@
             if (isLinkForF3H(link = links[i])) {
                 continue;
             }
-            href = getAttribute(link, 'href');
+            href = getAttribute(link, 'href', false);
             link.id = id = link.id || name + ':' + toID(href || getText(link));
             out[id] = toSave = fromElement(link);
             if (href) {
@@ -418,7 +418,7 @@
             if (isScriptForF3H(script = scripts[i])) {
                 continue;
             }
-            src = getAttribute(script, 'src');
+            src = getAttribute(script, 'src', false);
             script.id = id = script.id || name + ':' + toID(src || getText(script));
             out[id] = toSave = fromElement(script);
             if (src) {
@@ -439,7 +439,7 @@
             if (isStyleForF3H(style = styles[i])) {
                 continue;
             }
-            href = getAttribute(style, 'href');
+            href = getAttribute(style, 'href', false);
             style.id = id = style.id || name + ':' + toID(href || getText(style));
             out[id] = toSave = fromElement(style);
             if (href) {
@@ -459,7 +459,7 @@
 
     function isLinkForF3H(node) {
         let n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
-        return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+        return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
     }
 
     function isScriptForF3H(node) {
@@ -468,7 +468,7 @@
             return 1;
         }
         let n = toCaseLower(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
-        if (toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n))) {
+        if (getAttribute(node, 'data-' + n) || getAttribute(node, n)) {
             return 1;
         } // Exclude JavaScript that contains `F3H` instantiation
         if (toPattern('\\b' + name + '\\b').test(getText(node) || "")) {
@@ -482,12 +482,12 @@
         if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
             return 1; // Default value is `true`
         } // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
-        return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+        return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
     }
 
     function isStyleForF3H(node) {
         let n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
-        return toValue(getAttribute(node, 'data-' + n) || getAttribute(node, n)) ? 1 : 0;
+        return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
     }
 
     function letHash(ref) {
@@ -962,7 +962,7 @@
         'is': (source, ref) => {
             let target = source.target,
                 // Get URL data as-is from the DOM attribute string
-                raw = getAttribute(source, 'href') || getAttribute(source, 'action') || "",
+                raw = getAttribute(source, 'href', false) || getAttribute(source, 'action', false) || "",
                 // Get resolved URL data from the DOM property
                 value = source.href || source.action || "";
             if (target && '_self' !== target) {
@@ -994,6 +994,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.0';
+    F3H.version = '1.2.1';
     return F3H;
 });
