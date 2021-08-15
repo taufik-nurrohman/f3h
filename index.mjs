@@ -194,7 +194,7 @@ function F3H(source = D, state = {}) {
         return;
     }
 
-    $.state = state = fromStates(F3H.state, true === state ? {
+    $.state = state = fromStates({}, F3H.state, true === state ? {
         cache: state
     } : (state || {}));
 
@@ -690,6 +690,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.2.1';
+F3H.version = '1.2.2';
 
 export default F3H;

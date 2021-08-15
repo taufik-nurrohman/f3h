@@ -194,7 +194,7 @@ function F3H(source = D, state = {}) {
         return;
     }
 
-    $.state = state = fromStates(F3H.state, true === state ? {
+    $.state = state = fromStates({}, F3H.state, true === state ? {
         cache: state
     } : (state || {}));
 
