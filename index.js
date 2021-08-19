@@ -124,15 +124,20 @@
                 if (!isSet(out[k])) {
                     out[k] = lot[i][k];
                     continue;
-                } // Merge array unique
+                } // Merge array
                 if (isArray(out[k]) && isArray(lot[i][k])) {
+                    out[k] = [
+                        /* Clone! */
+                    ].concat(out[k]);
                     for (var ii = 0, jj = toCount(lot[i][k]); ii < jj; ++ii) {
                         if (!hasValue(lot[i][k][ii], out[k])) {
                             out[k].push(lot[i][k][ii]);
                         }
                     } // Merge object recursive
                 } else if (isObject(out[k]) && isObject(lot[i][k])) {
-                    fromStates(out[k], lot[i][k]); // Replace value
+                    out[k] = fromStates({
+                        /* Clone! */
+                    }, out[k], lot[i][k]); // Replace value
                 } else {
                     out[k] = lot[i][k];
                 }
@@ -1018,6 +1023,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.2';
+    F3H.version = '1.2.3';
     return F3H;
 });

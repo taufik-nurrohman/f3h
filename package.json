@@ -3,9 +3,9 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/f3h/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "^0.1.9",
+    "@taufik-nurrohman/document": "^0.1.10",
     "@taufik-nurrohman/event": "^0.3.1",
-    "@taufik-nurrohman/from": "^0.0.8",
+    "@taufik-nurrohman/from": "^0.0.9",
     "@taufik-nurrohman/has": "^0.0.3",
     "@taufik-nurrohman/hook": "^0.1.2",
     "@taufik-nurrohman/is": "^0.1.2",
@@ -51,5 +51,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "1.2.2"
+  "version": "1.2.3"
 }
