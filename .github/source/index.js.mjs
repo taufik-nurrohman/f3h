@@ -605,8 +605,8 @@ function F3H(source = D, state = {}) {
     $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
     $.kick = ref => {
         let trigger = setElement('a', {
-            'href': ref
-        });
+                'href': ref || getRef()
+            });
         onEvent('click', trigger, onFetch, {
             once: true
         });
