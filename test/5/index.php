@@ -36,7 +36,6 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     <script>
       let f3h = new F3H,
           main = document.querySelector('main');
-
       f3h.on(200, response => {
           document.title = response.title;
           main.innerHTML = response.querySelector('main').innerHTML;

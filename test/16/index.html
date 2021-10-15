@@ -20,11 +20,9 @@
     <script>
       let f3h = new F3H,
           main = document.querySelector('main');
-
       f3h.on('exit', () => {
           document.title = 'Loading…';
       });
-
       f3h.on('success', response => {
           delete f3h.scripts.test;
           document.title = response.title;

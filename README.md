@@ -29,69 +29,23 @@ Release Notes
 
 ### 1.1.23
 
- - Maintenance.
-
-### 1.1.16
-
- - Allowed to disable AJAX features by adding `data-f3h` or `f3h` attribute with `false` value to the source elements.
-
-### 1.1.14
-
- - Maintenance.
-
-### 1.1.11
-
- - Restructured the test files.
-
-### 1.1.10
-
- - Maintenance.
-
-### 1.1.4
-
  - Added `@taufik-nurrohman/document` as development dependency.
-
-### 1.1.3
-
  - Added `@taufik-nurrohman/file` and `@taufik-nurrohman/folder` as development dependency.
- - Output file for the browser is now using the [Universal Module Definition](https://github.com/umdjs/umd) format.
-
-### 1.1.2
-
- - Removed `read-package-json` development dependency.
-
-### 1.1.1
-
- - Removed all CLI dependencies (use the available JavaScript API where possible).
-
-### 1.1.0
-
- - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
-
-### 1.0.18
-
- - Preserved native web features where possible (#11)
-
-### 1.0.17
-
+ - Allowed to disable AJAX features by adding `data-f3h` or `f3h` attribute with `false` value to the source elements.
+ - Maintenance.
  - Modernized syntax.
+ - Output file for the browser is now using the [Universal Module Definition](https://github.com/umdjs/umd) format.
+ - Preserved native web features where possible (#11)
+ - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
+ - Removed `read-package-json` development dependency.
+ - Removed all CLI dependencies (use the available JavaScript API where possible).
+ - Restructured the test files.
 
 ### 1.0.16
 
- - Removed `F3H._` method.
-
-### 1.0.15
-
- - Small bug fixes.
-
-### 1.0.14
-
- - Small bug fixes.
- - Updated the donation target.
-
-### 1.0.13
-
  - Immediately change the URL when leaving the page if turbo feature is enabled.
+ - Removed `F3H._` method.
+ - Updated the donation target.
 
 ### 1.0.12
 
@@ -101,9 +55,6 @@ Release Notes
 ### 1.0.11
 
  - Fixed bug of undefined `f3h.links`, `f3h.scripts` and `f3h.styles` property.
-
-### 1.0.10
-
  - Fixed common issue with ES6 module which does not reference the `this` scope to `window` object by default.
  - Reset scroll position after updating the results.
 
@@ -115,11 +66,8 @@ Release Notes
 ### 1.0.8
 
  - Added `state.type` option as the default response type to be applied to the destination URL with a file extension that&rsquo;s not yet listed in the `state.types` object.
- - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
-
-### 1.0.7
-
  - Fixed double redirection bug.
+ - Reset cached page&rsquo;s scroll position on normal click and/or submit events.
 
 ### 1.0.6
 
@@ -129,11 +77,8 @@ Release Notes
 
 ### 1.0.5
 
- - Fixed generic search form not appending search query in URL.
-
-### 1.0.4
-
  - Added `f3h.links` property to store the available links to prefetch in the current response.
+ - Fixed generic search form not appending search query in URL.
  - Improved native HTML5 prefetch.
 
 ### 1.0.3

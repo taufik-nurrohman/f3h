@@ -25,7 +25,6 @@
     <script>
       let f3h = new F3H,
           main = document.querySelector('main');
-
       f3h.on(200, response => {
           main.innerHTML = response.querySelector('main').innerHTML;
       });

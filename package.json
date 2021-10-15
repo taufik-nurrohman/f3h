@@ -15,7 +15,7 @@
   },
   "description": "Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^0.1.19"
+    "@taufik-nurrohman/factory": "^1.0.1"
   },
   "exports": {
     "import": "./index.mjs",
@@ -51,5 +51,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "1.2.3"
+  "version": "1.2.4"
 }

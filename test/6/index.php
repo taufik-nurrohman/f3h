@@ -37,17 +37,14 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     <script>
       let f3h = new F3H,
           main = document.querySelector('main');
-
       f3h.on('exit', (response, any) => {
           document.title = (any.blob ? 'Uploading' : 'Loading') + '…';
       });
-
       f3h.on(200, response => {
           document.title = response.title;
           main.innerHTML = response.querySelector('main').innerHTML;
           document.forms[0].blob.value = "";
       });
-
       // Upload immediately on file selection
       document.forms[0].blob.addEventListener('change', function() {
           this.form.save.click(); // Click the hidden button element

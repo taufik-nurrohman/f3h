@@ -8,10 +8,10 @@
     <link href="/f3h/test/1/about/" rel="prefetch">
     <style>
       * {
+        box-sizing: border-box;
+        list-style: none;
         margin: 0;
         padding: 0;
-        list-style: none;
-        box-sizing: border-box;
       }
       :root {
         background: #000;
@@ -23,8 +23,8 @@
         text-decoration: none;
       }
       body {
-        max-width: 700px;
         margin: 0 auto;
+        max-width: 700px;
         padding: 5%;
       }
       form,
@@ -69,14 +69,11 @@
       let f3h = new F3H({
           turbo: true // Enable local cache feature and pre-fetch URL on hover
       });
-
       let main = document.querySelector('main'),
           nav = document.querySelector('nav');
-
       f3h.on('exit', () => {
           document.title = 'Loading…';
       });
-
       f3h.on('success', (response, target) => {
           if (404 !== f3h.status) {
               document.title = response.title;

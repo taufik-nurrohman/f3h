@@ -42,9 +42,7 @@
           nav = document.querySelector('nav'),
           prev = nav.querySelector('[rel=prev]'),
           next = nav.querySelector('[rel=next]'),
-
           sections = {};
-
       // Convert “Next/Previous” navigation in your traditional HTML pages into “Load More” navigation
       function nextToMore(title) {
           // Hide previous navigation
@@ -53,7 +51,6 @@
           next && (next.textContent = 'Load More') || (nav.innerHTML = '<i>No more pages to load.</i>');
           sections[main.offsetHeight] = title;
       }
-
       f3h.on('success', response => {
           main.insertAdjacentHTML('beforeend', '<hr>' + response.querySelector('main').innerHTML);
           nav.innerHTML = response.querySelector('nav').innerHTML;
@@ -61,10 +58,8 @@
           next = nav.querySelector('[rel=next]');
           nextToMore(response.title);
       });
-
       // Initial page
       nextToMore(document.title = 'Page 1');
-
       // Change document title on every section match
       window.addEventListener('scroll', () => {
           let visible = window.pageYOffset + (window.innerHeight / 2),
@@ -77,7 +72,6 @@
               break;
           }
       });
-
       // The code above is equal to the “Load More” example, with this extra ending scroll event detection
       let body = document.body,
           threshold = 200; // 200 pixel(s) before end of the document

@@ -14,10 +14,8 @@
     <script src="../../index.min.js"></script>
     <script>
       let f3h = new F3H,
-
           $document = $(document),
           $main = $('main');
-
       f3h.on('success', response => {
           let $response = $(response);
           $document.prop('title', $response.prop('title'));

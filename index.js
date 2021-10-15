@@ -949,7 +949,7 @@
         $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
         $.kick = ref => {
             let trigger = setElement('a', {
-                'href': ref
+                'href': ref || getRef()
             });
             onEvent('click', trigger, onFetch, {
                 once: true
@@ -1023,6 +1023,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.3';
+    F3H.version = '1.2.4';
     return F3H;
 });

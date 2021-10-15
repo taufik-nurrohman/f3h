@@ -605,8 +605,8 @@ function F3H(source = D, state = {}) {
     $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
     $.kick = ref => {
         let trigger = setElement('a', {
-            'href': ref
-        });
+                'href': ref || getRef()
+            });
         onEvent('click', trigger, onFetch, {
             once: true
         });
@@ -690,6 +690,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.2.3';
+F3H.version = '1.2.4';
 
 export default F3H;
