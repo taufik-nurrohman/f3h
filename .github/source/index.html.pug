@@ -145,6 +145,21 @@ block content
       li: a(href='test/15/index.html' target='_blank') jQuery Integration Example
       li: a(href='test/16/index.html' target='_blank') Soft Redirection Example
     h2 Settings
+    pre: code let f3h = new F3H(#[var cache] = false);
+    pre: code
+      | let f3h = new F3H(#[var state] = {
+      |         cache: false,
+      |         history: true,
+      |         is: (source, ref) =&gt; { &hellip; },
+      |         lot: {
+      |             'x-requested-with': 'F3H'
+      |         },
+      |         ref: (source, ref) =&gt; { &hellip; },
+      |         sources: 'a[href], form',
+      |         turbo: false,
+      |         type: 'document',
+      |         types: { &hellip; }
+      |     });
     table(border='1')
       thead
         tr
@@ -184,21 +199,6 @@ block content
         tr
           td: code state.types
           td List of file extensions with the expected response type.
-    pre: code const f3h = new F3H(#[var cache]);
-    pre: code
-      | const f3h = new F3H(#[var state] = {
-      |     cache: false,
-      |     history: true,
-      |     is: (source, ref) =&gt; { &hellip; },
-      |     lot: {
-      |         'x-requested-with': 'F3H'
-      |     },
-      |     ref: (source, ref) =&gt; { &hellip; },
-      |     sources: 'a[href], form',
-      |     turbo: false,
-      |     type: 'document',
-      |     types: { &hellip; }
-      | });
     h2 Methods and Properties
     h3 F3H.instances
     p Return the application instances. This application normally will be instantiated once because there will be only one page opened in a browser window.

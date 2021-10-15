@@ -1023,6 +1023,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.4';
+    F3H.version = '1.2.5';
     return F3H;
 });
