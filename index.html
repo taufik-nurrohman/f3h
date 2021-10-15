@@ -99,12 +99,12 @@
     &lt;/main&gt;
     &lt;script src="<a href="index.min.js" target="_blank">./index.min.js</a>"&gt;&lt;/script&gt;
     &lt;script&gt;
-    const f3h = new F3H;
-    const content = document.querySelector('#content');
-    f3h.on('success', response =&gt; {
-        document.title = response.title;
-        content.innerHTML = response.querySelector('#content').innerHTML;
-    });
+      const f3h = new F3H;
+      const content = document.querySelector('#content');
+      f3h.on('success', response =&gt; {
+          document.title = response.title;
+          content.innerHTML = response.querySelector('#content').innerHTML;
+      });
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
