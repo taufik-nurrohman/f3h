@@ -22,7 +22,7 @@ Contribute
 Release Notes
 -------------
 
-### 1.2.5
+### 1.2.6
 
  - Added `f3h.kick()` method to trigger soft redirection.
  - Maintenance.

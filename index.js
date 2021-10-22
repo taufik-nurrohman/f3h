@@ -224,7 +224,10 @@
     var getNext = function getNext(node) {
         return node.nextElementSibling || null;
     };
-    var getParent = function getParent(node) {
+    var getParent = function getParent(node, query) {
+        if (query) {
+            return node.closest(query) || null;
+        }
         return node.parentNode || null;
     };
     var getText = function getText(node, trim) {
@@ -242,8 +245,8 @@
     var hasAttribute = function hasAttribute(node, attribute) {
         return node.hasAttribute(attribute);
     };
-    var hasParent = function hasParent(node) {
-        return null !== getParent(node);
+    var hasParent = function hasParent(node, query) {
+        return null !== getParent(node, query);
     };
     var hasState = function hasState(node, state) {
         return state in node;
@@ -1023,6 +1026,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.5';
+    F3H.version = '1.2.6';
     return F3H;
 });
