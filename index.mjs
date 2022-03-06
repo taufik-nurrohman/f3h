@@ -462,7 +462,7 @@ function F3H(source = D, state = {}) {
             node, placesToRestore = {}, v;
         for (id in to) {
             if (node = getElement('#' + id.replace(/[:.]/g, '\\$&'), source)) {
-                placesToRestore[id] = getNext(node);
+                placesToRestore[id] = getNext(node, true);
             }
             if (!toCompare[id]) {
                 delete to[id];
@@ -690,6 +690,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.2.6';
+F3H.version = '1.2.7';
 
 export default F3H;

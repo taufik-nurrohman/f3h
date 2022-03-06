@@ -11,8 +11,8 @@ block style
     | }
     | :root {
     |   background: #fff;
-    |   color: #000;
     |   border-top: 4px solid;
+    |   color: #000;
     |   font: normal normal 16px/1.25 serif;
     | }
     | a {
@@ -27,13 +27,13 @@ block style
     |   font-size: 80%;
     | }
     | footer, header, main, nav {
-    |   max-width: 700px;
     |   margin: 0 auto;
+    |   max-width: 700px;
     | }
     | hr {
     |   border: 0;
-    |   color: inherit;
     |   border-top: 1px dashed;
+    |   color: inherit;
     |   height: 0;
     | }
     | pre {
@@ -41,8 +41,8 @@ block style
     |   word-wrap: break-word;
     | }
     | pre code {
-    |   display: block;
     |   background: #eee;
+    |   display: block;
     |   padding: 1em;
     | }
     | table {
@@ -52,7 +52,7 @@ block style
     |   text-align: left;
     |   vertical-align: top;
     | }
-    | body > p:first-child {
+    | [role='alert'] {
     |   background: #ffa;
     |   border: 1px dashed;
     |   margin-top: 0;
@@ -60,7 +60,7 @@ block style
     | }
 
 block content
-  p Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
+  p(role='alert') Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
   header
     h1= title
     p You can read #[abbr(title='Fetch') F3H] as how you would read #[abbr(title='Accessibility') A11Y] and #[abbr(title='Internationalization') I18N].
