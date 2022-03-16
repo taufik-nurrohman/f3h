@@ -93,8 +93,8 @@ function isForm(node) {
 
 function isLinkForF3H(node) {
     let n = toCaseLower(name);
-    // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with `false` value
-    return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
+    // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with falsy value
+    return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
 }
 
 function isScriptForF3H(node) {
@@ -103,8 +103,8 @@ function isScriptForF3H(node) {
         return 1;
     }
     let n = toCaseLower(name);
-    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with `false` value
-    if (getAttribute(node, 'data-' + n) || getAttribute(node, n)) {
+    // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with falsy value
+    if (hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n)) {
         return 1;
     }
     // Exclude JavaScript that contains `F3H` instantiation
@@ -116,17 +116,14 @@ function isScriptForF3H(node) {
 
 function isSourceForF3H(node) {
     let n = toCaseLower(name);
-    if (!hasAttribute(node, 'data-' + n) && !hasAttribute(node, n)) {
-        return 1; // Default value is `true`
-    }
-    // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with `false` value
-    return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
+    // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with falsy value
+    return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
 }
 
 function isStyleForF3H(node) {
     let n = toCaseLower(name);
-    // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with `false` value
-    return getAttribute(node, 'data-' + n) || getAttribute(node, n) ? 1 : 0;
+    // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with falsy value
+    return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
 }
 
 function letHash(ref) {
@@ -233,11 +230,11 @@ function F3H(source = D, state = {}) {
             to = [];
         if (isFunction(state.is)) {
             froms.forEach(from => {
-                state.is.call($, from, ref) && isSourceForF3H(from) && to.push(from);
+                state.is.call($, from, ref) && !isSourceForF3H(from) && to.push(from);
             });
         } else {
             froms.forEach(from => {
-                isSourceForF3H(from) && to.push(from);
+                !isSourceForF3H(from) && to.push(from);
             });
         }
         return to;
@@ -427,7 +424,13 @@ function F3H(source = D, state = {}) {
 
     // Pre-fetch page and store it into cache
     function doPreFetch(node, ref) {
-        let request = doFetchBase(node, GET, ref);
+        let request = doFetchBase(node, GET, ref, {
+            // <https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ#as_a_server_admin_can_i_distinguish_prefetch_requests_from_normal_requests>
+            'purpose': 'prefetch',
+            'x-moz': 'prefetch',
+            'x-purpose': 'prefetch',
+            // 'x-purpose': 'preview'
+        });
         onEvent('load', request, () => {
             if (200 === (status = request.status)) {
                 caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];

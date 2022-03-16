@@ -23,6 +23,10 @@ Contribute
 Release Notes
 -------------
 
+### 1.2.8
+
+ - Added `purpose: prefetch`, `x-moz: prefetch` and `x-purpose: prefetch` headers to the fake prefetch requests.
+
 ### 1.2.7
 
  - Added `f3h.kick()` method to trigger soft redirection.
