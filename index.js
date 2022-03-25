@@ -422,7 +422,7 @@
             links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
             toSave;
         for (let i = 0, j = toCount(links); i < j; ++i) {
-            if (isLinkForF3H(link = links[i])) {
+            if (isLinkToIgnore(link = links[i])) {
                 continue;
             }
             href = getAttribute(link, 'href', false);
@@ -447,7 +447,7 @@
             scripts = getElements('script', scope),
             toSave;
         for (let i = 0, j = toCount(scripts); i < j; ++i) {
-            if (isScriptForF3H(script = scripts[i])) {
+            if (isScriptToIgnore(script = scripts[i])) {
                 continue;
             }
             src = getAttribute(script, 'src', false);
@@ -468,7 +468,7 @@
             styles = getElements('link[rel=stylesheet],style', scope),
             toSave;
         for (let i = 0, j = toCount(styles); i < j; ++i) {
-            if (isStyleForF3H(style = styles[i])) {
+            if (isStyleToIgnore(style = styles[i])) {
                 continue;
             }
             href = getAttribute(style, 'href', false);
@@ -489,12 +489,12 @@
         return 'form' === getName(node);
     }
 
-    function isLinkForF3H(node) {
+    function isLinkToIgnore(node) {
         let n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
 
-    function isScriptForF3H(node) {
+    function isScriptToIgnore(node) {
         // Exclude this very JavaScript
         if (node.src && theScript.src === node.src) {
             return 1;
@@ -509,12 +509,12 @@
         return 0;
     }
 
-    function isSourceForF3H(node) {
+    function isSourceToIgnore(node) {
         let n = toCaseLower(name); // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
 
-    function isStyleForF3H(node) {
+    function isStyleToIgnore(node) {
         let n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
@@ -608,11 +608,11 @@
                 to = [];
             if (isFunction(state.is)) {
                 froms.forEach(from => {
-                    state.is.call($, from, ref) && !isSourceForF3H(from) && to.push(from);
+                    state.is.call($, from, ref) && !isSourceToIgnore(from) && to.push(from);
                 });
             } else {
                 froms.forEach(from => {
-                    !isSourceForF3H(from) && to.push(from);
+                    !isSourceToIgnore(from) && to.push(from);
                 });
             }
             return to;
@@ -831,28 +831,26 @@
                 }
             }
             for (id in toCompare) {
-                if (!to[id]) {
-                    to[id] = v = toCompare[id];
-                    if (placesToRestore[id] && hasParent(placesToRestore[id])) {
-                        setPrev(placesToRestore[id], toElement(v));
-                    } else if (defaultContainer) {
-                        setChildLast(defaultContainer, toElement(v));
-                    }
+                v = toCompare[id];
+                if (placesToRestore[id] && hasParent(placesToRestore[id])) {
+                    setPrev(placesToRestore[id], toElement(v));
+                } else if (defaultContainer) {
+                    setChildLast(defaultContainer, toElement(v));
                 }
             }
             return to;
         }
 
         function doUpdateLinks(compare) {
-            return doUpdate(compare, links, getLinks, H);
+            return doUpdate(compare, links = getLinks(), getLinks, H);
         }
 
         function doUpdateScripts(compare) {
-            return doUpdate(compare, scripts, getScripts, B);
+            return doUpdate(compare, scripts = getScripts(), getScripts, B);
         }
 
         function doUpdateStyles(compare) {
-            return doUpdate(compare, styles, getStyles, H);
+            return doUpdate(compare, styles = getStyles(), getStyles, H);
         }
 
         function onDocumentReady() {
@@ -869,7 +867,10 @@
         }
 
         function onFetch(e) {
-            doFetchAbortAll(); // Use native web feature when user press the control key
+            doFetchAbortAll(); // Skip element(s) that already have custom event(s)
+            if (e.defaultPrevented) {
+                return;
+            } // Use native web feature when user press the control key
             if (keyIsCtrl) {
                 return;
             }
@@ -925,18 +926,21 @@
 
         function onSourcesEventsLet() {
             sources.forEach(source => {
-                onEvent(getEventName(source), source, onFetch);
+                offEvent(getEventName(source), source, onFetch);
             });
         }
 
         function onSourcesEventsSet(data) {
             let turbo = state.turbo;
             sources.forEach(source => {
-                onEvent(getEventName(source), source, onFetch);
-                if (isForm(source)) {
-                    doAppendCurrentButtonValue(source);
-                } else {
-                    turbo && doPreFetchElement(source);
+                if (source.onclick || source.onsubmit);
+                else {
+                    onEvent(getEventName(source), source, onFetch);
+                    if (isForm(source)) {
+                        doAppendCurrentButtonValue(source);
+                    } else {
+                        turbo && doPreFetchElement(source);
+                    }
                 }
             });
             doFocusToElement(data);
@@ -1028,6 +1032,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.8';
+    F3H.version = '1.2.9';
     return F3H;
 });

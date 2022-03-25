@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Progressively enhanced JavaScript AJAX features to be implemented on your existing traditional web pages." name="description">
+    <title>Home</title>
+  </head>
+  <body>
+    <main>
+      <p>Check if elements already have custom events. If so, skip it!</p>
+      <p><a href="test.html">Default</a> <a href="test.html" onclick="return false;">Custom 1</a> <a id="a" href="test.html">Custom 2</a></p>
+      <form action="test.html" method="get">
+        <p><input name="q" type="text"> <button type="submit">Default</button></p>
+      </form>
+      <form action="test.html" method="get" onsubmit="return false;">
+        <p><input name="q" type="text"> <button type="submit">Custom 1</button></p>
+      </form>
+      <form id="form" action="test.html" method="get">
+        <p><input name="q" type="text"> <button type="submit">Custom 2</button></p>
+      </form>
+    </main>
+    <script src="../../index.min.js"></script>
+    <script>
+      let f3h = new F3H,
+          main = document.querySelector('main');
+      f3h.on('success', response => {
+          document.title = response.title;
+          main.innerHTML = response.querySelector('main').innerHTML;
+      });
+    </script>
+    <script>
+      document.querySelector('#a').addEventListener('click', e => e.preventDefault(), false);
+      document.querySelector('#form').addEventListener('submit', e => e.preventDefault(), false);
+    </script>
+  </body>
+</html>
