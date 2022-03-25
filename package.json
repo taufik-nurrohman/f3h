@@ -13,7 +13,7 @@
     "@taufik-nurrohman/rect": "^0.0.11",
     "@taufik-nurrohman/to": "^0.0.18"
   },
-  "description": "Progressively enhanced JavaScript AJAX features to be implemented on your existing traditional web pages.",
+  "description": "Progressively enhanced JavaScript AJAX features for your existing web pages.",
   "devDependencies": {
     "@taufik-nurrohman/factory": "^1.0.3"
   },

@@ -2,7 +2,7 @@ F3H: Fetch
 ==========
 
 ![Code Size](https://img.shields.io/github/languages/code-size/taufik-nurrohman/f3h?color=%23444&style=for-the-badge) ![License](https://img.shields.io/github/license/taufik-nurrohman/f3h?color=%23444&style=for-the-badge)
-> Load pages asynchronously using AJAX while maintaining the principles of progressive enhancement.
+> Progressively enhanced JavaScript AJAX features for your existing web pages.
 
 [Demo and Documentation](https://taufik-nurrohman.github.io/f3h)
 
