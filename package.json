@@ -15,7 +15,7 @@
   },
   "description": "Progressively enhanced JavaScript AJAX features for your existing web pages.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^1.0.3"
+    "@taufik-nurrohman/factory": "^1.0.8"
   },
   "exports": {
     "import": "./index.mjs",
@@ -48,8 +48,8 @@
     "url": "git+https://github.com/taufik-nurrohman/f3h.git"
   },
   "scripts": {
-    "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
+    "pack": "pack --clean=false --from=.github/factory --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "1.2.9"
+  "version": "1.2.10"
 }
