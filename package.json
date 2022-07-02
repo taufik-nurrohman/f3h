@@ -50,5 +50,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.github/factory --js-format=umd --js-name=F3H --js-top='%(js.license)' --mjs=true --to=."
   },
-  "version": "1.2.11"
+  "version": "1.2.12"
 }

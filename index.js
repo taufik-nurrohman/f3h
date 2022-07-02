@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function(global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.F3H = factory());
-})(this, function() {
+(function(g, f) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.F3H = f());
+})(this, (function() {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -42,8 +42,8 @@
     var isFunction = function isFunction(x) {
         return 'function' === typeof x;
     };
-    var isInstance = function isInstance(x, of ) {
-        return x && isSet( of ) && x instanceof of ;
+    var isInstance = function isInstance(x, of) {
+        return x && isSet(of) && x instanceof of ;
     };
     var isNull = function isNull(x) {
         return null === x;
@@ -396,7 +396,7 @@
         node.scrollTop = data[1];
         return node;
     };
-    let name = 'F3H',
+    var name = 'F3H',
         GET = 'GET',
         POST = 'POST',
         responseTypeHTML = 'document',
@@ -415,13 +415,13 @@
     }
 
     function getLinks(scope) {
-        let id,
+        var id,
             out = {},
             href,
             link,
             links = getElements('link[rel=dns-prefetch],link[rel=preconnect],link[rel=prefetch],link[rel=preload],link[rel=prerender]', scope),
             toSave;
-        for (let i = 0, j = toCount(links); i < j; ++i) {
+        for (var i = 0, j = toCount(links); i < j; ++i) {
             if (isLinkToIgnore(link = links[i])) {
                 continue;
             }
@@ -440,13 +440,13 @@
     }
 
     function getScripts(scope) {
-        let id,
+        var id,
             out = {},
             src,
             script,
             scripts = getElements('script', scope),
             toSave;
-        for (let i = 0, j = toCount(scripts); i < j; ++i) {
+        for (var i = 0, j = toCount(scripts); i < j; ++i) {
             if (isScriptToIgnore(script = scripts[i])) {
                 continue;
             }
@@ -461,13 +461,13 @@
     }
 
     function getStyles(scope) {
-        let id,
+        var id,
             out = {},
             href,
             style,
             styles = getElements('link[rel=stylesheet],style', scope),
             toSave;
-        for (let i = 0, j = toCount(styles); i < j; ++i) {
+        for (var i = 0, j = toCount(styles); i < j; ++i) {
             if (isStyleToIgnore(style = styles[i])) {
                 continue;
             }
@@ -490,7 +490,7 @@
     }
 
     function isLinkToIgnore(node) {
-        let n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with falsy value
+        var n = toCaseLower(name); // Exclude `<link rel="*">` tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
 
@@ -499,7 +499,7 @@
         if (node.src && theScript.src === node.src) {
             return 1;
         }
-        let n = toCaseLower(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with falsy value
+        var n = toCaseLower(name); // Exclude JavaScript tag that contains `data-f3h` or `f3h` attribute with falsy value
         if (hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n)) {
             return 1;
         } // Exclude JavaScript that contains `F3H` instantiation
@@ -510,12 +510,12 @@
     }
 
     function isSourceToIgnore(node) {
-        let n = toCaseLower(name); // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with falsy value
+        var n = toCaseLower(name); // Exclude anchor tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
 
     function isStyleToIgnore(node) {
-        let n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with falsy value
+        var n = toCaseLower(name); // Exclude CSS tag that contains `data-f3h` or `f3h` attribute with falsy value
         return hasAttribute(node, 'data-' + n) && !getAttribute(node, 'data-' + n) || hasAttribute(node, n) && !getAttribute(node, n) ? 1 : 0;
     }
 
@@ -526,7 +526,7 @@
         return ref.replace(/\/+(?=[?&#]|$)/, "");
     } // <https://stackoverflow.com/a/8831937/1163000>
     function toID(text) {
-        let c,
+        var c,
             i,
             j = toCount(text),
             out = 0;
@@ -542,7 +542,7 @@
     }
 
     function toHeadersAsProxy(request) {
-        let out = {},
+        var out = {},
             headers = request.getAllResponseHeaders().trim().split(/[\r\n]+/),
             header,
             h,
@@ -553,17 +553,23 @@
             out[k] = toValue(h.join(': '));
         } // Use proxy to make case-insensitive response header’s key
         return new Proxy(out, {
-            get: (o, k) => {
+            get: function get(o, k) {
                 return o[toCaseLower(k)] || null;
             },
-            set: (o, k, v) => {
+            set: function set(o, k, v) {
                 o[toCaseLower(k)] = v;
             }
         });
     }
 
-    function F3H(source = D, state = {}) {
-        const $ = this; // Return new instance if `F3H` was called without the `new` operator
+    function F3H(source, state) {
+        if (source === void 0) {
+            source = D;
+        }
+        if (state === void 0) {
+            state = {};
+        }
+        var $ = this; // Return new instance if `F3H` was called without the `new` operator
         if (!isInstance($, F3H)) {
             return new F3H(source, state);
         }
@@ -581,7 +587,7 @@
         if (state.turbo) {
             state.cache = true; // Enable turbo feature will force enable cache feature
         }
-        let caches = {},
+        var caches = {},
             links = null,
             lot = null,
             // Store current node to a variable to be compared to the next node
@@ -595,35 +601,34 @@
             sources = getSources(state.sources),
             status = null,
             styles = null;
-        let {
-            fire,
-            hooks
-        } = hook($); // Store current instance to `F3H.instances`
+        var _hook = hook($),
+            fire = _hook.fire,
+            hooks = _hook.hooks; // Store current instance to `F3H.instances`
         F3H.instances[source.id || source.name || toObjectCount(F3H.instances)] = $; // Mark current DOM as active to prevent duplicate instance
         source[name] = 1;
 
         function getSources(sources, root) {
             ref = getRef();
-            let froms = getElements(sources, root),
+            var froms = getElements(sources, root),
                 to = [];
             if (isFunction(state.is)) {
-                froms.forEach(from => {
+                froms.forEach(function(from) {
                     state.is.call($, from, ref) && !isSourceToIgnore(from) && to.push(from);
                 });
             } else {
-                froms.forEach(from => {
+                froms.forEach(function(from) {
                     !isSourceToIgnore(from) && to.push(from);
                 });
             }
             return to;
         } // Include submit button value to the form data ;)
         function doAppendCurrentButtonValue(node) {
-            let buttonValueStorage = setElement('input', {
+            var buttonValueStorage = setElement('input', {
                     type: 'hidden'
                 }),
                 buttons = getElements('[name][type=submit][value]', node);
             setChildLast(node, buttonValueStorage);
-            buttons.forEach(button => {
+            buttons.forEach(function(button) {
                 onEvent('click', button, function() {
                     buttonValueStorage.name = this.name;
                     buttonValueStorage.value = this.value;
@@ -639,7 +644,7 @@
         }
 
         function doFetch(node, type, ref) {
-            let nodeIsWindow = isWindow(node),
+            var nodeIsWindow = isWindow(node),
                 useHistory = state.history,
                 data; // Compare currently selected source element with the previously stored source element, unless it is a window.
             // Pressing back/forward button from the window shouldn’t be counted as accidental click(s) on the same source element
@@ -650,7 +655,7 @@
             $.ref = letSlashEnd(refCurrent = ref);
             fire('exit', [D, node]); // Get response from cache if any
             if (state.cache) {
-                let cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
+                var cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
                 if (cache) {
                     $.lot = lot = cache[2];
                     $.status = status = cache[0];
@@ -668,7 +673,7 @@
                     return;
                 }
             }
-            let fn,
+            var fn,
                 redirect,
                 request = doFetchBase(node, type, ref, state.lot),
                 requestAsPush = request.upload,
@@ -685,10 +690,10 @@
                 $.lot = lot;
                 $.status = status;
             }
-            onEvent('abort', request, () => {
+            onEvent('abort', request, function() {
                 dataSet(), fire('abort', [request.response, node]);
             });
-            onEvent('error', request, fn = () => {
+            onEvent('error', request, fn = function fn() {
                 dataSet();
                 requestIsDocument && !nodeIsWindow && useHistory && doScrollTo(R);
                 data = [request.response, node]; // Update `<link rel="*">` data for the next page
@@ -701,7 +706,7 @@
                 fire('enter', data);
             });
             onEvent('error', requestAsPush, fn);
-            onEvent('load', request, fn = () => {
+            onEvent('load', request, fn = function fn() {
                 dataSet();
                 data = [request.response, node];
                 redirect = request.responseURL; // Handle internal server-side redirection
@@ -710,7 +715,7 @@
                     // Redirection should delete a cache related to the response URL
                     // This is useful for case(s) like, when you have submitted a
                     // comment form and then you will be redirected to the same URL
-                    let r = letSlashEnd(letHash(redirect));
+                    var r = letSlashEnd(letHash(redirect));
                     caches[r] && delete caches[r]; // Trigger hook(s) immediately
                     fire('success', data);
                     fire(status, data); // Do the normal fetch
@@ -730,10 +735,10 @@
                 fire('enter', data);
             });
             onEvent('load', requestAsPush, fn);
-            onEvent('progress', request, e => {
+            onEvent('progress', request, function(e) {
                 dataSet(), fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
-            onEvent('progress', requestAsPush, e => {
+            onEvent('progress', requestAsPush, function(e) {
                 dataSet(), fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             return request;
@@ -747,15 +752,15 @@
         }
 
         function doFetchAbortAll() {
-            for (let request in requests) {
+            for (var request in requests) {
                 doFetchAbort(request);
             }
         } // TODO: Change to the modern `window.fetch` function when it is possible to track download and upload progress!
         function doFetchBase(node, type, ref, headers) {
             ref = isFunction(state.ref) ? state.ref.call($, node, ref) : ref;
-            let header,
+            var header,
                 request = new XMLHttpRequest(); // Automatic response type based on current file extension
-            let x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
+            var x = toCaseUpper(ref.split(/[?&#]/)[0].split('/').pop().split('.')[1] || ""),
                 responseType = state.types[x] || state.type || responseTypeTXT;
             if (isFunction(responseType)) {
                 responseType = responseType.call($, ref);
@@ -777,17 +782,17 @@
                 fire('focus', data);
                 return;
             }
-            let target = getElement('[autofocus]', source);
+            var target = getElement('[autofocus]', source);
             target && target.focus();
         } // Pre-fetch page and store it into cache
         function doPreFetch(node, ref) {
-            let request = doFetchBase(node, GET, ref, {
+            var request = doFetchBase(node, GET, ref, {
                 // <https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ#as_a_server_admin_can_i_distinguish_prefetch_requests_from_normal_requests>
                 'purpose': 'prefetch',
                 'x-moz': 'prefetch',
                 'x-purpose': 'prefetch' // 'x-purpose': 'preview'
             });
-            onEvent('load', request, () => {
+            onEvent('load', request, function() {
                 if (200 === (status = request.status)) {
                     caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
                 }
@@ -802,7 +807,7 @@
             if (!node) {
                 return;
             }
-            let theOffset = getOffset(node);
+            var theOffset = getOffset(node);
             setScroll(B, theOffset);
             setScroll(R, theOffset);
         } // Scroll to the first element with `id` or `name` attribute that has the same value as location hash
@@ -815,7 +820,7 @@
         }
 
         function doUpdate(compare, to, getAll, defaultContainer) {
-            let id,
+            var id,
                 toCompare = getAll(compare),
                 node,
                 placesToRestore = {},
@@ -826,7 +831,7 @@
                 }
                 if (!toCompare[id]) {
                     delete to[id];
-                    let target = getTarget(id);
+                    var target = getTarget(id);
                     target && letElement(target);
                 }
             }
@@ -874,7 +879,7 @@
             if (keyIsCtrl) {
                 return;
             }
-            let t = this,
+            var t = this,
                 q,
                 href = t.href,
                 action = t.action,
@@ -898,14 +903,14 @@
             offEventDefault(e);
         } // Pre-fetch URL on link hover
         function onHoverOnce() {
-            let t = this,
+            var t = this,
                 href = t.href;
             if (!caches[letSlashEnd(letHash(href))]) {
                 doPreFetch(t, href);
             }
             offEvent('mousemove', t, onHoverOnce);
         } // Check if user is pressing the control key before clicking on a link
-        let keyIsCtrl = false;
+        var keyIsCtrl = false;
 
         function onKeyDown(e) {
             keyIsCtrl = e.ctrlKey;
@@ -925,14 +930,14 @@
         }
 
         function onSourcesEventsLet() {
-            sources.forEach(source => {
+            sources.forEach(function(source) {
                 offEvent(getEventName(source), source, onFetch);
             });
         }
 
         function onSourcesEventsSet(data) {
-            let turbo = state.turbo;
-            sources.forEach(source => {
+            var turbo = state.turbo;
+            sources.forEach(function(source) {
                 if (source.onclick || source.onsubmit);
                 else {
                     onEvent(getEventName(source), source, onFetch);
@@ -946,7 +951,7 @@
             doFocusToElement(data);
             doScrollToElement(data);
         }
-        $.abort = request => {
+        $.abort = function(request) {
             if (!request) {
                 doFetchAbortAll();
             } else if (requests[request]) {
@@ -955,9 +960,11 @@
             return $;
         };
         $.caches = caches;
-        $.fetch = (ref, type, from) => doFetchBase(from, type, ref);
-        $.kick = ref => {
-            let trigger = setElement('a', {
+        $.fetch = function(ref, type, from) {
+            return doFetchBase(from, type, ref);
+        };
+        $.kick = function(ref) {
+            var trigger = setElement('a', {
                 'href': ref || getRef()
             });
             onEvent('click', trigger, onFetch, {
@@ -973,7 +980,7 @@
         $.state = state;
         $.styles = styles;
         $.status = null;
-        $.pop = () => {
+        $.pop = function() {
             if (!source[name]) {
                 return $; // Already ejected!
             }
@@ -997,8 +1004,8 @@
         'cache': false,
         // Store all response body to variable to be used later?
         'history': true,
-        'is': (source, ref) => {
-            let target = source.target,
+        'is': function is(source, ref) {
+            var target = source.target,
                 // Get URL data as-is from the DOM attribute string
                 raw = getAttribute(source, 'href', false) || getAttribute(source, 'action', false) || "",
                 // Get resolved URL data from the DOM property
@@ -1018,7 +1025,9 @@
         'lot': {
             'x-requested-with': name
         },
-        'ref': (source, ref) => ref,
+        'ref': function ref(source, _ref) {
+            return _ref;
+        },
         // Default URL hook
         'sources': 'a[href],form',
         'turbo': false,
@@ -1032,6 +1041,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.11';
+    F3H.version = '1.2.12';
     return F3H;
-});
+}));
