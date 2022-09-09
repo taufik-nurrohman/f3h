@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function(g, f) {
+(function (g, f) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.F3H = f());
-})(this, (function() {
+})(this, (function () {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -89,7 +89,7 @@
     };
     var toValue = function toValue(x) {
         if (isArray(x)) {
-            return x.map(function(v) {
+            return x.map(function (v) {
                 return toValue(v);
             });
         }
@@ -147,7 +147,7 @@
     };
     var fromValue = function fromValue(x) {
         if (isArray(x)) {
-            return x.map(function(v) {
+            return x.map(function (v) {
                 return fromValue(x);
             });
         }
@@ -335,7 +335,7 @@
             if (!isSet(hooks[name])) {
                 return $;
             }
-            hooks[name].forEach(function(then) {
+            hooks[name].forEach(function (then) {
                 return then.apply($, data);
             });
             return $;
@@ -612,11 +612,11 @@
             var froms = getElements(sources, root),
                 to = [];
             if (isFunction(state.is)) {
-                froms.forEach(function(from) {
+                froms.forEach(function (from) {
                     state.is.call($, from, ref) && !isSourceToIgnore(from) && to.push(from);
                 });
             } else {
-                froms.forEach(function(from) {
+                froms.forEach(function (from) {
                     !isSourceToIgnore(from) && to.push(from);
                 });
             }
@@ -628,8 +628,8 @@
                 }),
                 buttons = getElements('[name][type=submit][value]', node);
             setChildLast(node, buttonValueStorage);
-            buttons.forEach(function(button) {
-                onEvent('click', button, function() {
+            buttons.forEach(function (button) {
+                onEvent('click', button, function () {
                     buttonValueStorage.name = this.name;
                     buttonValueStorage.value = this.value;
                 });
@@ -690,7 +690,7 @@
                 $.lot = lot;
                 $.status = status;
             }
-            onEvent('abort', request, function() {
+            onEvent('abort', request, function () {
                 dataSet(), fire('abort', [request.response, node]);
             });
             onEvent('error', request, fn = function fn() {
@@ -735,10 +735,10 @@
                 fire('enter', data);
             });
             onEvent('load', requestAsPush, fn);
-            onEvent('progress', request, function(e) {
+            onEvent('progress', request, function (e) {
                 dataSet(), fire('pull', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
-            onEvent('progress', requestAsPush, function(e) {
+            onEvent('progress', requestAsPush, function (e) {
                 dataSet(), fire('push', e.lengthComputable ? [e.loaded, e.total] : [0, -1]);
             });
             return request;
@@ -792,7 +792,7 @@
                 'x-moz': 'prefetch',
                 'x-purpose': 'prefetch' // 'x-purpose': 'preview'
             });
-            onEvent('load', request, function() {
+            onEvent('load', request, function () {
                 if (200 === (status = request.status)) {
                     caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
                 }
@@ -930,14 +930,14 @@
         }
 
         function onSourcesEventsLet() {
-            sources.forEach(function(source) {
+            sources.forEach(function (source) {
                 offEvent(getEventName(source), source, onFetch);
             });
         }
 
         function onSourcesEventsSet(data) {
             var turbo = state.turbo;
-            sources.forEach(function(source) {
+            sources.forEach(function (source) {
                 if (source.onclick || source.onsubmit);
                 else {
                     onEvent(getEventName(source), source, onFetch);
@@ -951,7 +951,7 @@
             doFocusToElement(data);
             doScrollToElement(data);
         }
-        $.abort = function(request) {
+        $.abort = function (request) {
             if (!request) {
                 doFetchAbortAll();
             } else if (requests[request]) {
@@ -960,10 +960,10 @@
             return $;
         };
         $.caches = caches;
-        $.fetch = function(ref, type, from) {
+        $.fetch = function (ref, type, from) {
             return doFetchBase(from, type, ref);
         };
-        $.kick = function(ref) {
+        $.kick = function (ref) {
             var trigger = setElement('a', {
                 'href': ref || getRef()
             });
@@ -980,7 +980,7 @@
         $.state = state;
         $.styles = styles;
         $.status = null;
-        $.pop = function() {
+        $.pop = function () {
             if (!source[name]) {
                 return $; // Already ejected!
             }
@@ -1041,6 +1041,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.12';
+    F3H.version = '1.2.13';
     return F3H;
 }));
