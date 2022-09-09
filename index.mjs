@@ -248,7 +248,7 @@ function F3H(source = D, state = {}) {
             buttons = getElements('[name][type=submit][value]', node, source);
         setChildLast(node, buttonValueStorage);
         buttons.forEach(button => {
-            onEvent('click', button, function() {
+            onEvent('click', button, function () {
                 buttonValueStorage.name = this.name;
                 buttonValueStorage.value = this.value;
             });
@@ -699,6 +699,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.2.12';
+F3H.version = '1.2.13';
 
 export default F3H;

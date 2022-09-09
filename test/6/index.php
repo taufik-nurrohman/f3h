@@ -46,7 +46,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
           document.forms[0].blob.value = "";
       });
       // Upload immediately on file selection
-      document.forms[0].blob.addEventListener('change', function() {
+      document.forms[0].blob.addEventListener('change', function () {
           this.form.save.click(); // Click the hidden button element
       }, false);
     </script>
