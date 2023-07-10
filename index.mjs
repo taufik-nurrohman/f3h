@@ -475,6 +475,9 @@ function F3H(source = D, state = {}) {
         }
         for (id in toCompare) {
             v = toCompare[id];
+            if (node = getElement('#' + id.replace(/[:.]/g, '\\$&'), source)) {
+                letElement(node);
+            }
             if (placesToRestore[id] && hasParent(placesToRestore[id])) {
                 setPrev(placesToRestore[id], toElement(v));
             } else if (defaultContainer) {
@@ -699,6 +702,6 @@ F3H.state = {
     }
 };
 
-F3H.version = '1.2.13';
+F3H.version = '1.2.14';
 
 export default F3H;
