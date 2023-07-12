@@ -438,7 +438,7 @@
     }
 
     function getRef() {
-        return letSlashEnd(theLocation.href);
+        return theLocation.href;
     }
 
     function getScripts(scope) {
@@ -528,10 +528,6 @@
 
     function letHash(ref) {
         return ref.split('#')[0];
-    }
-    // Ignore trailing `/` character(s) in URL
-    function letSlashEnd(ref) {
-        return ref.replace(/\/+(?=[?&#]|$)/, "");
     }
     // <https://stackoverflow.com/a/8831937/1163000>
     function toID(text) {
@@ -669,11 +665,11 @@
                 return; // Accidental click(s) on the same source element should cancel the request!
             }
             nodeCurrent = node; // Store currently selected source element to a variable to be compared later
-            $.ref = letSlashEnd(refCurrent = ref);
+            $.ref = refCurrent = ref;
             fire('exit', [D, node]);
             // Get response from cache if any
             if (state.cache) {
-                var cache = caches[letSlashEnd(letHash(ref))]; // `[status, response, lot, requestIsDocument]`
+                var cache = caches[letHash(ref)]; // `[status, response, lot, requestIsDocument]`
                 if (cache) {
                     $.lot = lot = cache[2];
                     $.status = status = cache[0];
@@ -706,7 +702,7 @@
                 status = request.status;
                 if (GET === type && state.cache) {
                     // Make sure `status` is not `0` due to the request abortion, to prevent `null` response being cached
-                    status && (caches[letSlashEnd(letHash(ref))] = [status, request.response, lot, requestIsDocument]);
+                    status && (caches[letHash(ref)] = [status, request.response, lot, requestIsDocument]);
                 }
                 $.lot = lot;
                 $.status = status;
@@ -740,7 +736,7 @@
                     // Redirection should delete a cache related to the response URL
                     // This is useful for case(s) like, when you have submitted a
                     // comment form and then you will be redirected to the same URL
-                    var r = letSlashEnd(letHash(redirect));
+                    var r = letHash(redirect);
                     caches[r] && delete caches[r];
                     // Trigger hook(s) immediately
                     fire('success', data);
@@ -830,7 +826,7 @@
             });
             onEvent('load', request, function () {
                 if (200 === (status = request.status)) {
-                    caches[letSlashEnd(letHash(ref))] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
+                    caches[letHash(ref)] = [status, request.response, toHeadersAsProxy(request), responseTypeHTML === request.responseType];
                 }
             });
         }
@@ -928,7 +924,7 @@
                 q,
                 href = t.href,
                 action = t.action,
-                ref = letSlashEnd(href || action),
+                ref = href || action,
                 type = toCaseUpper(t.method || GET);
             if (GET === type) {
                 if (isForm(t)) {
@@ -952,7 +948,7 @@
         function onHoverOnce() {
             var t = this,
                 href = t.href;
-            if (!caches[letSlashEnd(letHash(href))]) {
+            if (!caches[letHash(href)]) {
                 doPreFetch(t, href);
             }
             offEvent('mousemove', t, onHoverOnce);
@@ -1093,6 +1089,6 @@
             'JSON': responseTypeJSON
         }
     };
-    F3H.version = '1.2.14';
+    F3H.version = '1.2.15';
     return F3H;
 }));
