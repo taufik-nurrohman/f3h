@@ -81,7 +81,7 @@
               nav.innerHTML = response.querySelector('nav').innerHTML;
           } else {
               document.title = 'Error 404';
-              alert('Page not found.');
+              main.innerHTML = '<h1>Error 404</h1><p>Page not found.</p>';
               target.style.textDecoration = 'line-through';
               target.removeAttribute('href');
           }
